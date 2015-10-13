@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import com.toggle.katana2d.Engine;
+import com.toggle.katana2d.Game;
 
 public class MainActivity extends Activity {
 
@@ -12,6 +13,12 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mEngine.init(this);
+
+        Game game = mEngine.getGame();
+        game.addScene(new TestScene(game));
+        game.setActiveScene(0);
+
+        mEngine.start();
     }
 
     @Override

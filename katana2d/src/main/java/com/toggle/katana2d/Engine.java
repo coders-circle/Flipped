@@ -5,13 +5,21 @@ import android.app.Activity;
 public class Engine {
 
     private SurfaceView mSurfaceView;
+    private Game mGame;
+    private Activity mActivity;
 
-    public void init(Activity context)
+    public void init(Activity activity)
     {
-        Game game = new Game(context);
-        mSurfaceView = new SurfaceView(context, game.getRenderer());
-        context.setContentView(mSurfaceView);
+        mGame = new Game(activity);
+        mActivity = activity;
     }
+
+    public void start() {
+        mSurfaceView = new SurfaceView(mActivity, mGame.getRenderer());
+        mActivity.setContentView(mSurfaceView);
+    }
+
+    public Game getGame() { return mGame; }
 
     public void onPause()
     {
