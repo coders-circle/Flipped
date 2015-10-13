@@ -1,11 +1,10 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "com.toggle.flipped"
         minSdkVersion 15
         targetSdkVersion 21
         versionCode 1
@@ -22,5 +21,5 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.2.0'
-    compile project(':katana2d')
+    compile files('libs/jbox2d-library-2.2.1.1.jar')
 }
