@@ -1,5 +1,6 @@
 package com.toggle.katana2d;
 
+// Uses sprite and transformation components of entities to render them
 public class RenderSystem extends System {
     public RenderSystem() {
         super(new Class[]{Sprite.class, Transformation.class});
@@ -8,7 +9,7 @@ public class RenderSystem extends System {
     @Override
     public void update(double dt) {
         for (Entity entity : mEntities) {
-            Sprite sc = entity.getComponent(Sprite.class);
+            Sprite sc = entity.get(Sprite.class);
             Sprite.SpriteSheetData ssd = sc.spriteSheetData;
 
             // animate a sprite sheet by advancing the image index when required time has elapsed
@@ -25,8 +26,8 @@ public class RenderSystem extends System {
     @Override
     public void draw() {
         for (Entity entity : mEntities) {
-            Sprite sc = entity.getComponent(Sprite.class);
-            Transformation tc = entity.getComponent(Transformation.class);
+            Sprite sc = entity.get(Sprite.class);
+            Transformation tc = entity.get(Transformation.class);
 
             if (sc.glSprite == null)
                 continue;;

@@ -1,5 +1,6 @@
 package com.toggle.katana2d;
 
+// Sprite component that stores sprite-sheet data and a reference to GLSprite
 public class Sprite implements Component{
     public GLSprite glSprite;
     public SpriteSheetData spriteSheetData;

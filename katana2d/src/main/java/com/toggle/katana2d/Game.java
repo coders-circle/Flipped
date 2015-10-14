@@ -24,9 +24,15 @@ public class Game  implements TimerCallback {
     // Active scene
     private Scene mActiveScene;
 
+    // Already initialized?
+    private boolean mInitialized = false;
+
     // Add a new scene and get its index
     public int addScene(Scene scene) {
         mScenes.add(scene);
+        if (mInitialized)
+            scene.init(this);
+
         return mScenes.size()-1;
     }
 
@@ -43,7 +49,8 @@ public class Game  implements TimerCallback {
     // called on surface creation
     public void init() {
         for (Scene scene : mScenes)
-            scene.init();
+            scene.init(this);
+        mInitialized = true;
     }
 
     // called on each frame
@@ -66,5 +73,7 @@ public class Game  implements TimerCallback {
         if (mActiveScene != null)
             mActiveScene.draw();
     }
+
+    /*TODO: Get Touch input data and generate input events for the active scene.*/
 }
 

@@ -1,5 +1,6 @@
 package com.toggle.katana2d;
 
+// Transformation component to store position and angle of entity
 public class Transformation implements Component {
     public float x, y, angle;
 

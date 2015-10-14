@@ -15,7 +15,7 @@ public class MainActivity extends Activity {
         mEngine.init(this);
 
         Game game = mEngine.getGame();
-        game.addScene(new TestScene(game));
+        game.addScene(new TestScene());
         game.setActiveScene(0);
 
         mEngine.start();

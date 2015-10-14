@@ -21,4 +21,6 @@ public class SurfaceView extends GLSurfaceView {
         // Set the Renderer for drawing on the GLSurfaceView
         setRenderer(renderer);
     }
+
+    /*TODO: Get Touch input data and send it to the Game class.*/
 }

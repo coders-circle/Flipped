@@ -9,6 +9,8 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 
+// PhysicsBody component that represents a box-2d body
+// with mass, friction etc.
 public class PhysicsBody implements Component {
     public PhysicsBody(Body body)
     {

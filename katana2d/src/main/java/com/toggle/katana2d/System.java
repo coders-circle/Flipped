@@ -20,7 +20,7 @@ public class System {
     // Add an entity to this system, checking if the entity contains necessary components
     public void addEntity(Entity entity) {
         for (Class component: mComponents) {
-            if (entity.hasComponent(component)) {
+            if (entity.has(component)) {
                 mEntities.add(entity);
             }
         }

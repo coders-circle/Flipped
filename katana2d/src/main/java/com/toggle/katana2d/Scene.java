@@ -7,21 +7,18 @@ public class Scene {
 
     protected Game mGame;
 
-    public Scene(Game game) {
-        mGame = game;
-    }
-
-    // The list of all systems
+    // List of all systems
     protected List<System> mSystems = new ArrayList<>();
 
-    // Method to add entity to all valid systems
+    // Add entity to all valid systems
     public void addEntity(Entity entity) {
         for (System system : mSystems) {
             system.addEntity(entity);
         }
     }
 
-    public void init() {
+    public void init(Game game) {
+        mGame = game;
         onInit();
 
         // initialize all systems
@@ -56,4 +53,6 @@ public class Scene {
 
     protected void onDraw() {
     }
+
+    /*TODO: Pass input events to all systems.*/
 }

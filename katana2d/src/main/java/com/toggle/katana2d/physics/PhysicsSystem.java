@@ -7,7 +7,7 @@ import com.toggle.katana2d.Transformation;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
 
-
+// Uses box2d to update all entities with PhysicsBody and Transformation components
 public class PhysicsSystem extends System {
     public static World world = new World(new Vec2(0, -10));
 
@@ -21,8 +21,8 @@ public class PhysicsSystem extends System {
         world.step((float)dt, 10, 8);
 
         for (Entity entity: mEntities) {
-            Transformation t = entity.getComponent(Transformation.class);
-            PhysicsBody b = entity.getComponent(PhysicsBody.class);
+            Transformation t = entity.get(Transformation.class);
+            PhysicsBody b = entity.get(PhysicsBody.class);
             t.x = b.body.getPosition().x;
             t.y = b.body.getPosition().y;
             t.angle = b.body.getAngle();
