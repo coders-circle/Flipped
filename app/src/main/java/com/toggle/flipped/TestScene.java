@@ -12,21 +12,10 @@ public class TestScene extends Scene {
         // Add the systems
         mSystems.add(new RenderSystem());
 
-        // Add resources to the manager
-        Manager manager = Manager.getManager();
-
-        // Yellow colored sprite
-        int spr0 = manager.addSprite(
-                new GLSprite(mGame.getRenderer(), null, new float[]{1, 1, 0, 1}, 64, 128)
-        );
-        // Test sprite from image
-        int spr1 = manager.addSprite(
-                new GLSprite(mGame.getRenderer(), mGame.getRenderer().loadTexture(R.drawable.test_spr), 124 - 40, 106)
-        );
 
         // Create first test entity with an yellow sprite and rotated initial transformation
         Entity testEntity1 = new Entity();
-        testEntity1.add(new Sprite(manager.getSprite(spr0)));
+        testEntity1.add(new Sprite(mGame.spriteManager.get("yellow_spr")));
         testEntity1.add(new Transformation(50, 50, 20));
         addEntity(testEntity1);
 
@@ -41,7 +30,7 @@ public class TestScene extends Scene {
         ssd.index = 1;
         ssd.animationSpeed = 6;
         testEntity2 = new Entity();
-        testEntity2.add(new Sprite(manager.getSprite(spr1), ssd));
+        testEntity2.add(new Sprite(mGame.spriteManager.get("test_spr"), ssd));
         testEntity2.add(new Transformation(150, 150, 0));
         addEntity(testEntity2);
     }

@@ -6,9 +6,9 @@ public class Engine {
 
     private SurfaceView mSurfaceView;
     private Game mGame;
-    private Activity mActivity;
+    private GameActivity mActivity;
 
-    public void init(Activity activity)
+    public void init(GameActivity activity)
     {
         mGame = new Game(activity);
         mActivity = activity;

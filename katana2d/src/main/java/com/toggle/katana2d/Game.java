@@ -8,13 +8,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Game  implements TimerCallback {
+    // Some common resources
+    // Sprites
+    public Manager<GLSprite> spriteManager = new Manager<>();
+
     // A reference to the renderer
     private final GLRenderer mRenderer;
     // Timer with 60 FPS as target
     private Timer mTimer = new Timer(60.0);
 
-    public Game(Context context) {
-        mRenderer = new GLRenderer(context, this);
+    // The activity that runs this game
+    private GameActivity mActivity;
+
+    public Game(GameActivity activity) {
+        mRenderer = new GLRenderer(activity, this);
+        mActivity = activity;
     }
 
     public GLRenderer getRenderer() { return mRenderer; }
@@ -48,6 +56,7 @@ public class Game  implements TimerCallback {
 
     // called on surface creation
     public void init() {
+        mActivity.onGameStart();
         for (Scene scene : mScenes)
             scene.init(this);
         mInitialized = true;
