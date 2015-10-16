@@ -2,43 +2,44 @@ package com.toggle.flipped;
 
 
 import com.toggle.katana2d.*;
+import com.toggle.katana2d.physics.PhysicsBody;
+import com.toggle.katana2d.physics.PhysicsSystem;
+
+import org.jbox2d.dynamics.BodyType;
 
 public class TestScene extends Scene {
 
-    private Entity testEntity1, testEntity2;
-
     @Override
     public void onInit() {
+        PhysicsSystem physicsSystem = new PhysicsSystem();
         // Add the systems
         mSystems.add(new RenderSystem());
+        mSystems.add(physicsSystem);
 
+        mGame.getRenderer().setBackgroundColor(1, 1, 1);
+        float w = mGame.getRenderer().width, h = mGame.getRenderer().height;
 
-        // Create first test entity with an yellow sprite and rotated initial transformation
-        Entity testEntity1 = new Entity();
-        testEntity1.add(new Sprite(mGame.spriteManager.get("yellow_spr")));
-        testEntity1.add(new Transformation(50, 50, 20));
-        addEntity(testEntity1);
+        int spr0 = mGame.spriteManager.add(
+                new GLSprite(mGame.getRenderer(), null, new float[]{0,0,0,1}, 32, 32)
+        );
+        int spr1 = mGame.spriteManager.add(
+                new GLSprite(mGame.getRenderer(), null, new float[]{0.2f,0.2f,0.2f,1.0f}, w, 32)
+        );
 
-        // Create second test entity with animated sprite-sheet
-        // The sprite-sheet data has been obtained with the help of an image editing program
-        Sprite.SpriteSheetData ssd = new Sprite.SpriteSheetData();
-        ssd.offsetX = 40;
-        ssd.hSpacing = 150-124;
-        ssd.numCols =  5;
-        ssd.imgWidth = 124-40;
-        ssd.imgHeight = 106;
-        ssd.index = 1;
-        ssd.animationSpeed = 6;
-        testEntity2 = new Entity();
-        testEntity2.add(new Sprite(mGame.spriteManager.get("test_spr"), ssd));
-        testEntity2.add(new Transformation(150, 150, 0));
-        addEntity(testEntity2);
-    }
+        Entity ground = new Entity();
+        ground.add(new Transformation(w / 2, h - 16, 0));
+        ground.add(new Sprite(mGame.spriteManager.get(spr1)));
+        ground.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.STATIC, ground, 0, 0.2f, 0, false));
+        addEntity(ground);
 
-    @Override
-    public void onUpdate(double deltaTime) {
-        mGame.getRenderer().getCamera().angle += deltaTime*10;
-        mGame.getRenderer().getCamera().x += deltaTime*50;
-        testEntity2.get(Transformation.class).x += deltaTime*50;
+        for (int i=0; i<10; ++i) {
+            Entity body = new Entity();
+            float x = w/2 - 32 + (i/5) * 32 - 8*i;
+            float y = h/2 - 32*2 + (i%5) * 32;
+            body.add(new Transformation(x, y, 48));
+            body.add(new Sprite(mGame.spriteManager.get(spr0)));
+            body.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.DYNAMIC, body, 1.0f, 0.2f, 0, false));
+            addEntity(body);
+        }
     }
 }

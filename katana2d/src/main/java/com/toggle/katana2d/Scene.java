@@ -19,6 +19,7 @@ public class Scene {
 
     public void init(Game game) {
         mGame = game;
+        mSystems.clear();
         onInit();
 
         // initialize all systems

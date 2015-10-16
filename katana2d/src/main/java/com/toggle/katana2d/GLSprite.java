@@ -20,6 +20,8 @@ public class GLSprite {
         mRenderer = renderer;
         this.width = width;
         this.height = height;
+        this.originX = this.width / 2;
+        this.originY = this.height / 2;
         if (texture == null)
             mTexture = mRenderer.mWhiteTexture;
         else

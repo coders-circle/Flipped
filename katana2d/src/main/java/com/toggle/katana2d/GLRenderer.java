@@ -60,6 +60,11 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     // Camera to defining view position and angle
     private Camera mCamera = new Camera();
 
+    // Set background color
+    public void setBackgroundColor(float r, float g, float b) {
+        GLES20.glClearColor(r, g, b, 1.0f);
+    }
+
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
 

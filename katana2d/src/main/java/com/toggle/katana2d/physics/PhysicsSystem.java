@@ -9,12 +9,17 @@ import org.jbox2d.dynamics.World;
 
 // Uses box2d to update all entities with PhysicsBody and Transformation components
 public class PhysicsSystem extends System {
-    public static World world = new World(new Vec2(0, -10));
+    public static final float BOX_TO_WORLD = 30f;
+    public static final float WORLD_TO_BOX = 1 / BOX_TO_WORLD;
 
-    PhysicsSystem()
+    private World world = new World(new Vec2(0, 10));
+
+    public PhysicsSystem()
     {
         super(new Class[]{PhysicsBody.class, Transformation.class});
     }
+
+    public World getWorld() { return world; }
 
     @Override
     public void update(double dt) {
@@ -23,9 +28,9 @@ public class PhysicsSystem extends System {
         for (Entity entity: mEntities) {
             Transformation t = entity.get(Transformation.class);
             PhysicsBody b = entity.get(PhysicsBody.class);
-            t.x = b.body.getPosition().x;
-            t.y = b.body.getPosition().y;
-            t.angle = b.body.getAngle();
+            t.x = b.body.getPosition().x * BOX_TO_WORLD;
+            t.y = b.body.getPosition().y * BOX_TO_WORLD;
+            t.angle = (float)Math.toDegrees(b.body.getAngle());
         }
     }
 }
