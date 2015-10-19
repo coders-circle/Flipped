@@ -1,6 +1,5 @@
 package com.toggle.flipped;
 
-import com.toggle.katana2d.GLSprite;
 import com.toggle.katana2d.Game;
 import com.toggle.katana2d.GameActivity;
 
@@ -10,7 +9,8 @@ public class MainActivity extends GameActivity {
     public void onGameStart() {
         Game game = mEngine.getGame();
         game.addScene(new TestScene());
-        game.setActiveScene(0);
+        game.addScene(new TestScene2());
+        game.setActiveScene(1);
     }
 
     @Override

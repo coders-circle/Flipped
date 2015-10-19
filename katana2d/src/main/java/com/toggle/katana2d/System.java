@@ -19,14 +19,20 @@ public class System {
 
     // Add an entity to this system, checking if the entity contains necessary components
     public void addEntity(Entity entity) {
+        boolean toAdd = true;
         for (Class component: mComponents) {
-            if (entity.has(component)) {
-                mEntities.add(entity);
-            }
+            if (!entity.has(component))
+                toAdd = false;
+        }
+        if (toAdd) {
+            mEntities.add(entity);
+            onEntityAdded(entity);
         }
     }
 
     // Some base methods that the derived classes may override
+
+    public void onEntityAdded(Entity entity) {}
     public void init() {}
     public void update(double dt) {}
     public void draw() {}

@@ -1,9 +1,6 @@
 package com.toggle.katana2d;
 
 
-import android.content.Context;
-import android.opengl.GLES20;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +23,8 @@ public class Game  implements TimerCallback {
     }
 
     public GLRenderer getRenderer() { return mRenderer; }
+
+    public TouchInputData getTouchInputData() { return mRenderer.touchInputData; }
 
     // List of all scenes
     private List<Scene> mScenes = new ArrayList<>();
@@ -77,8 +76,6 @@ public class Game  implements TimerCallback {
 
     // draw method for all rendering operations
     public void draw() {
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-
         if (mActiveScene != null)
             mActiveScene.draw();
     }

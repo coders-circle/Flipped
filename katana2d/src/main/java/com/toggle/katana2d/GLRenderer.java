@@ -28,6 +28,9 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     private Game mGame;
     GLRenderer(Context context, Game game) { mContext = context; mGame = game;}
 
+    // Touch input data;
+    public TouchInputData touchInputData = new TouchInputData();
+
     // GLSL program object
     public int mProgram;
 
@@ -60,9 +63,12 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     // Camera to defining view position and angle
     private Camera mCamera = new Camera();
 
+    private float mBackR, mBackG, mBackB;
     // Set background color
     public void setBackgroundColor(float r, float g, float b) {
-        GLES20.glClearColor(r, g, b, 1.0f);
+        mBackR = r;
+        mBackG = g;
+        mBackB = b;
     }
 
     @Override
@@ -127,6 +133,12 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 unused) {
+
+        GLES20.glDisable(GLES20.GL_SCISSOR_TEST);
+        GLES20.glClearColor(0, 0, 0, 1.0f);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glEnable(GLES20.GL_SCISSOR_TEST);
+
         // View transformations
         Matrix.setIdentityM(mViewMatrix, 0);
         Matrix.translateM(mViewMatrix, 0, width / 2, height / 2, 0);
@@ -134,6 +146,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         Matrix.translateM(mViewMatrix, 0, -width / 2, -height / 2, 0);
         Matrix.translateM(mViewMatrix, 0, -mCamera.x, -mCamera.y, 0);
 
+        GLES20.glClearColor(mBackR, mBackG, mBackB, 1.0f);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         mGame.newFrame();
     }
 

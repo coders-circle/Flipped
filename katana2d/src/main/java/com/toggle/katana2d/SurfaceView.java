@@ -2,10 +2,12 @@ package com.toggle.katana2d;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.view.MotionEvent;
 
 public class SurfaceView extends GLSurfaceView {
+    private TouchInputData mTouchInputData;
 
-    public SurfaceView(Context context, Renderer renderer){
+    public SurfaceView(Context context, GLRenderer renderer){
         super(context);
 
         // Create an OpenGL ES 2.0 context
@@ -13,7 +15,32 @@ public class SurfaceView extends GLSurfaceView {
 
         // Set the Renderer for drawing on the GLSurfaceView
         setRenderer(renderer);
+        mTouchInputData = renderer.touchInputData;
     }
 
-    /*TODO: Get Touch input data and send it to the Game class.*/
+    @Override
+    public boolean onTouchEvent(MotionEvent e) {
+        switch (e.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mTouchInputData.x = e.getX();
+                mTouchInputData.y = e.getY();
+                mTouchInputData.dx = mTouchInputData.dy = 0;
+                mTouchInputData.isMouseDown = true;
+                break;
+            case MotionEvent.ACTION_UP:
+                mTouchInputData.isMouseDown = false;
+                mTouchInputData.dx = 0;
+                mTouchInputData.dy = 0;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                float lastX = mTouchInputData.x;
+                float lastY = mTouchInputData.y;
+                mTouchInputData.x = e.getX();
+                mTouchInputData.y = e.getY();
+                mTouchInputData.dx = e.getX() - lastX;
+                mTouchInputData.dy = e.getY() - lastY;
+                break;
+        }
+        return true;
+    }
 }
