@@ -12,16 +12,4 @@ public class MainActivity extends GameActivity {
         game.addScene(new TestScene2());
         game.setActiveScene(1);
     }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mEngine.onPause();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mEngine.onResume();
-    }
 }
