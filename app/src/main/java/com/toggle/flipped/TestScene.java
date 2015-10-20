@@ -29,7 +29,7 @@ public class TestScene extends Scene {
         Entity ground = new Entity();
         ground.add(new Transformation(w / 2, h - 16, 0));
         ground.add(new Sprite(mGame.spriteManager.get(spr1)));
-        ground.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.STATIC, ground, 0, 0.2f, 0, false, false));
+        ground.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.STATIC, ground, new PhysicsBody.Properties(0)));
         addEntity(ground);
 
         for (int i=0; i<10; ++i) {
@@ -38,7 +38,7 @@ public class TestScene extends Scene {
             float y = h/2 - 32*2 + (i%5) * 32;
             body.add(new Transformation(x, y, 48));
             body.add(new Sprite(mGame.spriteManager.get(spr0)));
-            body.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.DYNAMIC, body, 1.0f, 0.2f, 0, false, false));
+            body.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.DYNAMIC, body, new PhysicsBody.Properties(1.0f)));
             addEntity(body);
         }
     }

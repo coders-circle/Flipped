@@ -20,13 +20,44 @@ import java.util.List;
 // PhysicsBody component that represents a box-2d body
 // with mass, friction etc.
 public class PhysicsBody implements Component {
+
+    public static class Properties {
+        // For default use: friction=0.2, restitution=0, density = 0(static)
+        float density, friction, restitution;
+        boolean bullet, fixedRotation;
+        boolean sensor;
+
+        public Properties(float density, float friction, float restitution, boolean bullet, boolean fixedRotation) {
+            this.density = density; this.friction = friction; this.restitution = restitution;
+            this.bullet = bullet; this.fixedRotation = fixedRotation;
+            this.sensor = false;
+        }
+
+        public Properties(float density) {
+            this(density, 0.2f, 0.0f, false, false);
+        }
+
+        public Properties(float density, float friction, float restitution) {
+            this(density, friction, restitution, false, false);
+        }
+
+        public Properties(boolean sensor, boolean bullet, boolean fixedRotation) {
+            this.sensor = sensor;
+            this.bullet = bullet;
+            this.fixedRotation = fixedRotation;
+        }
+
+        public Properties(boolean sensor) {
+            this(sensor, false, false);
+        }
+    }
+
     public PhysicsBody(Body body) {
         this.body = body;
     }
 
     private void init(World world, BodyType type, float posX, float posY, float angle,
-                      PolygonShape shape, float density, float friction, float restitution,
-                      boolean bullet, boolean fixedRotation, Object object) {
+                      PolygonShape shape, Object object, Properties properties) {
         posX = posX * PhysicsSystem.WORLD_TO_BOX;
         posY = posY * PhysicsSystem.WORLD_TO_BOX;
 
@@ -34,43 +65,42 @@ public class PhysicsBody implements Component {
         bodyDef.type = type;
         bodyDef.position = new Vec2(posX, posY);
         bodyDef.angle = (float)Math.toRadians(angle);
-        bodyDef.bullet = bullet;
-        bodyDef.fixedRotation = fixedRotation;
+        bodyDef.bullet = properties.bullet;
+        bodyDef.fixedRotation = properties.fixedRotation;
         bodyDef.userData = object;
         body = world.createBody(bodyDef);
 
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.density = density;
-        fixtureDef.friction = friction;
-        fixtureDef.restitution = restitution;
+        if (properties.sensor)
+            fixtureDef.isSensor = true;
+        else {
+            fixtureDef.density = properties.density;
+            fixtureDef.friction = properties.friction;
+            fixtureDef.restitution = properties.restitution;
+        }
         fixtureDef.shape = shape;
         fixtureDef.userData = object;
         body.createFixture(fixtureDef);
     }
 
     // Make sure entity has sprite and transformation
-    public PhysicsBody(World world, BodyType type, Entity entity, float density, float friction, float restitution,
-                       boolean bullet, boolean fixedRotation) {
+    public PhysicsBody(World world, BodyType type, Entity entity, Properties properties) {
         Transformation t = entity.get(Transformation.class);
         Sprite s = entity.get(Sprite.class);
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(s.glSprite.width/2 * PhysicsSystem.WORLD_TO_BOX - 0.01f, s.glSprite.height/2 * PhysicsSystem.WORLD_TO_BOX - 0.01f);
 
-        init(world, type, t.x, t.y, t.angle, shape, density, friction, restitution, bullet, fixedRotation, entity);
+        init(world, type, t.x, t.y, t.angle, shape, entity, properties);
     }
 
     // Make sure entity has transformation
-    public PhysicsBody(World world, BodyType type, Entity entity, PolygonShape shape,
-                       float density, float friction, float restitution, boolean bullet, boolean fixedRotation) {
+    public PhysicsBody(World world, BodyType type, Entity entity, PolygonShape shape, Properties properties) {
         Transformation t = entity.get(Transformation.class);
-        init(world, type, t.x, t.y, t.angle, shape, density, friction, restitution, bullet, fixedRotation, entity);
+        init(world, type, t.x, t.y, t.angle, shape, entity, properties);
     }
 
-    // For default use: friction=0.2, restitution=0, density = 0(static)
-    public PhysicsBody(World world, BodyType type, float posX, float posY, float angle,
-                       PolygonShape shape, float density, float friction, float restitution,
-                       boolean bullet, boolean fixedRotation, Object object) {
-        init(world, type, posX, posY, angle, shape, density, friction, restitution, bullet, fixedRotation, object);
+    public PhysicsBody(World world, BodyType type, float posX, float posY, float angle, PolygonShape shape, Object object, Properties properties) {
+        init(world, type, posX, posY, angle, shape, object, properties);
     }
 
     public Body body;

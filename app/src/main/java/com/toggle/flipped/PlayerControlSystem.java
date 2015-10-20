@@ -1,7 +1,5 @@
 package com.toggle.flipped;
 
-import android.util.Log;
-
 import com.toggle.katana2d.*;
 import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
@@ -35,6 +33,8 @@ public class PlayerControlSystem extends com.toggle.katana2d.System {
         Fixture f = b.body.getFixtureList();
         AABB aabb = f.getAABB(0);
         Vec2 ex = aabb.getExtents();
+
+        // A 2 pixel sensor at the bottom to sense the ground
         shape.setAsBox(ex.x/2, 2 * PhysicsSystem.WORLD_TO_BOX, new Vec2(0, ex.y), 0);
 
         FixtureDef fdef = new FixtureDef();
@@ -54,7 +54,8 @@ public class PlayerControlSystem extends com.toggle.katana2d.System {
 
             Vec2 v = b.body.getLinearVelocity();
 
-            // Check if on ground
+            // Check if the player's foot is touching something solid.
+            // that is, if the groundFixture has collided with something.
             boolean onGround = false;
             for (PhysicsBody.Collision c: b.collisions) {
                 if (c.myFixture == p.groundFixture) {
@@ -63,20 +64,30 @@ public class PlayerControlSystem extends com.toggle.katana2d.System {
                 }
             }
 
-            if (inputData.isMouseDown) {
+            if (inputData.isTouchDown) {
+                // when user is touching on the screen,
+                // set move-direction to horizontal sliding direction ( direction of dx )
                 if (inputData.dx > 5)
                     p.moveDirection = 1;
                 else if (inputData.dx < -5)
                     p.moveDirection = -1;
 
-                if (inputData.dy < -5 && onGround)
+                // if vertical sliding direction is up, and sliding magnitude is more than 8
+                // and our feet are touching solid object (onGround)
+                // then apply linear impulse to make tha player jump.
+                if (inputData.dy < -8 && onGround)
                     b.body.applyLinearImpulse(new Vec2(0, -3.5f), b.body.getWorldCenter());
             }
             else
                 p.moveDirection = 0;
 
+            // set horizontal velocity according to current moving direction.
             b.body.setLinearVelocity(new Vec2(p.moveDirection * 3, v.y));
 
+            // Scroll the camera so that player is at the center of screen.
+            // Make sure the camera don't go off the edges of the world,
+            // assuming the world is twice the width of camera view (w*2).
+            // This assumption is temporary.
             Camera camera = mGame.getRenderer().getCamera();
             float w = mGame.getRenderer().width;
             float h = mGame.getRenderer().height;

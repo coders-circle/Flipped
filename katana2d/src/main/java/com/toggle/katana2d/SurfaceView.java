@@ -25,10 +25,10 @@ public class SurfaceView extends GLSurfaceView {
                 mTouchInputData.x = e.getX();
                 mTouchInputData.y = e.getY();
                 mTouchInputData.dx = mTouchInputData.dy = 0;
-                mTouchInputData.isMouseDown = true;
+                mTouchInputData.isTouchDown = true;
                 break;
             case MotionEvent.ACTION_UP:
-                mTouchInputData.isMouseDown = false;
+                mTouchInputData.isTouchDown = false;
                 mTouchInputData.dx = 0;
                 mTouchInputData.dy = 0;
                 break;
