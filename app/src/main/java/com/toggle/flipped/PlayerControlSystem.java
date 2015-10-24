@@ -35,12 +35,7 @@ public class PlayerControlSystem extends com.toggle.katana2d.System {
 
         // A 2 pixel sensor at the bottom to sense the ground
         shape.setAsBox(ex.x/2, 2 * PhysicsSystem.WORLD_TO_BOX, new Vec2(0, ex.y), 0);
-
-        FixtureDef fdef = new FixtureDef();
-        fdef.shape = shape;
-        fdef.isSensor = true;
-        fdef.userData = e;
-        p.groundFixture = b.body.createFixture(fdef);
+        p.groundFixture = b.createSensor(shape);
     }
 
     @Override

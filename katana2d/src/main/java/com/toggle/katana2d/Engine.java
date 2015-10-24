@@ -24,10 +24,12 @@ public class Engine {
     public void onPause()
     {
         mSurfaceView.onPause();
+        mGame.onPause();
     }
 
     public void onResume()
     {
         mSurfaceView.onResume();
+        mGame.onResume();
     }
 }

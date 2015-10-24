@@ -34,7 +34,7 @@ public class TestScene2 extends Scene {
         );
         int spr1 = mGame.spriteManager.add(
                 //new GLSprite(mGame.getRenderer(), null, new float[]{1,0,0,1}, 32, 32)
-                new GLSprite(mGame.getRenderer(), mGame.getRenderer().loadTexture(R.drawable.test_spr2), 40, 36)
+                new GLSprite(mGame.getRenderer(), mGame.getRenderer().addTexture(R.drawable.test_spr2), 40, 36)
         );
         int spr2 = mGame.spriteManager.add(
                 new GLSprite(mGame.getRenderer(), null, new float[]{0.2f,0.2f,0.2f,1.0f}, w, 32)

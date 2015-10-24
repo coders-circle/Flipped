@@ -23,4 +23,8 @@ public class Manager<T> {
         return id;
     }
     public T get(String key) { return get(map.get(key)); }
+
+    public void clear() {
+        objects.clear();
+    }
 }

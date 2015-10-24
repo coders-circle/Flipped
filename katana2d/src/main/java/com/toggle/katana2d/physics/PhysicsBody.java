@@ -6,6 +6,7 @@ import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Transformation;
 
 import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
@@ -101,6 +102,14 @@ public class PhysicsBody implements Component {
 
     public PhysicsBody(World world, BodyType type, float posX, float posY, float angle, PolygonShape shape, Object object, Properties properties) {
         init(world, type, posX, posY, angle, shape, object, properties);
+    }
+
+    public Fixture createSensor(Shape shape) {
+        FixtureDef fdef = new FixtureDef();
+        fdef.shape = shape;
+        fdef.isSensor = true;
+        fdef.userData = body.getUserData();
+        return body.createFixture(fdef);
     }
 
     public Body body;

@@ -55,5 +55,8 @@ public class Scene {
     protected void onDraw() {
     }
 
+    public void onPause() {}
+    public void onResume() {}
+
     /*TODO: Pass input events to all systems.*/
 }

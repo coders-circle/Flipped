@@ -15,6 +15,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -82,7 +84,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         GLES20.glEnable(GLES20.GL_SCISSOR_TEST);
 
         // Set the background frame color
-        GLES20.glClearColor(100.0f/255, 149.0f/255, 237.0f/255, 1.0f);
+        GLES20.glClearColor(100.0f / 255, 149.0f / 255, 237.0f / 255, 1.0f);
 
         // Compile the sprite shaders
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, getRawFileText(R.raw.vs_sprite));
@@ -123,7 +125,10 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         int texHandle = GLES20.glGetUniformLocation(mProgram, "uTexture");
         GLES20.glUniform1i(texHandle, 0);
 
-        mWhiteTexture = loadTexture(R.drawable.white);
+        for (Texture t: mTextures)
+            reloadTexture(t);
+
+        mWhiteTexture = addTexture(R.drawable.white);
 
         // Initialize the Engine
         mGame.init();
@@ -223,9 +228,9 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         return shader;
     }
 
-    // load texture from a resource file
-    public Texture loadTexture(int resourceId)
-    {
+    private List<Texture> mTextures = new ArrayList<>();
+
+    private void loadTexture(Texture texture, int resourceId) {
         int[] textureHandle = new int[1];
         int width, height;
         GLES20.glGenTextures(1, textureHandle, 0);
@@ -248,7 +253,23 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         else {
             throw new RuntimeException("Error loading texture.");
         }
+        texture.textureId = textureHandle[0];
+        texture.width = width;
+        texture.height = height;
+        texture.resourceId = resourceId;
+    }
 
-        return new Texture(textureHandle[0], width, height);
+    // load texture from a resource file
+    public Texture addTexture(int resourceId)
+    {
+        Texture t = new Texture();
+        loadTexture(t, resourceId);
+        mTextures.add(t);
+        return t;
+    }
+
+    private void reloadTexture(Texture t) {
+        loadTexture(t, t.resourceId);
     }
 }
+
