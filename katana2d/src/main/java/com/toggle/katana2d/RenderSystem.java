@@ -30,7 +30,12 @@ public class RenderSystem extends System {
             Transformation tc = entity.get(Transformation.class);
 
             if (sc.glSprite == null)
-                continue;;
+                continue;
+
+            if (sc.isReflected) {
+                tc.x += sc.glSprite.width;
+                sc.glSprite.width *= -1;
+            }
 
             if (sc.spriteSheetData == null)
                 sc.glSprite.draw(tc.x, tc.y, tc.angle);
@@ -50,6 +55,11 @@ public class RenderSystem extends System {
                 float clipH = ssd.imgHeight / sc.glSprite.mTexture.height;
 
                 sc.glSprite.draw(tc.x, tc.y, tc.angle, clipX, clipY, clipW, clipH);
+            }
+
+            if (sc.isReflected) {
+                tc.x += sc.glSprite.width;
+                sc.glSprite.width *= -1;
             }
         }
     }

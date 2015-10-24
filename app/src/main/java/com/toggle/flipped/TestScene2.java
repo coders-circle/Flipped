@@ -33,7 +33,8 @@ public class TestScene2 extends Scene {
                 new GLSprite(mGame.getRenderer(), null, new float[]{0,0,0,1}, 32, 32)
         );
         int spr1 = mGame.spriteManager.add(
-                new GLSprite(mGame.getRenderer(), null, new float[]{1,0,0,1}, 32, 32)
+                //new GLSprite(mGame.getRenderer(), null, new float[]{1,0,0,1}, 32, 32)
+                new GLSprite(mGame.getRenderer(), mGame.getRenderer().loadTexture(R.drawable.test_spr2), 40, 36)
         );
         int spr2 = mGame.spriteManager.add(
                 new GLSprite(mGame.getRenderer(), null, new float[]{0.2f,0.2f,0.2f,1.0f}, w, 32)
@@ -78,16 +79,39 @@ public class TestScene2 extends Scene {
         mirror2.get(FlipSystem.FlipItem.class).targetAngle = 0;
 
         Entity body = new Entity();
-        body.add(new Transformation(w/2, h-32-16, 0));
+        body.add(new Transformation(w / 2, h - 32 - 16, 0));
         body.add(new Sprite(mGame.spriteManager.get(spr0)));
         body.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.DYNAMIC, body, new PhysicsBody.Properties(0.4f)));
         addEntity(body);
 
         Entity player = new Entity();
-        player.add(new Transformation(w/4, h-32-16, 0));
+        player.add(new Transformation(w / 4, h - 32 - 16, 0));
         player.add(new Sprite(mGame.spriteManager.get(spr1)));
-        player.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.DYNAMIC, player, new PhysicsBody.Properties(1.0f, 0.5f, 0.0f, false, true)));
+        player.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.DYNAMIC, player, new PhysicsBody.Properties(1f, 0f, 0f, false, true)));
         player.add(new PlayerControlSystem.Player());
+
+        Sprite.SpriteSheetData stand = new Sprite.SpriteSheetData();
+        stand.offsetX = 12; stand.offsetY = 252;
+        stand.imgWidth = 38; stand.imgHeight = 35;
+        stand.numRows = stand.numCols = 1;
+        stand.animationSpeed = 0;
+        player.get(PlayerControlSystem.Player.class).stand = stand;
+
+        Sprite.SpriteSheetData walk = new Sprite.SpriteSheetData();
+        walk.offsetX = 16; walk.offsetY = 312;
+        walk.imgWidth = 36.8f; walk.imgHeight = 36;
+        walk.hSpacing = 1f;
+        walk.numCols = 6; walk.numRows = 1;
+        player.get(PlayerControlSystem.Player.class).walk = walk;
+
+        Sprite.SpriteSheetData jump = new Sprite.SpriteSheetData();
+        jump.offsetX = 39; jump.offsetY = 373;
+        jump.imgWidth = 37.8f; jump.imgHeight = 36;
+        jump.numCols = 8; jump.numRows = 1;
+        jump.animationSpeed = 0;
+        player.get(PlayerControlSystem.Player.class).jump = jump;
+
+        player.get(Sprite.class).spriteSheetData = stand;
         addEntity(player);
 
 

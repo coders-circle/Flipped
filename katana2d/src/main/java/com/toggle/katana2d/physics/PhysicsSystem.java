@@ -1,7 +1,5 @@
 package com.toggle.katana2d.physics;
 
-import android.util.Log;
-
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.System;
 import com.toggle.katana2d.Transformation;
@@ -9,7 +7,6 @@ import com.toggle.katana2d.Transformation;
 import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.collision.Manifold;
-import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.contacts.Contact;
@@ -18,7 +15,7 @@ import java.util.Iterator;
 
 // Uses box2d to update all entities with PhysicsBody and Transformation components
 public class PhysicsSystem extends System implements ContactListener {
-    public static final float BOX_TO_WORLD = 30f;
+    public static final float BOX_TO_WORLD = 32f;               // 32 pixels = 1 meter
     public static final float WORLD_TO_BOX = 1 / BOX_TO_WORLD;
 
     private World world = new World(new Vec2(0, 10));
