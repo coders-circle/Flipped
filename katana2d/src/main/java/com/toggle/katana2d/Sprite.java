@@ -26,6 +26,9 @@ public class Sprite implements Component{
     }
 
     public void changeSpriteSheet(SpriteSheetData newSpriteSheetData) {
+        if (spriteSheetData == newSpriteSheetData)
+            return;
+
         if (spriteSheetData != null) {
             spriteSheetData.index = 0;
             spriteSheetData.timePassed = 0;

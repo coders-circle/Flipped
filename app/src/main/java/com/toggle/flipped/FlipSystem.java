@@ -16,7 +16,7 @@ public class FlipSystem extends com.toggle.katana2d.System {
         public float targetAngle = 180; // target angle for mirror
     }
 
-    private static PlayerControlSystem.Player mPlayerComponent;
+    private static Bot mBotComponent;
     private static Camera mCamera;
 
     public FlipSystem(Camera camera) {
@@ -25,7 +25,7 @@ public class FlipSystem extends com.toggle.katana2d.System {
     }
 
     public void setPlayer(Entity player) {
-        mPlayerComponent = player.get(PlayerControlSystem.Player.class);
+        mBotComponent = player.get(Bot.class);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class FlipSystem extends com.toggle.katana2d.System {
                 if (mCamera.angle != f.targetAngle) {
                     boolean colliding = false;
                     for (PhysicsBody.Collision c : b.collisions) {
-                        if (c.otherFixture == mPlayerComponent.groundFixture) {
+                        if (c.otherFixture == mBotComponent.groundFixture) {
                             colliding = true;
                             break;
                         }
