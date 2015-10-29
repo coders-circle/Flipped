@@ -2,6 +2,7 @@ package com.toggle.flipped;
 
 
 import com.toggle.katana2d.Entity;
+import com.toggle.katana2d.GLPointSprites;
 import com.toggle.katana2d.GLSprite;
 import com.toggle.katana2d.RenderSystem;
 import com.toggle.katana2d.Scene;

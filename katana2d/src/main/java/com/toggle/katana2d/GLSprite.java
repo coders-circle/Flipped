@@ -41,11 +41,14 @@ public class GLSprite {
 
     // draw clipped sprite: all parameters are to be in texture-space i.e. in the range of [0, 1]
     public void draw(float x, float y, float angle, float clipX, float clipY, float clipW, float clipH) {
-        GLES20.glUniform4f(mRenderer.mClipHandle, clipX, clipY, clipW, clipH);
+        GLES20.glUseProgram(mRenderer.mSpriteProgram);
+        GLES20.glVertexAttribPointer(mRenderer.mSpritePositionHandle, 2, GLES20.GL_FLOAT, false, 2 * 4, mRenderer.mSpriteVertexBuffer);
+
+        GLES20.glUniform4f(mRenderer.mSpriteClipHandle, clipX, clipY, clipW, clipH);
         mRenderer.setSpriteTransform(x, y, width, height, angle, originX, originY);
-        GLES20.glUniform4fv(mRenderer.mColorHandle, 1, mColor, 0);
+        GLES20.glUniform4fv(mRenderer.mSpriteColorHandle, 1, mColor, 0);
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);  // sample-0
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTexture.textureId);
-        GLES20.glDrawElements(GLES20.GL_TRIANGLES, 6, GLES20.GL_UNSIGNED_SHORT, mRenderer.indexBuffer);
+        GLES20.glDrawElements(GLES20.GL_TRIANGLES, 6, GLES20.GL_UNSIGNED_SHORT, mRenderer.mSpriteIndexBuffer);
     }
 }

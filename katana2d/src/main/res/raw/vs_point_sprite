@@ -1,0 +1,12 @@
+uniform mat4 uMVPMatrix;    // the model-view-projection matrix
+attribute vec4 vPosition;   // vertex position
+attribute vec4 vColor;      // color
+attribute float vSize;       // size
+
+varying vec4 fColor;     // texture coordinates for the vertex
+
+void main() {
+    gl_Position = uMVPMatrix * vPosition;
+    gl_PointSize = vSize;
+    fColor = vColor;
+}

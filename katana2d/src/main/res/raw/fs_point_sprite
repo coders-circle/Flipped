@@ -1,0 +1,8 @@
+precision mediump float;
+
+uniform sampler2D uTexture; // sprite texture
+varying vec4 fColor;     // texture coordinates for the fragment
+
+void main() {
+    gl_FragColor = texture2D(uTexture, gl_PointCoord) * fColor;
+}

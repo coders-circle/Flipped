@@ -33,26 +33,36 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     // Touch input data;
     public TouchInputData touchInputData = new TouchInputData();
 
-    // GLSL program object
-    public int mProgram;
+    // GLSL program objects
+    public int mSpriteProgram;
+    public int mPointSpriteProgram;
 
     // Uniform handles
-    public int mColorHandle;
-    public int mMVPMatrixHandle;
-    public int mClipHandle;
+    public int mSpriteColorHandle;
+    public int mSpriteMVPMatrixHandle;
+    public int mSpriteClipHandle;
+
+    public int mPointSpriteMVPMatrixHandle;
 
     // vertex buffer data
-    private static float squareCoords[] = {
+    private static float mSquareCoords[] = {
             0, 1,
             0, 0,
             1, 0,
             1, 1,
     };
     // index buffer data
-    private static short drawOrder[] = { 0, 2, 1, 0, 3, 2 };
+    private static short mSquareDrawOrder[] = { 0, 2, 1, 0, 3, 2 };
+
     //vertex and index buffer objects
-    public FloatBuffer vertexBuffer;
-    public ShortBuffer indexBuffer;
+    public FloatBuffer mSpriteVertexBuffer;
+    public ShortBuffer mSpriteIndexBuffer;
+
+    // Attribute handles
+    public int mSpritePositionHandle;
+    public int mPointSpritePositionHandle;
+    public int mPointSpriteColorHandle;
+    public int mPointSpriteSizeHandle;
 
     // Transformation matrices
     public final float[] mMVPMatrix = new float[16];
@@ -91,39 +101,60 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, getRawFileText(R.raw.fs_sprite));
 
         // Link the shaders to a program
-        mProgram = GLES20.glCreateProgram();
-        GLES20.glAttachShader(mProgram, vertexShader);
-        GLES20.glAttachShader(mProgram, fragmentShader);
-        GLES20.glLinkProgram(mProgram);
-        GLES20.glUseProgram(mProgram);
+        mSpriteProgram = GLES20.glCreateProgram();
+        GLES20.glAttachShader(mSpriteProgram, vertexShader);
+        GLES20.glAttachShader(mSpriteProgram, fragmentShader);
+        GLES20.glLinkProgram(mSpriteProgram);
+        GLES20.glUseProgram(mSpriteProgram);
 
         // Get the attribute and uniform handles
-        int positionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
-        GLES20.glEnableVertexAttribArray(positionHandle);
-        mColorHandle = GLES20.glGetUniformLocation(mProgram, "uColor");
-        mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
-        mClipHandle = GLES20.glGetUniformLocation(mProgram, "uClip");
+        mSpritePositionHandle = GLES20.glGetAttribLocation(mSpriteProgram, "vPosition");
+        GLES20.glEnableVertexAttribArray(mSpritePositionHandle);
+        mSpriteColorHandle = GLES20.glGetUniformLocation(mSpriteProgram, "uColor");
+        mSpriteMVPMatrixHandle = GLES20.glGetUniformLocation(mSpriteProgram, "uMVPMatrix");
+        mSpriteClipHandle = GLES20.glGetUniformLocation(mSpriteProgram, "uClip");
 
         // Create the vertex buffer
-        ByteBuffer bb = ByteBuffer.allocateDirect(squareCoords.length*4);
+        ByteBuffer bb = ByteBuffer.allocateDirect(mSquareCoords.length*4);
         bb.order(ByteOrder.nativeOrder());
-        vertexBuffer = bb.asFloatBuffer();
-        vertexBuffer.put(squareCoords);
-        vertexBuffer.position(0);
+        mSpriteVertexBuffer = bb.asFloatBuffer();
+        mSpriteVertexBuffer.put(mSquareCoords);
+        mSpriteVertexBuffer.position(0);
 
         // Create the index buffer
-        ByteBuffer dlb = ByteBuffer.allocateDirect(drawOrder.length * 2);
+        ByteBuffer dlb = ByteBuffer.allocateDirect(mSquareDrawOrder.length * 2);
         dlb.order(ByteOrder.nativeOrder());
-        indexBuffer = dlb.asShortBuffer();
-        indexBuffer.put(drawOrder);
-        indexBuffer.position(0);
-
-        // point the vertex-position attribute to the vertex buffer data
-        GLES20.glVertexAttribPointer(positionHandle, 2, GLES20.GL_FLOAT, false, 2*4, vertexBuffer);
+        mSpriteIndexBuffer = dlb.asShortBuffer();
+        mSpriteIndexBuffer.put(mSquareDrawOrder);
+        mSpriteIndexBuffer.position(0);
 
         // get the texture uniform handle and set it to use the sample-0
-        int texHandle = GLES20.glGetUniformLocation(mProgram, "uTexture");
+        int texHandle = GLES20.glGetUniformLocation(mSpriteProgram, "uTexture");
         GLES20.glUniform1i(texHandle, 0);
+
+        // Shaders for point sprites
+        int pVertexShader = loadShader(GLES20.GL_VERTEX_SHADER, getRawFileText(R.raw.vs_point_sprite));
+        int pFragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, getRawFileText(R.raw.fs_point_sprite));
+
+        // Link the shaders to a program
+        mPointSpriteProgram = GLES20.glCreateProgram();
+        GLES20.glAttachShader(mPointSpriteProgram, pVertexShader);
+        GLES20.glAttachShader(mPointSpriteProgram, pFragmentShader);
+        GLES20.glLinkProgram(mPointSpriteProgram);
+        GLES20.glUseProgram(mPointSpriteProgram);
+
+        // Get the attribute and uniform handles
+        mPointSpritePositionHandle = GLES20.glGetAttribLocation(mPointSpriteProgram, "vPosition");
+        GLES20.glEnableVertexAttribArray(mPointSpritePositionHandle);
+        mPointSpriteColorHandle = GLES20.glGetAttribLocation(mPointSpriteProgram, "vColor");
+        GLES20.glEnableVertexAttribArray(mPointSpriteColorHandle);
+        mPointSpriteSizeHandle = GLES20.glGetAttribLocation(mPointSpriteProgram, "vSize");
+        GLES20.glEnableVertexAttribArray(mPointSpriteSizeHandle);
+        mPointSpriteMVPMatrixHandle = GLES20.glGetUniformLocation(mPointSpriteProgram, "uMVPMatrix");
+
+        // get the texture uniform handle and set it to use the sample-0
+        int pTexHandle = GLES20.glGetUniformLocation(mPointSpriteProgram, "uTexture");
+        GLES20.glUniform1i(pTexHandle, 0);
 
         for (Texture t: mTextures)
             reloadTexture(t);
@@ -204,7 +235,19 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
 
         // finally set the value of mvpMatrix uniform to the mMVPMatrix
-        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
+        GLES20.glUniformMatrix4fv(mSpriteMVPMatrixHandle, 1, false, mMVPMatrix, 0);
+    }
+
+    public void setPointSpriteTransform(float posX, float posY) {
+        Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.translateM(mModelMatrix, 0, posX, posY, 0);
+
+        // mMVPMatrix = mProjectionMatrix * mViewMatrix * mModelMatrix
+        Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
+
+        // finally set the value of mvpMatrix uniform to the mMVPMatrix
+        GLES20.glUniformMatrix4fv(mPointSpriteMVPMatrixHandle, 1, false, mMVPMatrix, 0);
     }
 
     // Read text from a raw resource file
@@ -225,6 +268,13 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         int shader = GLES20.glCreateShader(type);
         GLES20.glShaderSource(shader, shaderCode);
         GLES20.glCompileShader(shader);
+        int[] compiled = new int[1];
+        GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compiled, 0);
+        if (compiled[0] != GLES20.GL_TRUE) {
+            GLES20.glDeleteShader(shader);
+            throw new RuntimeException("Could not compile program: "
+                    + GLES20.glGetShaderInfoLog(shader) + " | " + shaderCode);
+        }
         return shader;
     }
 
