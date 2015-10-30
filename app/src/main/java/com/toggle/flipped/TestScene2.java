@@ -1,9 +1,10 @@
 package com.toggle.flipped;
 
 
+import com.toggle.katana2d.Emitter;
 import com.toggle.katana2d.Entity;
-import com.toggle.katana2d.GLPointSprites;
 import com.toggle.katana2d.GLSprite;
+import com.toggle.katana2d.ParticleSystem;
 import com.toggle.katana2d.RenderSystem;
 import com.toggle.katana2d.Scene;
 import com.toggle.katana2d.Sprite;
@@ -19,34 +20,36 @@ public class TestScene2 extends Scene {
     public void onInit() {
         PhysicsSystem physicsSystem = new PhysicsSystem();
         FlipSystem flipSystem = new FlipSystem(mGame.getRenderer().getCamera());
+        ParticleSystem particleSystem = new ParticleSystem(mGame);
 
         // Add the systems
         mSystems.add(new RenderSystem());
         mSystems.add(physicsSystem);
-        //mSystems.add(new PlayerControlSystem(mGame));
+        mSystems.add(particleSystem);
+
         mSystems.add(new BotControlSystem());
         mSystems.add(new PlayerInputSystem(mGame));
         mSystems.add(flipSystem);
 
         // Some sprites which are just colored boxes
-        mGame.getRenderer().setBackgroundColor(1, 1, 1);
+        mGame.getRenderer().setBackgroundColor(0, 0, 0);
         float w = mGame.getRenderer().width, h = mGame.getRenderer().height;
 
         int spr0 = mGame.spriteManager.add(
-                new GLSprite(mGame.getRenderer(), null, new float[]{0,0,0,1}, 32, 32)
+                new GLSprite(mGame.getRenderer(), null, new float[]{0.7f, 0.7f, 0.7f, 1}, 32, 32)
         );
         int spr1 = mGame.spriteManager.add(
                 //new GLSprite(mGame.getRenderer(), null, new float[]{1,0,0,1}, 32, 32)
                 new GLSprite(mGame.getRenderer(), mGame.getRenderer().addTexture(R.drawable.test_spr2), 40, 36)
         );
         int spr2 = mGame.spriteManager.add(
-                new GLSprite(mGame.getRenderer(), null, new float[]{0.2f,0.2f,0.2f,1.0f}, w, 32)
+                new GLSprite(mGame.getRenderer(), null, new float[]{0.2f, 0.2f, 0.2f, 1.0f}, w, 32)
         );
         int spr3 = mGame.spriteManager.add(
-                new GLSprite(mGame.getRenderer(), null, new float[]{0.2f,0.2f,0.2f,1.0f}, w * 2, 32)
+                new GLSprite(mGame.getRenderer(), null, new float[]{0.2f, 0.2f, 0.2f, 1.0f}, w * 2, 32)
         );
         int spr4 = mGame.spriteManager.add(
-                new GLSprite(mGame.getRenderer(), null, new float[]{0.5f,0.5f,0.0f,1.0f}, 32, 4)
+                new GLSprite(mGame.getRenderer(), null, new float[]{0.5f, 0.5f, 0.0f, 1.0f}, 32, 4)
         );
 
         // Add some entities
@@ -95,23 +98,31 @@ public class TestScene2 extends Scene {
         player.add(new Bot());
 
         Sprite.SpriteSheetData stand = new Sprite.SpriteSheetData();
-        stand.offsetX = 12; stand.offsetY = 252;
-        stand.imgWidth = 38; stand.imgHeight = 35;
+        stand.offsetX = 12;
+        stand.offsetY = 252;
+        stand.imgWidth = 38;
+        stand.imgHeight = 35;
         stand.numRows = stand.numCols = 1;
         stand.animationSpeed = 0;
         player.get(Bot.class).idle = stand;
 
         Sprite.SpriteSheetData walk = new Sprite.SpriteSheetData();
-        walk.offsetX = 16; walk.offsetY = 312;
-        walk.imgWidth = 36.8f; walk.imgHeight = 36;
+        walk.offsetX = 16;
+        walk.offsetY = 312;
+        walk.imgWidth = 36.8f;
+        walk.imgHeight = 36;
         walk.hSpacing = 1f;
-        walk.numCols = 6; walk.numRows = 1;
+        walk.numCols = 6;
+        walk.numRows = 1;
         player.get(Bot.class).walk = walk;
 
         Sprite.SpriteSheetData jump = new Sprite.SpriteSheetData();
-        jump.offsetX = 39; jump.offsetY = 373;
-        jump.imgWidth = 37.8f; jump.imgHeight = 36;
-        jump.numCols = 8; jump.numRows = 1;
+        jump.offsetX = 39;
+        jump.offsetY = 373;
+        jump.imgWidth = 37.8f;
+        jump.imgHeight = 36;
+        jump.numCols = 8;
+        jump.numRows = 1;
         jump.animationSpeed = 0;
         player.get(Bot.class).jump = jump;
 
@@ -122,5 +133,21 @@ public class TestScene2 extends Scene {
         // FlipSystem detects player interaction with flip-items like mirrors.
         // Set the player to check interaction with.
         flipSystem.setPlayer(player);
+
+        // Create a emitter
+        Entity emitter = new Entity();
+        emitter.add(new Transformation(w / 2 + 32, h - 32 - 16, -90));
+        emitter.add(new Emitter(mGame.getRenderer(), 300, mGame.getRenderer().mFuzzyTexture, 3, 100, new float[]{51f / 255, 102f / 255, 179f / 255, 1}, new float[]{0, 0, 0, 0}));
+        addEntity(emitter);
+
+        Emitter e = emitter.get(Emitter.class);
+        e.var_startColor[3] = 0.3f;
+        e.size = 20;
+        e.var_size = 5;
+        e.var_angle = 90;
+        e.speed = 10;
+        e.var_speed = 5;
+        e.accel_x = 20;
+        e.additiveBlend = true;
     }
 }

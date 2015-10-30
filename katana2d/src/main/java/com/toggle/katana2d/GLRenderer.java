@@ -71,6 +71,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
     // A white texture to use when no texture is selected
     public Texture mWhiteTexture;
+    public Texture mFuzzyTexture;
 
     // Camera to defining view position and angle
     private Camera mCamera = new Camera();
@@ -81,6 +82,14 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         mBackR = r;
         mBackG = g;
         mBackB = b;
+    }
+
+    public void setAdditiveBlending() {
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE);
+    }
+
+    public void setAlphaBlending() {
+        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     @Override
@@ -159,7 +168,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         for (Texture t: mTextures)
             reloadTexture(t);
 
-        mWhiteTexture = addTexture(R.drawable.white);
+        mWhiteTexture = createTexture(R.drawable.white);
+        mFuzzyTexture = createTexture(R.drawable.fuzzy_circle);
 
         // Initialize the Engine
         mGame.init();
@@ -238,9 +248,10 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         GLES20.glUniformMatrix4fv(mSpriteMVPMatrixHandle, 1, false, mMVPMatrix, 0);
     }
 
-    public void setPointSpriteTransform(float posX, float posY) {
+    public void setPointSpriteTransform(float posX, float posY, float angle) {
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.translateM(mModelMatrix, 0, posX, posY, 0);
+        Matrix.rotateM(mModelMatrix, 0, angle, 0, 0, 1);
 
         // mMVPMatrix = mProjectionMatrix * mViewMatrix * mModelMatrix
         Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
@@ -309,11 +320,16 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         texture.resourceId = resourceId;
     }
 
+    private Texture createTexture(int resourceId) {
+        Texture t = new Texture();
+        loadTexture(t, resourceId);
+        return t;
+    }
+
     // load texture from a resource file
     public Texture addTexture(int resourceId)
     {
-        Texture t = new Texture();
-        loadTexture(t, resourceId);
+        Texture t = createTexture(resourceId);
         mTextures.add(t);
         return t;
     }

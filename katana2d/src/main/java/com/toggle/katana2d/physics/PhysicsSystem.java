@@ -15,8 +15,8 @@ import java.util.Iterator;
 
 // Uses box2d to update all entities with PhysicsBody and Transformation components
 public class PhysicsSystem extends System implements ContactListener {
-    public static final float BOX_TO_WORLD = 32f;               // 32 pixels = 1 meter
-    public static final float WORLD_TO_BOX = 1 / BOX_TO_WORLD;
+    public static final float PIXELS_PER_METER = 32f;               // 32 pixels = 1 meter
+    public static final float METERS_PER_PIXEL = 1 / PIXELS_PER_METER;
 
     private World world = new World(new Vec2(0, 10));
 
@@ -35,8 +35,8 @@ public class PhysicsSystem extends System implements ContactListener {
         for (Entity entity: mEntities) {
             Transformation t = entity.get(Transformation.class);
             PhysicsBody b = entity.get(PhysicsBody.class);
-            t.x = b.body.getPosition().x * BOX_TO_WORLD;
-            t.y = b.body.getPosition().y * BOX_TO_WORLD;
+            t.x = b.body.getPosition().x * PIXELS_PER_METER;
+            t.y = b.body.getPosition().y * PIXELS_PER_METER;
             t.angle = (float)Math.toDegrees(b.body.getAngle());
         }
     }

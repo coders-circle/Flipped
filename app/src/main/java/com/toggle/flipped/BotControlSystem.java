@@ -1,7 +1,5 @@
 package com.toggle.flipped;
 
-import com.toggle.katana2d.Camera;
-import com.toggle.katana2d.Component;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Transformation;
@@ -10,7 +8,6 @@ import com.toggle.katana2d.physics.PhysicsSystem;
 
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Fixture;
 
 public class BotControlSystem extends com.toggle.katana2d.System {
 
@@ -28,7 +25,7 @@ public class BotControlSystem extends com.toggle.katana2d.System {
         Vec2 ex = b.body.getFixtureList().getAABB(0).getExtents();
 
         // A 2 pixel sensor at the bottom to sense the ground
-        shape.setAsBox(ex.x/2, 2 * PhysicsSystem.WORLD_TO_BOX, new Vec2(0, ex.y), 0);
+        shape.setAsBox(ex.x/2, 2 * PhysicsSystem.METERS_PER_PIXEL, new Vec2(0, ex.y), 0);
         p.groundFixture = b.createSensor(shape);
     }
 

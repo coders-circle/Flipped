@@ -1,6 +1,7 @@
 package com.toggle.katana2d;
 
 import android.opengl.GLES20;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -9,6 +10,8 @@ import java.nio.FloatBuffer;
 public class GLPointSprites {
 
     private GLRenderer mRenderer;
+    public GLRenderer getRenderer() { return mRenderer; }
+
     public FloatBuffer mPointSpriteVertexBuffer;
     private Texture mTexture;
 
@@ -27,7 +30,7 @@ public class GLPointSprites {
             mTexture = texture;
     }
 
-    public void draw(float[] data, float x, float y) {
+    public void draw(float[] data, float x, float y, float angle, int numPoints) {
         if (data == null || data.length == 0)
             return;
 
@@ -44,10 +47,10 @@ public class GLPointSprites {
         mPointSpriteVertexBuffer.position(0);
 
         GLES20.glUseProgram(mRenderer.mPointSpriteProgram);
-        mRenderer.setPointSpriteTransform(x, y);
+        mRenderer.setPointSpriteTransform(x, y, angle);
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);  // sample-0
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTexture.textureId);
-        GLES20.glDrawArrays(GLES20.GL_POINTS, 0, data.length/ELEMENTS_PER_POINT);
+        GLES20.glDrawArrays(GLES20.GL_POINTS, 0, numPoints);
 
     }
 
