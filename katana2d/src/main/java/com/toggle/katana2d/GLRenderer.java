@@ -89,7 +89,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     }
 
     public void setAlphaBlending() {
-        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     @Override
@@ -168,8 +168,10 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         for (Texture t: mTextures)
             reloadTexture(t);
 
-        mWhiteTexture = createTexture(R.drawable.white);
-        mFuzzyTexture = createTexture(R.drawable.fuzzy_circle);
+        if (mWhiteTexture == null)
+            mWhiteTexture = addTexture(R.drawable.white);
+        if (mFuzzyTexture == null)
+            mFuzzyTexture = addTexture(R.drawable.fuzzy_circle);
 
         // Initialize the Engine
         mGame.init();

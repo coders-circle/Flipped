@@ -20,13 +20,22 @@ public class BotControlSystem extends com.toggle.katana2d.System {
         // Add sensors
         Bot p = e.get(Bot.class);
         PhysicsBody b = e.get(PhysicsBody.class);
-
-        PolygonShape shape = new PolygonShape();
         Vec2 ex = b.body.getFixtureList().getAABB(0).getExtents();
 
+        float twopixels =  2 * PhysicsSystem.METERS_PER_PIXEL;
+
         // A 2 pixel sensor at the bottom to sense the ground
-        shape.setAsBox(ex.x/2, 2 * PhysicsSystem.METERS_PER_PIXEL, new Vec2(0, ex.y), 0);
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(ex.x*0.7f, twopixels, new Vec2(0, ex.y), 0);
         p.groundFixture = b.createSensor(shape);
+
+        // Side sensors
+        shape = new PolygonShape();
+        shape.setAsBox(twopixels, ex.y/2, new Vec2(-ex.x, 0), 0);
+        p.leftsideFixture = b.createSensor(shape);
+        shape = new PolygonShape();
+        shape.setAsBox(twopixels, ex.y/2, new Vec2(ex.x, 0), 0);
+        p.rightsideFixture = b.createSensor(shape);
     }
 
     @Override
@@ -43,11 +52,14 @@ public class BotControlSystem extends com.toggle.katana2d.System {
             // Check if the bot foot is touching something solid.
             // that is, if the groundFixture has collided with something.
             boolean onGround = false;
+            boolean onLeftSide = false, onRightSide = false;
             for (PhysicsBody.Collision c: b.collisions) {
-                if (c.myFixture == bot.groundFixture) {
+                if (c.myFixture == bot.groundFixture)
                     onGround = true;
-                    break;
-                }
+                else if (c.myFixture == bot.leftsideFixture)
+                    onLeftSide = true;
+                else if (c.myFixture == bot.rightsideFixture)
+                    onRightSide = true;
             }
 
             // If we are on ground but we are in JUMP state, revert to NOTHING action state
@@ -79,13 +91,17 @@ public class BotControlSystem extends com.toggle.katana2d.System {
 
             // change sprites
             if (onGround) {
-                if (speed != 0)
-                    s.changeSpriteSheet(bot.walk);
+                if (speed != 0) {
+                    if ((speed < 0 && onLeftSide) || (speed > 0 && onRightSide))
+                        s.changeSprite(bot.sprPush, bot.ssdPush);
+                    else
+                        s.changeSprite(bot.sprWalk, bot.ssdWalk);
+                }
                 else
-                    s.changeSpriteSheet(bot.idle);
+                    s.changeSprite(bot.sprIdle, bot.ssdIdle);
             }
             else
-                s.changeSpriteSheet(bot.jump);
+                s.changeSprite(bot.sprJump, bot.ssdJump);
 
             if (speed != 0)
                 s.isReflected = speed < 0;

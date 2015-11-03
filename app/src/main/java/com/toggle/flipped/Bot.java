@@ -1,5 +1,6 @@
 package com.toggle.flipped;
 
+import com.toggle.katana2d.GLSprite;
 import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Component;
 
@@ -17,11 +18,12 @@ public class Bot implements Component {
     MotionState motionState;
     ActionState actionState;
 
-    // A ground sensor required to sense if bot is on solid ground
+    // Sensors required to sense if bot is colliding on ground or on sides
     Fixture groundFixture;
-    // Other sensors to sense e.g. enemies during fighting
+    Fixture leftsideFixture, rightsideFixture;
 
     // Health, damagePoints
 
-    Sprite.SpriteSheetData idle, walk, jump, fight;
+    Sprite.SpriteSheetData ssdIdle, ssdWalk, ssdJump, fight, ssdPush;
+    GLSprite sprIdle, sprWalk, sprJump, sprFight, sprPush;
 }

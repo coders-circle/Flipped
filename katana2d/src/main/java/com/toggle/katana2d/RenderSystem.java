@@ -1,5 +1,7 @@
 package com.toggle.katana2d;
 
+import android.util.Log;
+
 // Uses sprite and transformation components of entities to render them
 public class RenderSystem extends System {
     public RenderSystem() {
@@ -14,10 +16,13 @@ public class RenderSystem extends System {
 
             // animate a sprite sheet by advancing the image index when required time has elapsed
             if (ssd != null && ssd.animationSpeed > 0) {
+                if (ssd.numImages < 0)
+                    ssd.numImages = ssd.numRows * ssd.numCols;
+
                 ssd.timePassed += (float) dt;
                 if (ssd.timePassed >= 1.0/ssd.animationSpeed) {
                     ssd.timePassed = 0;
-                    ssd.index = (ssd.index+1)%(ssd.numCols*ssd.numRows);
+                    ssd.index = (ssd.index+1)%(ssd.numImages);
                 }
             }
         }
