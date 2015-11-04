@@ -52,7 +52,7 @@ public class LevelLoader {
 
     public void loadWorld(String worldName, Scene scene, World boxWorld) {
         try {
-            JSONObject world = data.getJSONObject("world").getJSONObject(worldName);
+            JSONObject world = data.getJSONObject("worlds").getJSONObject(worldName);
             JSONObject entities = world.getJSONObject("entities");
             Iterator<String> keys = entities.keys();
             while (keys.hasNext()) {
@@ -64,7 +64,7 @@ public class LevelLoader {
 
                 Iterator<String> ckeys = jsonComponents.keys();
                 while (ckeys.hasNext()) {
-                    String ckey = keys.next();
+                    String ckey = ckeys.next();
                     addComponent(scene.getGame(), boxWorld, e, ckey, jsonComponents.getJSONObject(ckey), jsonComponents);
                 }
 
@@ -76,58 +76,62 @@ public class LevelLoader {
     }
 
     public void addComponent(Game game, World world, Entity entity, String compName, JSONObject component, JSONObject components) throws JSONException {
-        if (compName.equals("Sprite")) {
-            entity.add(new Sprite(game.spriteManager.get(component.getString("Sprite"))));
-        }
-        else if (compName.equals("Transformation")) {
-            entity.add(new Transformation((float)component.getDouble("Translate-X"),
-                    (float)component.getDouble("Translate-Y"), (float)component.getDouble("Angle")));
-        }
-        else if (compName.equals("RigidBody")) {
-            if (components.has("Sprite")) {
-                JSONObject jsonShape =
-                        data.getJSONObject("sprites").getJSONObject(components.getJSONObject("Sprite").getString("Sprite"))
-                        .getJSONObject("shape");
+        switch (compName) {
+            case "Sprite":
+                entity.add(new Sprite(game.spriteManager.get(component.getString("Sprite"))));
+                break;
+            case "Transformation":
+                entity.add(new Transformation((float) component.getDouble("Translate-X"),
+                        (float) component.getDouble("Translate-Y"), (float) component.getDouble("Angle")));
+                break;
+            case "RigidBody":
+                if (components.has("Sprite")) {
+                    JSONObject jsonShape =
+                            data.getJSONObject("sprites").getJSONObject(components.getJSONObject("Sprite").getString("Sprite"))
+                                    .getJSONObject("shape");
 
-                Shape shape;
-                String type = jsonShape.getString("type");
-                if (type.equals("box")) {
-                    shape = new PolygonShape();
-                    ((PolygonShape)shape).setAsBox((float) jsonShape.getDouble("width") / 2 * PhysicsSystem.METERS_PER_PIXEL,
-                            (float) jsonShape.getDouble("height") / 2 * PhysicsSystem.METERS_PER_PIXEL);
-                }
-                else if (type.equals("circle")) {
-                    shape = new CircleShape();
-                    shape.setRadius((float) jsonShape.getDouble("radius") * PhysicsSystem.METERS_PER_PIXEL);
-                }
-                else {
-                    shape = new PolygonShape();
+                    Shape shape;
+                    String type = jsonShape.getString("type");
+                    switch (type) {
+                        case "box":
+                            shape = new PolygonShape();
+                            ((PolygonShape) shape).setAsBox((float) jsonShape.getDouble("width") / 2 * PhysicsSystem.METERS_PER_PIXEL,
+                                    (float) jsonShape.getDouble("height") / 2 * PhysicsSystem.METERS_PER_PIXEL);
+                            break;
+                        case "circle":
+                            shape = new CircleShape();
+                            shape.setRadius((float) jsonShape.getDouble("radius") * PhysicsSystem.METERS_PER_PIXEL);
+                            break;
+                        default:
+                            shape = new PolygonShape();
 
-                    Pattern pattern = Pattern.compile("(\\d|\\.)+,\\s*(\\d|\\.)+");
-                    Matcher matcher = pattern.matcher(jsonShape.getString("points"));
+                            Pattern pattern = Pattern.compile("(\\d|\\.)+,\\s*(\\d|\\.)+");
+                            Matcher matcher = pattern.matcher(jsonShape.getString("points"));
 
-                    List<Vec2> vertices = new ArrayList<>();
-                    while (matcher.find()) {
-                        float x = Float.parseFloat(matcher.group(1)) * PhysicsSystem.METERS_PER_PIXEL;
-                        float y = Float.parseFloat(matcher.group(2)) * PhysicsSystem.METERS_PER_PIXEL;
-                        vertices.add(new Vec2(x, y));
+                            List<Vec2> vertices = new ArrayList<>();
+                            while (matcher.find()) {
+                                float x = Float.parseFloat(matcher.group(1)) * PhysicsSystem.METERS_PER_PIXEL;
+                                float y = Float.parseFloat(matcher.group(2)) * PhysicsSystem.METERS_PER_PIXEL;
+                                vertices.add(new Vec2(x, y));
+                            }
+
+                            ((PolygonShape) shape).set((Vec2[]) vertices.toArray(), vertices.size());
+                            break;
                     }
 
-                    ((PolygonShape)shape).set((Vec2[])vertices.toArray(), vertices.size());
+                    BodyType bodyType;
+                    if (component.getString("Type").equals("Static"))
+                        bodyType = BodyType.STATIC;
+                    else if (component.getString("Type").equals("Dynamic"))
+                        bodyType = BodyType.DYNAMIC;
+                    else
+                        bodyType = BodyType.KINEMATIC;
+
+                    entity.add(new PhysicsBody(world, bodyType, entity, shape, new PhysicsBody.Properties(
+                            (float) component.getDouble("Density"), (float) component.getDouble("Friction"), (float) component.getDouble("Restitution")
+                    )));
                 }
-
-                BodyType bodyType;
-                if (component.getString("Type").equals("Static"))
-                    bodyType = BodyType.STATIC;
-                else if (component.getString("Type").equals("Dynamic"))
-                    bodyType = BodyType.DYNAMIC;
-                else
-                    bodyType = BodyType.KINEMATIC;
-
-                entity.add(new PhysicsBody(world, bodyType, entity, shape, new PhysicsBody.Properties(
-                        (float)component.getDouble("Density"), (float)component.getDouble("Friction"), (float)component.getDouble("Restitution")
-                )));
-            }
+                break;
         }
     }
 
