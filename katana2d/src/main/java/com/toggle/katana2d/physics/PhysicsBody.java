@@ -58,7 +58,7 @@ public class PhysicsBody implements Component {
     }
 
     private void init(World world, BodyType type, float posX, float posY, float angle,
-                      PolygonShape shape, Object object, Properties properties) {
+                      Shape shape, Object object, Properties properties) {
         posX = posX * PhysicsSystem.METERS_PER_PIXEL;
         posY = posY * PhysicsSystem.METERS_PER_PIXEL;
 
@@ -95,12 +95,12 @@ public class PhysicsBody implements Component {
     }
 
     // Make sure entity has transformation
-    public PhysicsBody(World world, BodyType type, Entity entity, PolygonShape shape, Properties properties) {
+    public PhysicsBody(World world, BodyType type, Entity entity, Shape shape, Properties properties) {
         Transformation t = entity.get(Transformation.class);
         init(world, type, t.x, t.y, t.angle, shape, entity, properties);
     }
 
-    public PhysicsBody(World world, BodyType type, float posX, float posY, float angle, PolygonShape shape, Object object, Properties properties) {
+    public PhysicsBody(World world, BodyType type, float posX, float posY, float angle, Shape shape, Object object, Properties properties) {
         init(world, type, posX, posY, angle, shape, object, properties);
     }
 

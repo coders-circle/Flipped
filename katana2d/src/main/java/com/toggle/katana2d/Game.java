@@ -22,6 +22,8 @@ public class Game  implements TimerCallback {
         mActivity = activity;
     }
 
+    public GameActivity getActivity() { return mActivity; }
+
     public GLRenderer getRenderer() { return mRenderer; }
 
     public TouchInputData getTouchInputData() { return mRenderer.touchInputData; }

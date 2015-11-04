@@ -17,13 +17,17 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
 
     @Override
     public void update(double dt) {
-        TouchInputData touch = mGame.getTouchInputData();
+        TouchInputData touchData = mGame.getTouchInputData();
 
         for (Entity e: mEntities) {
             Player p = e.get(Player.class);
             Bot b = e.get(Bot.class);
 
-            if (touch.isTouchDown) {
+            // If at least one pointer is touching
+            if (touchData.pointers.size() > 0) {
+                // User first pointer to process
+                TouchInputData.Pointer touch = touchData.pointers.valueAt(0);
+
                 // when user is touching on the screen,
                 // set move-direction to direction of dx
                 if (touch.dx > 5) {

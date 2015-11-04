@@ -31,7 +31,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     GLRenderer(Context context, Game game) { mContext = context; mGame = game;}
 
     // Touch input data;
-    public TouchInputData touchInputData = new TouchInputData();
+    public TouchInputData touchInputData;
 
     // GLSL program objects
     public int mSpriteProgram;

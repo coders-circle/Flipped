@@ -58,5 +58,9 @@ public class Scene {
     public void onPause() {}
     public void onResume() {}
 
+    public Game getGame() {
+        return mGame;
+    }
+
     /*TODO: Pass input events to all systems.*/
 }
