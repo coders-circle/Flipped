@@ -2,6 +2,7 @@ package com.toggle.katana2d;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.support.v4.view.MotionEventCompat;
 import android.view.MotionEvent;
 
 public class SurfaceView extends GLSurfaceView {
