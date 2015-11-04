@@ -10,6 +10,7 @@ public class MainActivity extends GameActivity {
         Game game = mEngine.getGame();
         game.addScene(new TestScene());
         game.addScene(new TestScene2());
+        game.addScene(new LevelTestScene());
         game.setActiveScene(1);
     }
 }

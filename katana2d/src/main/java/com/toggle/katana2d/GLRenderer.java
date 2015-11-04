@@ -31,7 +31,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     GLRenderer(Context context, Game game) { mContext = context; mGame = game;}
 
     // Touch input data;
-    public TouchInputData touchInputData = new TouchInputData();
+    public TouchInputData touchInputData;
 
     // GLSL program objects
     public int mSpriteProgram;
@@ -106,8 +106,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         GLES20.glClearColor(100.0f / 255, 149.0f / 255, 237.0f / 255, 1.0f);
 
         // Compile the sprite shaders
-        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, getRawFileText(R.raw.vs_sprite));
-        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, getRawFileText(R.raw.fs_sprite));
+        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, getRawFileText(mContext, R.raw.vs_sprite));
+        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, getRawFileText(mContext, R.raw.fs_sprite));
 
         // Link the shaders to a program
         mSpriteProgram = GLES20.glCreateProgram();
@@ -142,8 +142,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         GLES20.glUniform1i(texHandle, 0);
 
         // Shaders for point sprites
-        int pVertexShader = loadShader(GLES20.GL_VERTEX_SHADER, getRawFileText(R.raw.vs_point_sprite));
-        int pFragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, getRawFileText(R.raw.fs_point_sprite));
+        int pVertexShader = loadShader(GLES20.GL_VERTEX_SHADER, getRawFileText(mContext, R.raw.vs_point_sprite));
+        int pFragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, getRawFileText(mContext, R.raw.fs_point_sprite));
 
         // Link the shaders to a program
         mPointSpriteProgram = GLES20.glCreateProgram();
@@ -264,8 +264,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     }
 
     // Read text from a raw resource file
-    public String getRawFileText(int rawResId) {
-        InputStream inputStream  = mContext.getResources().openRawResource(rawResId);
+    public static String getRawFileText(Context context, int rawResId) {
+        InputStream inputStream  = context.getResources().openRawResource(rawResId);
         String s = new java.util.Scanner(inputStream).useDelimiter("\\A").next();
 
         try {
