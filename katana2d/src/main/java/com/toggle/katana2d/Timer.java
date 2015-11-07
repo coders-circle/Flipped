@@ -3,13 +3,14 @@ package com.toggle.katana2d;
 import static java.lang.System.nanoTime;
 
 public class Timer {
+    private static final int ONE_SECOND = 1000000000;
 
     public Timer(double targetFPS) {
-        Reset(targetFPS);
+        reset(targetFPS);
     }
 
     // Reset the timer with given target-FPS
-    public void Reset(double targetFPS) {
+    public void reset(double targetFPS) {
         mLeftOver = 0.0;
         mTotalTime = 0.0;
         mLastTime = nanoTime();
@@ -18,14 +19,13 @@ public class Timer {
     }
 
     // Get actual FPS calculated
-    int GetFPS() {
+    public int getFPS() {
         return mFps;
     }
     // Get total time elapsed since reset
-    double GetTotalTime() { return mTotalTime; }
+    public double getTotalTime() { return mTotalTime; }
 
-    private static final int ONE_SECOND = 1000000000;
-    void Update(TimerCallback callback) {
+    public void Update(TimerCallback callback) {
 
         // get current and delta times
         double currentTime = nanoTime();

@@ -7,10 +7,7 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
-import android.util.Log;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -106,8 +103,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         GLES20.glClearColor(100.0f / 255, 149.0f / 255, 237.0f / 255, 1.0f);
 
         // Compile the sprite shaders
-        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, getRawFileText(mContext, R.raw.vs_sprite));
-        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, getRawFileText(mContext, R.raw.fs_sprite));
+        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, Utilities.getRawFileText(mContext, R.raw.vs_sprite));
+        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, Utilities.getRawFileText(mContext, R.raw.fs_sprite));
 
         // Link the shaders to a program
         mSpriteProgram = GLES20.glCreateProgram();
@@ -142,8 +139,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         GLES20.glUniform1i(texHandle, 0);
 
         // Shaders for point sprites
-        int pVertexShader = loadShader(GLES20.GL_VERTEX_SHADER, getRawFileText(mContext, R.raw.vs_point_sprite));
-        int pFragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, getRawFileText(mContext, R.raw.fs_point_sprite));
+        int pVertexShader = loadShader(GLES20.GL_VERTEX_SHADER, Utilities.getRawFileText(mContext, R.raw.vs_point_sprite));
+        int pFragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, Utilities.getRawFileText(mContext, R.raw.fs_point_sprite));
 
         // Link the shaders to a program
         mPointSpriteProgram = GLES20.glCreateProgram();
@@ -261,19 +258,6 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
         // finally set the value of mvpMatrix uniform to the mMVPMatrix
         GLES20.glUniformMatrix4fv(mPointSpriteMVPMatrixHandle, 1, false, mMVPMatrix, 0);
-    }
-
-    // Read text from a raw resource file
-    public static String getRawFileText(Context context, int rawResId) {
-        InputStream inputStream  = context.getResources().openRawResource(rawResId);
-        String s = new java.util.Scanner(inputStream).useDelimiter("\\A").next();
-
-        try {
-            inputStream.close();
-        } catch (IOException e) {
-            Log.e("Raw File read Error", e.getMessage());
-        }
-        return s;
     }
 
     // Create shader object from shader program

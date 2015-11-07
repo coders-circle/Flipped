@@ -14,9 +14,9 @@ public class Bot implements Component {
     enum MotionState { IDLE, MOVE };
     enum ActionState { NOTHING, JUMP_START, JUMP, FIGHT};
 
-    Direction direction;
-    MotionState motionState;
-    ActionState actionState;
+    Direction direction = Direction.RIGHT;
+    MotionState motionState = MotionState.IDLE;
+    ActionState actionState = ActionState.NOTHING;
 
     // Sensors required to sense if bot is colliding on ground or on sides
     Fixture groundFixture;
@@ -24,6 +24,7 @@ public class Bot implements Component {
 
     // Health, damagePoints
 
+    // Sprites and sprite-sheet-data for different states
     Sprite.SpriteSheetData ssdIdle, ssdWalk, ssdJump, fight, ssdPush;
     GLSprite sprIdle, sprWalk, sprJump, sprFight, sprPush;
 }

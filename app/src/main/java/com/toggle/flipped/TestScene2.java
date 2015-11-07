@@ -1,6 +1,9 @@
 package com.toggle.flipped;
 
 
+import android.util.Log;
+
+import com.toggle.katana2d.Emitter;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.GLSprite;
 import com.toggle.katana2d.ParticleSystem;
@@ -46,14 +49,14 @@ public class TestScene2 extends Scene {
         int spr4 = mGame.spriteManager.add(
                 new GLSprite(mGame.getRenderer(), null, new float[]{0.5f, 0.5f, 0.0f, 1.0f}, 32, 4)
         );
-
-        // player sprites
-        int sprRun = mGame.spriteManager.add(
-                new GLSprite(mGame.getRenderer(), mGame.getRenderer().addTexture(R.drawable.runnin), 24, 48)
-        );
-        int sprPush = mGame.spriteManager.add(
-                new GLSprite(mGame.getRenderer(), mGame.getRenderer().addTexture(R.drawable.pushin), 24, 48)
-        );
+//
+//        // player sprites
+//        int sprRun = mGame.spriteManager.add(
+//                new GLSprite(mGame.getRenderer(), mGame.getRenderer().addTexture(R.drawable.runnin), 24, 48)
+//        );
+//        int sprPush = mGame.spriteManager.add(
+//                new GLSprite(mGame.getRenderer(), mGame.getRenderer().addTexture(R.drawable.pushin), 24, 48)
+//        );
 
         // Add some entities
 
@@ -93,49 +96,51 @@ public class TestScene2 extends Scene {
         body.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.DYNAMIC, body, new PhysicsBody.Properties(0.8f)));
         addEntity(body);
 
-        Entity player = new Entity();
-        player.add(new Transformation(w / 4, h - 32 - 16, 0));
-        player.add(new Sprite(mGame.spriteManager.get(sprRun)));
-        player.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.DYNAMIC, player, new PhysicsBody.Properties(1f, 0f, 0f, false, true)));
-        player.add(new Player());
-        player.add(new Bot());
+//        Entity player = new Entity();
+//        player.add(new Transformation(w / 4, h - 32 - 16, 0));
+//        player.add(new Sprite(mGame.spriteManager.get(sprRun)));
+//        player.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.DYNAMIC, player, new PhysicsBody.Properties(1f, 0f, 0f, false, true)));
+//        player.add(new Player());
+//        player.add(new Bot());
+//
+//        Bot playerBot = player.get(Bot.class);
+//
+//        Sprite.SpriteSheetData stand = new Sprite.SpriteSheetData();
+//        stand.imgWidth = 139;
+//        stand.imgHeight = 276;
+//        stand.numRows = 2; stand.numCols = 5;
+//        stand.animationSpeed = 0;
+//        stand.index = 0; //5;
+//        playerBot.ssdIdle = stand;
+//        playerBot.sprIdle = mGame.spriteManager.get(sprRun);
+//
+//        Sprite.SpriteSheetData walk = new Sprite.SpriteSheetData();
+//        walk.imgWidth = 139;
+//        walk.imgHeight = 276;
+//        walk.numRows = 2; walk.numCols = 5;
+//        playerBot.ssdWalk = walk;
+//        playerBot.sprWalk = mGame.spriteManager.get(sprRun);
+//
+//        Sprite.SpriteSheetData jump = new Sprite.SpriteSheetData();
+//        jump.imgWidth = 139;
+//        jump.imgHeight = 276;
+//        jump.numRows = 2; jump.numCols = 5;
+//        jump.animationSpeed = 0;
+//        jump.index = 2;
+//        playerBot.ssdJump = jump;
+//        playerBot.sprJump = mGame.spriteManager.get(sprRun);
+//
+//        Sprite.SpriteSheetData push = new Sprite.SpriteSheetData();
+//        push.imgWidth = 154;
+//        push.imgHeight = 276;
+//        push.numRows = 2; push.numCols = 5;
+//        push.numImages = 7;
+//        playerBot.ssdPush = push;
+//        playerBot.sprPush = mGame.spriteManager.get(sprPush);
+//
+//        player.get(Sprite.class).spriteSheetData = stand;
 
-        Bot playerBot = player.get(Bot.class);
-
-        Sprite.SpriteSheetData stand = new Sprite.SpriteSheetData();
-        stand.imgWidth = 139;
-        stand.imgHeight = 276;
-        stand.numRows = 2; stand.numCols = 5;
-        stand.animationSpeed = 0;
-        stand.index = 0; //5;
-        playerBot.ssdIdle = stand;
-        playerBot.sprIdle = mGame.spriteManager.get(sprRun);
-
-        Sprite.SpriteSheetData walk = new Sprite.SpriteSheetData();
-        walk.imgWidth = 139;
-        walk.imgHeight = 276;
-        walk.numRows = 2; walk.numCols = 5;
-        playerBot.ssdWalk = walk;
-        playerBot.sprWalk = mGame.spriteManager.get(sprRun);
-
-        Sprite.SpriteSheetData jump = new Sprite.SpriteSheetData();
-        jump.imgWidth = 139;
-        jump.imgHeight = 276;
-        jump.numRows = 2; jump.numCols = 5;
-        jump.animationSpeed = 0;
-        jump.index = 2;
-        playerBot.ssdJump = jump;
-        playerBot.sprJump = mGame.spriteManager.get(sprRun);
-
-        Sprite.SpriteSheetData push = new Sprite.SpriteSheetData();
-        push.imgWidth = 154;
-        push.imgHeight = 276;
-        push.numRows = 2; push.numCols = 5;
-        push.numImages = 7;
-        playerBot.ssdPush = push;
-        playerBot.sprPush = mGame.spriteManager.get(sprPush);
-
-        player.get(Sprite.class).spriteSheetData = stand;
+        Entity player = new BotCreator(mGame, physicsSystem.getWorld()).createBot("player", w / 4, h - 32 - 16,0);
         addEntity(player);
 
 
@@ -143,8 +148,8 @@ public class TestScene2 extends Scene {
         // Set the player to check interaction with.
         flipSystem.setPlayer(player);
 
-        /*// Create a emitter
-        Entity emitter = new Entity();
+        // Create a emitter
+        /*Entity emitter = new Entity();
         emitter.add(new Transformation(w / 2 + 32, h - 32 - 16, -90));
         emitter.add(new Emitter(mGame.getRenderer(), 300, mGame.getRenderer().mFuzzyTexture, 3, 100, new float[]{51f / 255, 102f / 255, 179f / 255, 1}, new float[]{0, 0, 0, 0}));
         addEntity(emitter);
@@ -159,4 +164,10 @@ public class TestScene2 extends Scene {
         e.accel_x = 20;
         e.additiveBlend = true;*/
     }
+
+    // Uncomment following to display FPS on logcat
+    /*@Override
+    public void onDraw() {
+        Log.d("FPS", mGame.getTimer().getFPS() + "");
+    }*/
 }

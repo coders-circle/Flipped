@@ -1,0 +1,9 @@
+{
+  "walk_sprite" : { "file":"runnin", "width": 24, "height": 48 },
+  "walk_sheet": { "width":139, "height": 276, "rows": 2, "cols" : 5 },
+
+  "jump_sheet": { "width":139, "height": 276, "rows": 2, "cols" : 5, "index": 2 },
+
+  "push_sprite" : { "file":"pushin", "width": 24, "height": 48 },
+  "push_sheet": { "width":154, "height": 276, "rows": 2, "cols" : 5, "images": 7 }
+}

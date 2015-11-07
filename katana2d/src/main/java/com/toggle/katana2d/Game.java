@@ -4,15 +4,15 @@ package com.toggle.katana2d;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Game  implements TimerCallback {
+public class Game implements TimerCallback {
     // Some common resources
     // Sprites
     public Manager<GLSprite> spriteManager = new Manager<>();
 
     // A reference to the renderer
     private final GLRenderer mRenderer;
-    // Timer with 60 FPS as target
-    private Timer mTimer = new Timer(60.0);
+    // Timer with 40 FPS as target
+    private Timer mTimer = new Timer(40.0);
 
     // The activity that runs this game
     private GameActivity mActivity;
@@ -25,6 +25,8 @@ public class Game  implements TimerCallback {
     public GameActivity getActivity() { return mActivity; }
 
     public GLRenderer getRenderer() { return mRenderer; }
+
+    public Timer getTimer() { return mTimer; }
 
     public TouchInputData getTouchInputData() { return mRenderer.touchInputData; }
 
@@ -95,7 +97,5 @@ public class Game  implements TimerCallback {
         for (Scene scene: mScenes)
             scene.onResume();
     }
-
-    /*TODO: Get Touch input data and generate input events for the active scene.*/
 }
 
