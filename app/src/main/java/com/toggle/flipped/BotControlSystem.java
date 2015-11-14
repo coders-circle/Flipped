@@ -54,13 +54,19 @@ public class BotControlSystem extends com.toggle.katana2d.System {
             boolean onGround = false;
             boolean onLeftSide = false, onRightSide = false;
             for (PhysicsBody.Collision c: b.collisions) {
-                if (c.myFixture == bot.groundFixture)
-                    onGround = true;
-                else if (c.myFixture == bot.leftsideFixture)
-                    onLeftSide = true;
-                else if (c.myFixture == bot.rightsideFixture)
-                    onRightSide = true;
+                if (!c.otherFixture.isSensor()) {
+                    if (c.myFixture == bot.groundFixture)
+                        onGround = true;
+                    else if (c.myFixture == bot.leftsideFixture)
+                        onLeftSide = true;
+                    else if (c.myFixture == bot.rightsideFixture)
+                        onRightSide = true;
+                }
             }
+            if (onGround)
+                b.body.getFixtureList().setFriction(0.5f);
+            else
+                b.body.getFixtureList().setFriction(0.0f);
 
             // If we are on ground but we are in JUMP state, revert to NOTHING action state
             if (bot.actionState == Bot.ActionState.JUMP && onGround)

@@ -25,6 +25,6 @@ public class Bot implements Component {
     // Health, damagePoints
 
     // Sprites and sprite-sheet-data for different states
-    Sprite.SpriteSheetData ssdIdle, ssdWalk, ssdJump, fight, ssdPush;
-    GLSprite sprIdle, sprWalk, sprJump, sprFight, sprPush;
+    Sprite.SpriteSheetData ssdIdle, ssdWalk, ssdJump, ssdPush;
+    GLSprite sprIdle, sprWalk, sprJump, sprPush;
 }

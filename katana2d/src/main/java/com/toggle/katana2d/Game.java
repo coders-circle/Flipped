@@ -11,8 +11,8 @@ public class Game implements TimerCallback {
 
     // A reference to the renderer
     private final GLRenderer mRenderer;
-    // Timer with 40 FPS as target
-    private Timer mTimer = new Timer(40.0);
+    // Timer with 60 FPS as target
+    private Timer mTimer = new Timer(60.0);
 
     // The activity that runs this game
     private GameActivity mActivity;

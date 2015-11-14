@@ -32,6 +32,8 @@ public class TestScene2 extends Scene {
         mSystems.add(new BotControlSystem());
         mSystems.add(new PlayerInputSystem(mGame));
         mSystems.add(flipSystem);
+        mSystems.add(new WindSystem());
+        mSystems.add(new RopeSystem(physicsSystem.getWorld()));
 
         // Some sprites which are just colored boxes
         mGame.getRenderer().setBackgroundColor(0, 0, 0);
@@ -91,54 +93,10 @@ public class TestScene2 extends Scene {
         mirror2.get(FlipSystem.FlipItem.class).targetAngle = 0;
 
         Entity body = new Entity();
-        body.add(new Transformation(w / 2, h - 32 - 16, 0));
+        body.add(new Transformation(w / 2-64, h - 32 - 16, 0));
         body.add(new Sprite(mGame.spriteManager.get(spr0)));
         body.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.DYNAMIC, body, new PhysicsBody.Properties(0.8f)));
         addEntity(body);
-
-//        Entity player = new Entity();
-//        player.add(new Transformation(w / 4, h - 32 - 16, 0));
-//        player.add(new Sprite(mGame.spriteManager.get(sprRun)));
-//        player.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.DYNAMIC, player, new PhysicsBody.Properties(1f, 0f, 0f, false, true)));
-//        player.add(new Player());
-//        player.add(new Bot());
-//
-//        Bot playerBot = player.get(Bot.class);
-//
-//        Sprite.SpriteSheetData stand = new Sprite.SpriteSheetData();
-//        stand.imgWidth = 139;
-//        stand.imgHeight = 276;
-//        stand.numRows = 2; stand.numCols = 5;
-//        stand.animationSpeed = 0;
-//        stand.index = 0; //5;
-//        playerBot.ssdIdle = stand;
-//        playerBot.sprIdle = mGame.spriteManager.get(sprRun);
-//
-//        Sprite.SpriteSheetData walk = new Sprite.SpriteSheetData();
-//        walk.imgWidth = 139;
-//        walk.imgHeight = 276;
-//        walk.numRows = 2; walk.numCols = 5;
-//        playerBot.ssdWalk = walk;
-//        playerBot.sprWalk = mGame.spriteManager.get(sprRun);
-//
-//        Sprite.SpriteSheetData jump = new Sprite.SpriteSheetData();
-//        jump.imgWidth = 139;
-//        jump.imgHeight = 276;
-//        jump.numRows = 2; jump.numCols = 5;
-//        jump.animationSpeed = 0;
-//        jump.index = 2;
-//        playerBot.ssdJump = jump;
-//        playerBot.sprJump = mGame.spriteManager.get(sprRun);
-//
-//        Sprite.SpriteSheetData push = new Sprite.SpriteSheetData();
-//        push.imgWidth = 154;
-//        push.imgHeight = 276;
-//        push.numRows = 2; push.numCols = 5;
-//        push.numImages = 7;
-//        playerBot.ssdPush = push;
-//        playerBot.sprPush = mGame.spriteManager.get(sprPush);
-//
-//        player.get(Sprite.class).spriteSheetData = stand;
 
         Entity player = new BotCreator(mGame, physicsSystem.getWorld()).createBot("player", w / 4, h - 32 - 16,0);
         addEntity(player);
@@ -149,20 +107,40 @@ public class TestScene2 extends Scene {
         flipSystem.setPlayer(player);
 
         // Create a emitter
-        /*Entity emitter = new Entity();
+        Entity emitter = new Entity();
         emitter.add(new Transformation(w / 2 + 32, h - 32 - 16, -90));
-        emitter.add(new Emitter(mGame.getRenderer(), 300, mGame.getRenderer().mFuzzyTexture, 3, 100, new float[]{51f / 255, 102f / 255, 179f / 255, 1}, new float[]{0, 0, 0, 0}));
+        emitter.add(new Emitter(mGame.getRenderer(), 300, mGame.getRenderer().mFuzzyTexture, 3, 100, new float[]{180f / 255, 80f / 255, 10f / 255, 1}, new float[]{0, 0, 0, 0}));
         addEntity(emitter);
 
         Emitter e = emitter.get(Emitter.class);
         e.var_startColor[3] = 0.3f;
-        e.size = 20;
+        e.size = 30;
         e.var_size = 5;
         e.var_angle = 90;
         e.speed = 10;
         e.var_speed = 5;
         e.accel_x = 20;
-        e.additiveBlend = true;*/
+        e.additiveBlend = true;
+
+        // Create some few random objects to blow with the wind
+        // TODO
+
+        // Create a wind source
+        /*Entity windSource = new Entity();
+        windSource.add(new Transformation(w, h/2-32, 180));
+        windSource.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.STATIC, windSource, null, null));
+        windSource.add(new WindSource(100, 1024, 64));
+
+        addEntity(windSource);*/
+
+
+        // Create a rope
+        GLSprite segmentSprite = new GLSprite(mGame.getRenderer(), null, new float[]{0.5f, 0.5f, 0.5f, 1.0f}, 4, 5);
+        Entity ropeEntity = new Entity();
+        ropeEntity.add(new Rope(w, h/2+32, 8, 4, 4, platform.get(PhysicsBody.class).body, null));
+        ropeEntity.get(Rope.class).segmentSprite = new Sprite(segmentSprite);
+
+        addEntity(ropeEntity);
     }
 
     // Uncomment following to display FPS on logcat

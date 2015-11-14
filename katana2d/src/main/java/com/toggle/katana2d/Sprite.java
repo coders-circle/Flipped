@@ -1,7 +1,5 @@
 package com.toggle.katana2d;
 
-import android.util.Log;
-
 // Sprite component that stores sprite-sheet data and a reference to GLSprite
 public class Sprite implements Component{
     public GLSprite glSprite;
@@ -40,5 +38,39 @@ public class Sprite implements Component{
             spriteSheetData.timePassed = 0;
         }
         spriteSheetData = newSpriteSheetData;
+    }
+
+
+    public void draw(float x, float y, float angle) {
+        if (glSprite == null)
+            return;
+
+        if (isReflected) {
+            x += glSprite.width;
+            glSprite.width *= -1;
+        }
+
+        if (spriteSheetData == null)
+            glSprite.draw(x, y, angle);
+        else {
+            Sprite.SpriteSheetData ssd = spriteSheetData;
+
+            int col = ssd.index % ssd.numCols;
+            int row = ssd.index / ssd.numCols;
+
+            float clipX = (ssd.imgWidth + ssd.hSpacing) * col + ssd.offsetX;
+            float clipY = (ssd.imgHeight + ssd.vShacing) * row + ssd.offsetY;
+
+            clipX /= glSprite.mTexture.width;
+            clipY /= glSprite.mTexture.height;
+
+            float clipW = ssd.imgWidth / glSprite.mTexture.width;
+            float clipH = ssd.imgHeight / glSprite.mTexture.height;
+
+            glSprite.draw(x, y, angle, clipX, clipY, clipW, clipH);
+        }
+
+        if (isReflected)
+            glSprite.width *= -1;
     }
 }

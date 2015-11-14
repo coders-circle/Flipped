@@ -26,9 +26,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+// A class to handle level loading from json
 public class LevelLoader {
     private JSONObject data;
-    private CustomLoader mCustomLoader;
+    private CustomLoader mCustomLoader;     // custom loader to handle loading of specific sprites/entities
 
     public void load(Game game, String json, CustomLoader customLoader) {
         mCustomLoader = customLoader;
@@ -129,7 +130,7 @@ public class LevelLoader {
                             // TODO: This needs to be verified
 
                             // Regex matching to get every x, y
-                            Pattern pattern = Pattern.compile("(\\d+\\.?\\d*),\\s*(\\d+\\.?\\d*)");
+                            Pattern pattern = Pattern.compile("(\\-?\\d+\\.?\\d*),\\s*(\\-?\\d+\\.?\\d*)");
                             Matcher matcher = pattern.matcher(jsonShape.getString("points"));
 
                             List<Vec2> vertices = new ArrayList<>();

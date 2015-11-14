@@ -2,6 +2,8 @@ package com.toggle.flipped;
 
 import com.toggle.katana2d.Component;
 
+// NOT USED RIGHT NOW
+
 public class Enemy implements Component {
     // Enemy internal states
     // Need to update Bot states accordingly

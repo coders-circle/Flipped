@@ -1,8 +1,5 @@
 package com.toggle.katana2d;
 
-
-import android.opengl.GLES20;
-
 import java.util.Random;
 
 public class ParticleSystem extends System {
@@ -83,44 +80,49 @@ public class ParticleSystem extends System {
         for (Entity entity : mEntities) {
             Emitter e = entity.get(Emitter.class);
 
-            e.emissionTime += dt;
-            float et = 1/e.emissionRate;
-            if (e.emissionTime >= et) {
-                e.emissionTime -= et;
-                emit(e, 1);
-            }
-
-            for (int i=0; i<e.numParticles; ++i) {
-                Emitter.Particle p = e.particles[i];
-
-                if (p.life >= e.life) {
-                    kill(e, i);
-                    if (i == e.numParticles - 1)
-                        break;
-                    p = e.particles[i];
+            if (e.emitNext) {
+                e.emissionTime += dt;
+                float et = 1 / e.emissionRate;
+                if (e.emissionTime >= et) {
+                    e.emissionTime -= et;
+                    emit(e, 1);
                 }
-                p.life += dt;
 
-                p.speed_x += p.accel_x * dt;
-                p.speed_y += p.accel_y * dt;
+                for (int i = 0; i < e.numParticles; ++i) {
+                    Emitter.Particle p = e.particles[i];
 
-                p.x = p.x + p.speed_x * dt;
-                p.y = p.y + p.speed_y * dt;
+                    if (p.life >= e.life) {
+                        kill(e, i);
+                        if (i == e.numParticles - 1)
+                            break;
+                        p = e.particles[i];
+                    }
+                    p.life += dt;
+
+                    p.speed_x += p.accel_x * dt;
+                    p.speed_y += p.accel_y * dt;
+
+                    p.x = p.x + p.speed_x * dt;
+                    p.y = p.y + p.speed_y * dt;
 
 
-                // Fill the point sprites data
-                int o = i * GLPointSprites.ELEMENTS_PER_POINT;
+                    // Fill the point sprites data
+                    int o = i * GLPointSprites.ELEMENTS_PER_POINT;
 
-                e.pointSpritesData[o] = p.x;
-                e.pointSpritesData[o+1] = p.y;
+                    e.pointSpritesData[o] = p.x;
+                    e.pointSpritesData[o + 1] = p.y;
 
-                float f = p.life/e.life;
-                e.pointSpritesData[o+2] = p.startColor[0] + f * p.rangeColor[0];
-                e.pointSpritesData[o+3] = p.startColor[1] + f * p.rangeColor[1];
-                e.pointSpritesData[o+4] = p.startColor[2] + f * p.rangeColor[2];
-                e.pointSpritesData[o+5] = p.startColor[3] + f * p.rangeColor[3];
+                    float f = p.life / e.life;
+                    e.pointSpritesData[o + 2] = p.startColor[0] + f * p.rangeColor[0];
+                    e.pointSpritesData[o + 3] = p.startColor[1] + f * p.rangeColor[1];
+                    e.pointSpritesData[o + 4] = p.startColor[2] + f * p.rangeColor[2];
+                    e.pointSpritesData[o + 5] = p.startColor[3] + f * p.rangeColor[3];
 
-                e.pointSpritesData[o+6] = p.size;
+                    e.pointSpritesData[o + 6] = p.size;
+                }
+
+                if (e.emitOnlyOnce)
+                    e.emitNext = false;
             }
         }
     }

@@ -1,6 +1,5 @@
 package com.toggle.katana2d;
 
-import android.util.Log;
 
 // Uses sprite and transformation components of entities to render them
 public class RenderSystem extends System {
@@ -34,38 +33,7 @@ public class RenderSystem extends System {
             Sprite sc = entity.get(Sprite.class);
             Transformation tc = entity.get(Transformation.class);
 
-            if (sc.glSprite == null)
-                continue;
-
-            if (sc.isReflected) {
-                tc.x += sc.glSprite.width;
-                sc.glSprite.width *= -1;
-            }
-
-            if (sc.spriteSheetData == null)
-                sc.glSprite.draw(tc.x, tc.y, tc.angle);
-            else {
-                Sprite.SpriteSheetData ssd = sc.spriteSheetData;
-
-                int col = ssd.index % ssd.numCols;
-                int row = ssd.index / ssd.numCols;
-
-                float clipX = (ssd.imgWidth + ssd.hSpacing) * col + ssd.offsetX;
-                float clipY = (ssd.imgHeight + ssd.vShacing) * row + ssd.offsetY;
-
-                clipX /= sc.glSprite.mTexture.width;
-                clipY /= sc.glSprite.mTexture.height;
-
-                float clipW = ssd.imgWidth / sc.glSprite.mTexture.width;
-                float clipH = ssd.imgHeight / sc.glSprite.mTexture.height;
-
-                sc.glSprite.draw(tc.x, tc.y, tc.angle, clipX, clipY, clipW, clipH);
-            }
-
-            if (sc.isReflected) {
-                tc.x += sc.glSprite.width;
-                sc.glSprite.width *= -1;
-            }
+            sc.draw(tc.x, tc.y, tc.angle);
         }
     }
 }

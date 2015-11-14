@@ -14,6 +14,10 @@ import org.jbox2d.dynamics.World;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
+// Create a bot from corresponding json file
+// The json file is expected to be in the 'raw' directory
+// and must have filename in the form bot_<bot_type>.json.
 public class BotCreator {
     private Game mGame;
     private World mWorld;
@@ -23,6 +27,8 @@ public class BotCreator {
         mWorld = world;
     }
 
+    // Get the sprite from a json sprite data
+    // If the sprite already exists, return it, else create new and return it.
     public GLSprite getSprite(JSONObject sprite) throws JSONException {
         String spriteName = sprite.getString("file");
         if (mGame.spriteManager.has(spriteName))
@@ -34,6 +40,7 @@ public class BotCreator {
         return glSprite;
     }
 
+    // Get sprite sheet data from json data
     public Sprite.SpriteSheetData getSpriteSheet(JSONObject sheet) throws JSONException {
         Sprite.SpriteSheetData sheetData = new Sprite.SpriteSheetData();
         sheetData.imgWidth = (float)sheet.getDouble("width");
@@ -45,6 +52,8 @@ public class BotCreator {
         return sheetData;
     }
 
+    // Create a new bot of type 'type'
+    // The bot_'type'.json file must exists;
     public Entity createBot(String type, float x, float y, float angle) {
         type = type.toLowerCase();
         String jsonFile = "bot_" + type;
@@ -54,6 +63,7 @@ public class BotCreator {
             JSONObject json = new JSONObject(Utilities.getRawFileText(mGame.getActivity(),
                     Utilities.getResourceId(mGame.getActivity(), "raw", jsonFile)));
 
+            // First create the bot entity with required components
             entity.add(new Transformation(x, y, angle));
             entity.add(new Sprite(getSprite(json.getJSONObject("walk_sprite"))));
             entity.add(new PhysicsBody(mWorld, BodyType.DYNAMIC, entity, new PhysicsBody.Properties(1f, 0f, 0f, false, true)));
@@ -61,6 +71,10 @@ public class BotCreator {
             entity.add(new Bot());
 
             Bot bot = entity.get(Bot.class);
+
+            // For the 'bot' components, set the sprites and sprite sheets
+            // for different actions as given in the json file.
+            bot.sprWalk = getSprite(json.getJSONObject("walk_sprite"));
 
             if (json.has("idle_sprite"))
                 bot.sprIdle = getSprite(json.getJSONObject("idle_sprite"));

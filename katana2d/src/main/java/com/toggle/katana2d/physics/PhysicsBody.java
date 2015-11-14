@@ -66,22 +66,26 @@ public class PhysicsBody implements Component {
         bodyDef.type = type;
         bodyDef.position = new Vec2(posX, posY);
         bodyDef.angle = (float)Math.toRadians(angle);
-        bodyDef.bullet = properties.bullet;
-        bodyDef.fixedRotation = properties.fixedRotation;
         bodyDef.userData = object;
+        if (properties != null) {
+            bodyDef.bullet = properties.bullet;
+            bodyDef.fixedRotation = properties.fixedRotation;
+        }
         body = world.createBody(bodyDef);
 
-        FixtureDef fixtureDef = new FixtureDef();
-        if (properties.sensor)
-            fixtureDef.isSensor = true;
-        else {
-            fixtureDef.density = properties.density;
-            fixtureDef.friction = properties.friction;
-            fixtureDef.restitution = properties.restitution;
+        if (properties != null) {
+            FixtureDef fixtureDef = new FixtureDef();
+            if (properties.sensor)
+                fixtureDef.isSensor = true;
+            else {
+                fixtureDef.density = properties.density;
+                fixtureDef.friction = properties.friction;
+                fixtureDef.restitution = properties.restitution;
+            }
+            fixtureDef.shape = shape;
+            fixtureDef.userData = object;
+            body.createFixture(fixtureDef);
         }
-        fixtureDef.shape = shape;
-        fixtureDef.userData = object;
-        body.createFixture(fixtureDef);
     }
 
     // Make sure entity has sprite and transformation
@@ -97,6 +101,15 @@ public class PhysicsBody implements Component {
     // Make sure entity has transformation
     public PhysicsBody(World world, BodyType type, Entity entity, Shape shape, Properties properties) {
         Transformation t = entity.get(Transformation.class);
+        init(world, type, t.x, t.y, t.angle, shape, entity, properties);
+    }
+
+    // Make sure entity has transformation
+    public PhysicsBody(World world, BodyType type, Entity entity, float width, float height, Properties properties) {
+        Transformation t = entity.get(Transformation.class);
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(width/2 * PhysicsSystem.METERS_PER_PIXEL - 0.01f, height/2 * PhysicsSystem.METERS_PER_PIXEL - 0.01f);
+
         init(world, type, t.x, t.y, t.angle, shape, entity, properties);
     }
 

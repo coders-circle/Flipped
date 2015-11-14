@@ -2,6 +2,8 @@ package com.toggle.flipped;
 
 import com.toggle.katana2d.Entity;
 
+// NOT USED RIGHT NOW
+
 public class EnemyAISystem extends com.toggle.katana2d.System {
 
     public EnemyAISystem() {
