@@ -21,4 +21,13 @@ public class Entity {
     public  <T extends Component> T get(Class<T> componentClass) {
         return componentClass.cast(mComponents.get(componentClass));
     }
+
+    /*// Flags can be used to... flag the entity for something
+    public long flags;
+
+    // Generate flag
+    public static int lastFlag = 0;
+    public static int getNewFlag() {
+        return ++lastFlag;
+    }*/
 }

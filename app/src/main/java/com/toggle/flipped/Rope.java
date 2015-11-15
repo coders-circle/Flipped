@@ -39,16 +39,22 @@ public class Rope implements Component {
     // List of box2d bodies representing each segment
     final List<Body> segments = new ArrayList<>();
 
-    // To remove a segment, add the box2d body to this list
-    final List<Body> segmentsToDelete = new ArrayList<>();
-
 
     // Burn data for burning the rope
     // TODO
-    private static class BurnData {
+    public static class BurnData {
         float timeToBurn;       // time to burn a segment
         float timePassed = 0;   // time passed since burning current segment started
 
         Sprite burningSegmentSprite;
+    }
+
+    public boolean isBurning = false;
+    public BurnData burnData;
+
+    public BurnData burn() {
+        isBurning = true;
+        burnData = new BurnData();
+        return burnData;
     }
 }

@@ -15,12 +15,42 @@ public class Sprite implements Component{
         this.spriteSheetData = spriteSheetData;
     }
 
+    public void reset() {
+        if (spriteSheetData != null) {
+            spriteSheetData.index = 0;
+            spriteSheetData.timePassed = 0;
+        }
+    }
+
+    public void animate(double dt) {
+        SpriteSheetData ssd = spriteSheetData;
+        // animate a sprite sheet by advancing the image index when required time has elapsed
+        if (ssd != null && ssd.animationSpeed > 0) {
+            if (ssd.numImages < 0)
+                ssd.numImages = ssd.numRows * ssd.numCols;
+
+            ssd.timePassed += (float) dt;
+            if (ssd.timePassed >= 1.0/ssd.animationSpeed) {
+                ssd.timePassed = 0;
+                ssd.index++;
+
+                if (ssd.index >= ssd.numImages) {
+                    if (ssd.loop)
+                        ssd.index = 0;
+                    else
+                        ssd.index--;
+                }
+            }
+        }
+    }
+
     public static class SpriteSheetData {
         public float offsetX = 0, offsetY = 0, imgWidth, imgHeight, hSpacing = 0, vShacing = 0;
         public int numRows = 1, numCols = 1;
         public int numImages = -1;              // If -1 then numImages = numRows x numCols
 
         public float animationSpeed = 12; // in FPS
+        public boolean loop = true;       // loop animation?
         public float timePassed = 0;     // time that has elapsed since last frame
 
         public int index = 0;	// the index of image to draw next
