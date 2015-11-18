@@ -29,12 +29,18 @@ public class PhysicsSystem extends System implements ContactListener {
     public World getWorld() { return world; }
 
     @Override
-    public void update(double dt) {
-        world.step((float) dt, 10, 8);
+    public void update(float dt) {
+        world.step(dt, 10, 8);
 
         for (Entity entity: mEntities) {
             Transformation t = entity.get(Transformation.class);
             PhysicsBody b = entity.get(PhysicsBody.class);
+
+            /*t.vel_x = b.body.getLinearVelocity().x * PIXELS_PER_METER;
+            t.vel_y = b.body.getLinearVelocity().y * PIXELS_PER_METER;
+            t.vel_angle = (float)Math.toDegrees(b.body.getAngularVelocity());*/
+            t.saveState();
+
             t.x = b.body.getPosition().x * PIXELS_PER_METER;
             t.y = b.body.getPosition().y * PIXELS_PER_METER;
             t.angle = (float)Math.toDegrees(b.body.getAngle());
@@ -78,8 +84,10 @@ public class PhysicsSystem extends System implements ContactListener {
                 Iterator<PhysicsBody.Collision> c = b.collisions.iterator();
                 while (c.hasNext()) {
                     PhysicsBody.Collision cc = c.next();
-                    if (cc.myFixture == contact.getFixtureA() && cc.otherFixture == contact.getFixtureB())
+                    if (cc.myFixture == contact.getFixtureA() && cc.otherFixture == contact.getFixtureB()) {
                         c.remove();
+                        break;
+                    }
                 }
             }
         }
@@ -92,8 +100,10 @@ public class PhysicsSystem extends System implements ContactListener {
                 Iterator<PhysicsBody.Collision> c = b.collisions.iterator();
                 while (c.hasNext()) {
                     PhysicsBody.Collision cc = c.next();
-                    if (cc.myFixture == contact.getFixtureB() && cc.otherFixture == contact.getFixtureA())
+                    if (cc.myFixture == contact.getFixtureB() && cc.otherFixture == contact.getFixtureA()) {
                         c.remove();
+                        break;
+                    }
                 }
             }
         }

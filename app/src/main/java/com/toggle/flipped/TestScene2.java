@@ -48,14 +48,6 @@ public class TestScene2 extends Scene {
         int spr4 = mGame.spriteManager.add(
                 new GLSprite(mGame.getRenderer(), null, new float[]{0.5f, 0.5f, 0.0f, 1.0f}, 32, 4)
         );
-//
-//        // player sprites
-//        int sprRun = mGame.spriteManager.add(
-//                new GLSprite(mGame.getRenderer(), mGame.getRenderer().addTexture(R.drawable.runnin), 24, 48)
-//        );
-//        int sprPush = mGame.spriteManager.add(
-//                new GLSprite(mGame.getRenderer(), mGame.getRenderer().addTexture(R.drawable.pushin), 24, 48)
-//        );
 
         // Add some entities
 
@@ -95,7 +87,9 @@ public class TestScene2 extends Scene {
         body.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.DYNAMIC, body, new PhysicsBody.Properties(0.8f)));
         addEntity(body);
 
+        // Use botceator to create a bot from "bot_player.json" file
         Entity player = new BotCreator(mGame, physicsSystem.getWorld()).createBot("player", w / 4, h - 32 - 16,0);
+        player.add(new Player());
         addEntity(player);
 
 
@@ -132,32 +126,28 @@ public class TestScene2 extends Scene {
 
 
         // Create a rope
-        //GLSprite segmentSprite = new GLSprite(mGame.getRenderer(), null, new float[]{0.5f, 0.5f, 0.5f, 1.0f}, 4, 5);
         GLSprite segmentSprite = new GLSprite(mGame.getRenderer(), mGame.getRenderer().addTexture(R.drawable.rope), 6, 5);
+
         Entity ropeEntity = new Entity();
         ropeEntity.add(new Rope(w-128, h/2+32, 8, 4, 4, platform.get(PhysicsBody.class).body, null));
-        Sprite segSprite = ropeEntity.get(Rope.class).segmentSprite = new Sprite(segmentSprite);
-        segSprite.spriteSheetData = new Sprite.SpriteSheetData();
-        segSprite.spriteSheetData.numCols = 5;
-        segSprite.spriteSheetData.numRows = 1;
-        segSprite.spriteSheetData.imgWidth = 6;
-        segSprite.spriteSheetData.imgHeight = 5;
+
+        // Set rope segment sprite
+        Sprite segSprite = ropeEntity.get(Rope.class).segmentSprite = new Sprite(segmentSprite, 5, 1);
         segSprite.spriteSheetData.animationSpeed = 0;
 
-        Rope.BurnData burnData = ropeEntity.get(Rope.class).burn();
-        Sprite burnSegSprite = burnData.burningSegmentSprite = new Sprite(segmentSprite);
+        // Set rope-segment burn time to 1 second
+        Rope.BurnData burnData = ropeEntity.get(Rope.class).makeBurnable();
         burnData.timeToBurn = 1f;
 
-        burnSegSprite.spriteSheetData = new Sprite.SpriteSheetData();
-        burnSegSprite.spriteSheetData.numCols = 5;
-        burnSegSprite.spriteSheetData.numRows = 1;
-        burnSegSprite.spriteSheetData.imgWidth = 6;
-        burnSegSprite.spriteSheetData.imgHeight = 5;
+        // Set burning segment sprite
+        Sprite burnSegSprite = burnData.burningSegmentSprite = new Sprite(segmentSprite, 5, 1);
         burnSegSprite.spriteSheetData.animationSpeed = 4;   // 1 second to burn, 4 frames on image sheet, hence 4 fps
         burnSegSprite.spriteSheetData.loop = false;
 
-        
         addEntity(ropeEntity);
+
+        // Uncomment to start burning
+        //ropeEntity.get(Rope.class).startBurning();
     }
 
     // Uncomment following to display FPS on logcat

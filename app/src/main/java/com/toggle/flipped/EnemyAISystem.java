@@ -11,7 +11,7 @@ public class EnemyAISystem extends com.toggle.katana2d.System {
     }
 
     @Override
-    public void update(double dt) {
+    public void update(float dt) {
         for (Entity entity: mEntities) {
             Enemy e = entity.get(Enemy.class);
             Bot b = entity.get(Bot.class);

@@ -43,12 +43,24 @@ public class BotCreator {
     // Get sprite sheet data from json data
     public Sprite.SpriteSheetData getSpriteSheet(JSONObject sheet) throws JSONException {
         Sprite.SpriteSheetData sheetData = new Sprite.SpriteSheetData();
-        sheetData.imgWidth = (float)sheet.getDouble("width");
-        sheetData.imgHeight = (float)sheet.getDouble("height");
         sheetData.index = sheet.optInt("index", 0);
         sheetData.numCols = sheet.optInt("cols", 5);
         sheetData.numRows = sheet.optInt("rows", 2);
         sheetData.numImages = sheet.optInt("images", sheetData.numRows * sheetData.numCols);
+
+        float wref = (float)sheet.optDouble("width-ref", 1);
+        float href = (float)sheet.optDouble("height-ref", 1);
+
+        if (sheet.has("width"))
+            sheetData.imgWidth = (float)sheet.getDouble("width") / wref;
+        else
+            sheetData.imgWidth = 1f/sheetData.numCols;
+
+        if (sheet.has("height"))
+            sheetData.imgHeight = (float)sheet.getDouble("height") / href;
+        else
+            sheetData.imgHeight = 1f/sheetData.numRows;
+
         return sheetData;
     }
 
@@ -67,7 +79,6 @@ public class BotCreator {
             entity.add(new Transformation(x, y, angle));
             entity.add(new Sprite(getSprite(json.getJSONObject("walk_sprite"))));
             entity.add(new PhysicsBody(mWorld, BodyType.DYNAMIC, entity, new PhysicsBody.Properties(1f, 0f, 0f, false, true)));
-            entity.add(new Player());
             entity.add(new Bot());
 
             Bot bot = entity.get(Bot.class);

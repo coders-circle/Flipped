@@ -20,11 +20,8 @@ import org.jbox2d.dynamics.World;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 // A class to handle level loading from json
 public class LevelLoader {
@@ -69,7 +66,7 @@ public class LevelLoader {
 
                 // if custom-loader doesn't handle this entity,
                 // load the entity by creating new one and adding components
-                if (!mCustomLoader.loadEntity(scene, key, jsonEntity)) {
+                if (!mCustomLoader.loadEntity(scene, boxWorld, key, jsonEntity)) {
                     Entity e = new Entity();
                     JSONObject jsonComponents = jsonEntity.getJSONObject("components");
 
@@ -102,9 +99,8 @@ public class LevelLoader {
                 if (components.has("Sprite")) {
 
                     // get the shape data and create a shape accordingly
-                    JSONObject jsonShape =
-                            data.getJSONObject("sprites").getJSONObject(components.getJSONObject("Sprite").getString("Sprite"))
-                                    .getJSONObject("shape");
+                    JSONObject sprite = data.getJSONObject("sprites").getJSONObject(components.getJSONObject("Sprite").getString("Sprite"));
+                    JSONObject jsonShape = sprite.getJSONObject("shape");
 
                     Shape shape;
                     String type = jsonShape.getString("type");
@@ -125,23 +121,12 @@ public class LevelLoader {
 
                         default:
                             shape = new PolygonShape();
-
-                            // parse the points and create vertices
-                            // TODO: This needs to be verified
-
-                            // Regex matching to get every x, y
-                            Pattern pattern = Pattern.compile("(\\-?\\d+\\.?\\d*),\\s*(\\-?\\d+\\.?\\d*)");
-                            Matcher matcher = pattern.matcher(jsonShape.getString("points"));
-
-                            List<Vec2> vertices = new ArrayList<>();
-                            while (matcher.find()) {
-                                float x = Float.parseFloat(matcher.group(1)) * PhysicsSystem.METERS_PER_PIXEL;
-                                float y = Float.parseFloat(matcher.group(2)) * PhysicsSystem.METERS_PER_PIXEL;
-                                vertices.add(new Vec2(x, y));
-                            }
-
-                            ((PolygonShape) shape).set((Vec2[]) vertices.toArray(), vertices.size());
+                            float offsetX = (float)sprite.getDouble("width")/2;
+                            float offsetY = (float)sprite.getDouble("height")/2;
+                            List<Vec2> vertices = Utilities.parsePoints(jsonShape.getString("points"), offsetX, offsetY);
+                            ((PolygonShape) shape).set(vertices.toArray(new Vec2[vertices.size()]), vertices.size());
                             break;
+
                     }
 
                     // Finally create the rigid body

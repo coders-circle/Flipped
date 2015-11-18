@@ -52,9 +52,14 @@ public class Rope implements Component {
     public boolean isBurning = false;
     public BurnData burnData;
 
-    public BurnData burn() {
-        isBurning = true;
+    public BurnData makeBurnable() {
         burnData = new BurnData();
         return burnData;
+    }
+
+    public void startBurning() {
+        if (burnData == null)
+            makeBurnable();
+        isBurning = true;
     }
 }

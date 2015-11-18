@@ -15,6 +15,38 @@ public class Sprite implements Component{
         this.spriteSheetData = spriteSheetData;
     }
 
+    public Sprite(GLSprite glSprite, int numCols, int numRows) {
+        this(glSprite, numCols, numRows, numCols*numRows);
+    }
+
+    public Sprite(GLSprite glSprite, int numCols, int numRows, int numImages) {
+        this.glSprite = glSprite;
+        spriteSheetData = new SpriteSheetData();
+        spriteSheetData.numRows = numRows;
+        spriteSheetData.numCols = numCols;
+        spriteSheetData.numImages = numImages;
+
+        spriteSheetData.imgWidth = 1f/numCols;
+        spriteSheetData.imgHeight = 1f/numRows;
+    }
+
+    public Sprite(GLSprite glSprite, int numCols, int numRows, int numImages, int index, float animationSpeed) {
+        this(glSprite, numCols, numRows, numImages);
+        spriteSheetData.index = index;
+        spriteSheetData.animationSpeed = animationSpeed;
+    }
+
+    public Sprite(GLSprite glSprite, int numCols, int numRows, int numImages, int index, float animationSpeed,
+                  float offsetX, float offsetY, float hSpacing, float vSpacing) {
+        this(glSprite, numCols, numRows, numImages);
+        spriteSheetData.index = index;
+        spriteSheetData.animationSpeed = animationSpeed;
+        spriteSheetData.offsetX = offsetX;
+        spriteSheetData.offsetY = offsetY;
+        spriteSheetData.hSpacing = hSpacing;
+        spriteSheetData.vSpacing = vSpacing;
+    }
+
     public void reset() {
         if (spriteSheetData != null) {
             spriteSheetData.index = 0;
@@ -45,7 +77,9 @@ public class Sprite implements Component{
     }
 
     public static class SpriteSheetData {
-        public float offsetX = 0, offsetY = 0, imgWidth, imgHeight, hSpacing = 0, vShacing = 0;
+        // all these are normalized (i.e. in [0, 1] range) with respect to texture size
+        public float offsetX = 0, offsetY = 0, imgWidth, imgHeight, hSpacing = 0, vSpacing = 0;
+
         public int numRows = 1, numCols = 1;
         public int numImages = -1;              // If -1 then numImages = numRows x numCols
 
@@ -89,15 +123,9 @@ public class Sprite implements Component{
             int row = ssd.index / ssd.numCols;
 
             float clipX = (ssd.imgWidth + ssd.hSpacing) * col + ssd.offsetX;
-            float clipY = (ssd.imgHeight + ssd.vShacing) * row + ssd.offsetY;
+            float clipY = (ssd.imgHeight + ssd.vSpacing) * row + ssd.offsetY;
 
-            clipX /= glSprite.mTexture.width;
-            clipY /= glSprite.mTexture.height;
-
-            float clipW = ssd.imgWidth / glSprite.mTexture.width;
-            float clipH = ssd.imgHeight / glSprite.mTexture.height;
-
-            glSprite.draw(x, y, angle, clipX, clipY, clipW, clipH);
+            glSprite.draw(x, y, angle, clipX, clipY, ssd.imgWidth, ssd.imgHeight);
         }
 
         if (isReflected)

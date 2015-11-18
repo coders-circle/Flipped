@@ -31,7 +31,7 @@ public class WindSystem extends com.toggle.katana2d.System{
     }
 
     @Override
-    public void update(double dt) {
+    public void update(float dt) {
         for (Entity entity: mEntities) {
             WindSource wind = entity.get(WindSource.class);
             PhysicsBody b = entity.get(PhysicsBody.class);

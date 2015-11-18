@@ -12,7 +12,7 @@ public class Game implements TimerCallback {
     // A reference to the renderer
     private final GLRenderer mRenderer;
     // Timer with 60 FPS as target
-    private Timer mTimer = new Timer(60.0);
+    private Timer mTimer = new Timer(40f);
 
     // The activity that runs this game
     private GameActivity mActivity;
@@ -71,20 +71,21 @@ public class Game implements TimerCallback {
     // called on each frame
     public void newFrame() {
         mTimer.Update(this);
-        draw();
+        //draw();
     }
 
     // update method for updating game logic and animations, which are time dependent
     @Override
-    public void update(double deltaTime) {
+    public void update(float deltaTime) {
         if (mActiveScene != null)
             mActiveScene.update(deltaTime);
     }
 
     // draw method for all rendering operations
-    public void draw() {
+    @Override
+    public void draw(float interpolation) {
         if (mActiveScene != null)
-            mActiveScene.draw();
+            mActiveScene.draw(interpolation);
     }
 
     // pause and resume events

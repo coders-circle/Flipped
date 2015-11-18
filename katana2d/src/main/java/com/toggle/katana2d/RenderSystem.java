@@ -1,6 +1,5 @@
 package com.toggle.katana2d;
 
-
 // Uses sprite and transformation components of entities to render them
 public class RenderSystem extends System {
     public RenderSystem() {
@@ -8,7 +7,7 @@ public class RenderSystem extends System {
     }
 
     @Override
-    public void update(double dt) {
+    public void update(float dt) {
         for (Entity entity : mEntities) {
             Sprite sc = entity.get(Sprite.class);
             sc.animate(dt);
@@ -16,12 +15,21 @@ public class RenderSystem extends System {
     }
 
     @Override
-    public void draw() {
+    public void draw(float interpolation) {
         for (Entity entity : mEntities) {
-            Sprite sc = entity.get(Sprite.class);
-            Transformation tc = entity.get(Transformation.class);
+            Sprite s = entity.get(Sprite.class);
+            Transformation t = entity.get(Transformation.class);
 
-            sc.draw(tc.x, tc.y, tc.angle);
+            /*float x = t.x + t.vel_x * interpolation;
+            float y = t.y + t.vel_y * interpolation;
+            float angle = t.angle + t.vel_angle * interpolation;*/
+
+            float minus = 1-interpolation;
+            float x = t.x * interpolation + t.lastX * minus;
+            float y = t.y * interpolation + t.lastY * minus;
+            float angle = t.angle * interpolation + t.lastAngle * minus;
+            s.draw(x, y, angle);
+            //s.draw(t.x, t.y, t.angle);
         }
     }
 }

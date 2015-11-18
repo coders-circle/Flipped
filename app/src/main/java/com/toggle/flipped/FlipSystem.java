@@ -29,7 +29,7 @@ public class FlipSystem extends com.toggle.katana2d.System {
     }
 
     @Override
-    public void update(double dt) {
+    public void update(float dt) {
         for (Entity e: mEntities) {
             FlipItem f = e.get(FlipItem.class);
             PhysicsBody b = e.get(PhysicsBody.class);

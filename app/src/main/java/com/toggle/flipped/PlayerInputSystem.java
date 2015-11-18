@@ -16,7 +16,7 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
     }
 
     @Override
-    public void update(double dt) {
+    public void update(float dt) {
         TouchInputData touchData = mGame.getTouchInputData();
 
         for (Entity e: mEntities) {

@@ -1,5 +1,7 @@
 package com.toggle.katana2d.physics;
 
+import android.util.Log;
+
 import com.toggle.katana2d.Component;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Sprite;

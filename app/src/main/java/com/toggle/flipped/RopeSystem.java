@@ -71,7 +71,7 @@ public class RopeSystem extends com.toggle.katana2d.System {
     }
 
     @Override
-    public void update(double dt) {
+    public void update(float dt) {
         for (Entity entity: mEntities) {
             Rope rope = entity.get(Rope.class);
 
@@ -104,7 +104,7 @@ public class RopeSystem extends com.toggle.katana2d.System {
     }
 
     @Override
-    public void draw() {
+    public void draw(float interpolation) {
         for (Entity entity: mEntities) {
             Rope rope = entity.get(Rope.class);
             if (rope.segmentSprite == null)

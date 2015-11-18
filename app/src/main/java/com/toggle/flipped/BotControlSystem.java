@@ -1,5 +1,7 @@
 package com.toggle.flipped;
 
+import android.util.Log;
+
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Transformation;
@@ -12,7 +14,7 @@ import org.jbox2d.common.Vec2;
 public class BotControlSystem extends com.toggle.katana2d.System {
 
     public BotControlSystem() {
-        super(new Class[] { Player.class, Bot.class, Transformation.class, PhysicsBody.class, Sprite.class });
+        super(new Class[] { Bot.class, Transformation.class, PhysicsBody.class, Sprite.class });
     }
 
     @Override
@@ -22,35 +24,34 @@ public class BotControlSystem extends com.toggle.katana2d.System {
         PhysicsBody b = e.get(PhysicsBody.class);
         Vec2 ex = b.body.getFixtureList().getAABB(0).getExtents();
 
-        float twopixels =  2 * PhysicsSystem.METERS_PER_PIXEL;
+        float sensorSize =  2 * PhysicsSystem.METERS_PER_PIXEL;
 
-        // A 2 pixel sensor at the bottom to sense the ground
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(ex.x*0.7f, twopixels, new Vec2(0, ex.y), 0);
+
+        // A sensor at the bottom to sense the ground
+        shape.setAsBox(ex.x*0.8f, sensorSize, new Vec2(0, ex.y), 0);
         p.groundFixture = b.createSensor(shape);
 
         // Side sensors
         shape = new PolygonShape();
-        shape.setAsBox(twopixels, ex.y/2, new Vec2(-ex.x, 0), 0);
+        shape.setAsBox(sensorSize, ex.y/2, new Vec2(-ex.x, 0), 0);
         p.leftsideFixture = b.createSensor(shape);
         shape = new PolygonShape();
-        shape.setAsBox(twopixels, ex.y/2, new Vec2(ex.x, 0), 0);
+        shape.setAsBox(sensorSize, ex.y/2, new Vec2(ex.x, 0), 0);
         p.rightsideFixture = b.createSensor(shape);
     }
 
     @Override
-    public void update(double dt) {
+    public void update(float dt) {
         for (Entity e : mEntities) {
-            Transformation t = e.get(Transformation.class);
+            //Transformation t = e.get(Transformation.class);
             PhysicsBody b = e.get(PhysicsBody.class);
-            Player p = e.get(Player.class);
             Sprite s = e.get(Sprite.class);
             Bot bot = e.get(Bot.class);
 
             Vec2 v = b.body.getLinearVelocity();
 
-            // Check if the bot foot is touching something solid.
-            // that is, if the groundFixture has collided with something.
+            // Check sensors
             boolean onGround = false;
             boolean onLeftSide = false, onRightSide = false;
             for (PhysicsBody.Collision c: b.collisions) {

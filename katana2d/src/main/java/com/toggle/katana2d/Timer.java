@@ -5,14 +5,14 @@ import static java.lang.System.nanoTime;
 public class Timer {
     private static final int ONE_SECOND = 1000000000;
 
-    public Timer(double targetFPS) {
+    public Timer(float targetFPS) {
         reset(targetFPS);
     }
 
     // Reset the timer with given target-FPS
-    public void reset(double targetFPS) {
-        mLeftOver = 0.0;
-        mTotalTime = 0.0;
+    public void reset(float targetFPS) {
+        mLeftOver = 0f;
+        mTotalTime = 0f;
         mLastTime = nanoTime();
         mTarget = ONE_SECOND / targetFPS;
         mFps = mFrameCounter = mSecondCounter = 0;
@@ -23,13 +23,13 @@ public class Timer {
         return mFps;
     }
     // Get total time elapsed since reset
-    public double getTotalTime() { return mTotalTime; }
+    public float getTotalTime() { return mTotalTime; }
 
     public void Update(TimerCallback callback) {
 
         // get current and delta times
-        double currentTime = nanoTime();
-        double deltaTime = currentTime - mLastTime;
+        float currentTime = nanoTime();
+        float deltaTime = currentTime - mLastTime;
         mLastTime = currentTime;
 
         // second counter is used to keep track whether we have crossed a second
@@ -41,14 +41,14 @@ public class Timer {
             deltaTime = ONE_SECOND;
 
         // stop accumulation of small error
-        if (Math.abs(deltaTime - mTarget) < 0.000004)
+        if (Math.abs(deltaTime - mTarget) < 0.000004f)
             deltaTime = mTarget;
 
         // add deltaTime and leftOver time from previous frame
         mLeftOver += deltaTime;
 
         // check if we have passed one more frame this second
-        // IMPORTANT: don't call this for each update call below inside the while loop below
+        // IMPORTANT: `n't call this for each update call below inside the while loop below
         // as more calls needed means more time passed, which means slower device, which means less FPS not more
         if (mLeftOver >= mTarget)
             mFrameCounter++;
@@ -60,6 +60,8 @@ public class Timer {
             callback.update(mTarget/ONE_SECOND);
         }
 
+        float alpha = mLeftOver/mTarget;
+
         // calculate FPS using frameCounter and secondCounter
         if (mSecondCounter >= ONE_SECOND) {
             mFps = mFrameCounter;
@@ -67,8 +69,9 @@ public class Timer {
             mSecondCounter %= ONE_SECOND;
         }
 
+        callback.draw(alpha);
     }
 
-    private double mLastTime, mTarget, mLeftOver, mTotalTime;
+    private float mLastTime, mTarget, mLeftOver, mTotalTime;
     private int mFps, mFrameCounter, mSecondCounter;
 }

@@ -74,7 +74,7 @@ public class ParticleSystem extends System {
     }
 
     @Override
-    public void update(double deltaTime) {
+    public void update(float deltaTime) {
         float dt = (float) deltaTime;
 
         for (Entity entity : mEntities) {
@@ -128,13 +128,23 @@ public class ParticleSystem extends System {
     }
 
     @Override
-    public void draw() {
+    public void draw(float interpolation) {
         for (Entity entity : mEntities) {
             Emitter e = entity.get(Emitter.class);
             Transformation t = entity.get(Transformation.class);
             if (e.additiveBlend)
                 e.pointSprites.getRenderer().setAdditiveBlending();
-            e.pointSprites.draw(e.pointSpritesData, t.x, t.y, t.angle, e.numParticles);
+
+            /*float x = t.x + t.vel_x * interpolation;
+            float y = t.y + t.vel_y * interpolation;
+            float angle = t.angle + t.vel_angle * interpolation;*/
+
+            float minus = 1-interpolation;
+            float x = t.x * interpolation + t.lastX * minus;
+            float y = t.y * interpolation + t.lastY * minus;
+            float angle = t.angle * interpolation + t.lastAngle * minus;
+            e.pointSprites.draw(e.pointSpritesData, x, y, angle, e.numParticles);
+
             if (e.additiveBlend)
                 e.pointSprites.getRenderer().setAlphaBlending();
         }
