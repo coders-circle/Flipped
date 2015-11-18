@@ -25,7 +25,7 @@ public class Timer {
     // Get total time elapsed since reset
     public float getTotalTime() { return mTotalTime; }
 
-    public void Update(TimerCallback callback) {
+    public float update(TimerCallback callback) {
 
         // get current and delta times
         float currentTime = nanoTime();
@@ -69,7 +69,7 @@ public class Timer {
             mSecondCounter %= ONE_SECOND;
         }
 
-        callback.draw(alpha);
+        return alpha;
     }
 
     private float mLastTime, mTarget, mLeftOver, mTotalTime;

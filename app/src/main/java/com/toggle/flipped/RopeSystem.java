@@ -16,9 +16,11 @@ import org.jbox2d.dynamics.joints.RevoluteJointDef;
 public class RopeSystem extends com.toggle.katana2d.System {
 
     private World mWorld;
-    public RopeSystem(World world) {
+    private GLRenderer mRenderer;
+    public RopeSystem(World world, GLRenderer renderer) {
         super(new Class[]{Rope.class});
         mWorld = world;
+        mRenderer = renderer;
     }
 
     @Override
@@ -103,6 +105,8 @@ public class RopeSystem extends com.toggle.katana2d.System {
         }
     }
 
+    // TODO: Use temporal antialiasing
+
     @Override
     public void draw(float interpolation) {
         for (Entity entity: mEntities) {
@@ -118,9 +122,9 @@ public class RopeSystem extends com.toggle.katana2d.System {
 
                 // if burning, show burning sprite for the last segment
                 if (rope.isBurning && i == rope.segments.size()-1)
-                    rope.burnData.burningSegmentSprite.draw(x, y, angle);
+                    rope.burnData.burningSegmentSprite.draw(mRenderer, x, y, angle);
                 else
-                    rope.segmentSprite.draw(x, y, angle);
+                    rope.segmentSprite.draw(mRenderer, x, y, angle);
             }
         }
     }

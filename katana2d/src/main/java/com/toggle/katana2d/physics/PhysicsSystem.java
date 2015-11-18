@@ -36,9 +36,6 @@ public class PhysicsSystem extends System implements ContactListener {
             Transformation t = entity.get(Transformation.class);
             PhysicsBody b = entity.get(PhysicsBody.class);
 
-            /*t.vel_x = b.body.getLinearVelocity().x * PIXELS_PER_METER;
-            t.vel_y = b.body.getLinearVelocity().y * PIXELS_PER_METER;
-            t.vel_angle = (float)Math.toDegrees(b.body.getAngularVelocity());*/
             t.saveState();
 
             t.x = b.body.getPosition().x * PIXELS_PER_METER;

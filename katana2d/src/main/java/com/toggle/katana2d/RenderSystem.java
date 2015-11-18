@@ -2,8 +2,10 @@ package com.toggle.katana2d;
 
 // Uses sprite and transformation components of entities to render them
 public class RenderSystem extends System {
-    public RenderSystem() {
+    private GLRenderer mRenderer;
+    public RenderSystem(GLRenderer renderer) {
         super(new Class[]{Sprite.class, Transformation.class});
+        mRenderer = renderer;
     }
 
     @Override
@@ -20,16 +22,12 @@ public class RenderSystem extends System {
             Sprite s = entity.get(Sprite.class);
             Transformation t = entity.get(Transformation.class);
 
-            /*float x = t.x + t.vel_x * interpolation;
-            float y = t.y + t.vel_y * interpolation;
-            float angle = t.angle + t.vel_angle * interpolation;*/
-
             float minus = 1-interpolation;
             float x = t.x * interpolation + t.lastX * minus;
             float y = t.y * interpolation + t.lastY * minus;
             float angle = t.angle * interpolation + t.lastAngle * minus;
-            s.draw(x, y, angle);
-            //s.draw(t.x, t.y, t.angle);
+
+            s.draw(mRenderer, x, y, angle);
         }
     }
 }

@@ -3,7 +3,7 @@ package com.toggle.katana2d;
 // An emitter that emits particles
 public class Emitter implements Component {
     public final int maxParticles;  // Total number of particles
-    public final Texture texture;   // Texture to use for drawing each particle
+    public final int textureId;   // Texture to use for drawing each particle
 
     // Each particle has its own postion, speed, acceleration, size, color and life
     public static class Particle {
@@ -13,25 +13,25 @@ public class Emitter implements Component {
     }
 
     // Create a new emitter
-    public Emitter(GLRenderer renderer, int maxParticles, Texture texture) {
+    public Emitter(GLRenderer renderer, int maxParticles, int textureId) {
         this.maxParticles = maxParticles;
-        this.texture = texture;
-        pointSpritesData = new float[GLPointSprites.ELEMENTS_PER_POINT * maxParticles];
-        pointSprites = new GLPointSprites(renderer, texture, maxParticles);
+        this.textureId = textureId;
+        pointSpritesData = new float[PointSprites.ELEMENTS_PER_POINT * maxParticles];
+        pointSprites = new PointSprites(renderer, textureId, maxParticles);
         particles = new Particle[maxParticles];
     }
 
     // Create a new emitter
-    public Emitter(GLRenderer renderer, int maxParticles, Texture texture,
+    public Emitter(GLRenderer renderer, int maxParticles, int textureId,
                    float life, float emissionRate, float[] startColor, float[] endColor) {
         this.maxParticles = maxParticles;
-        this.texture = texture;
+        this.textureId = textureId;
         this.life = life;
         this.emissionRate = emissionRate;
         this.startColor = startColor;
         this.endColor = endColor;
-        pointSpritesData = new float[GLPointSprites.ELEMENTS_PER_POINT * maxParticles];
-        pointSprites = new GLPointSprites(renderer, texture, maxParticles);
+        pointSpritesData = new float[PointSprites.ELEMENTS_PER_POINT * maxParticles];
+        pointSprites = new PointSprites(renderer, textureId, maxParticles);
         particles = new Particle[maxParticles];
     }
 
@@ -51,7 +51,7 @@ public class Emitter implements Component {
     public float accel_y = 0, var_accel_y = 0;  // y-axis acceleration and amount to vary it
     public boolean additiveBlend = false;       // blend the particles additively? this makes the area with large number of particles very bright
 
-    public final GLPointSprites pointSprites;   // Opengl point sprites to draw all particles at once with GPU
+    public final PointSprites pointSprites;   // Opengl point sprites to draw all particles at once with GPU
     public final float[] pointSpritesData;   // position, color, size of each particle used by GLPointSprites
     public final Particle[] particles;       // all particles
     public int numParticles = 0;             // total number of particles emitted

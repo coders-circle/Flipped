@@ -54,4 +54,9 @@ public class Level implements CustomLoader {
             return true;
         return false;
     }
+
+    // During level change, we unload resources specific to that level
+    public void unloadResources() {
+
+    }
 }

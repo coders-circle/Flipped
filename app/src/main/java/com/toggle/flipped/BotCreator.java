@@ -1,7 +1,6 @@
 package com.toggle.flipped;
 
 import com.toggle.katana2d.Entity;
-import com.toggle.katana2d.GLSprite;
 import com.toggle.katana2d.Game;
 import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Texture;
@@ -29,14 +28,14 @@ public class BotCreator {
 
     // Get the sprite from a json sprite data
     // If the sprite already exists, return it, else create new and return it.
-    public GLSprite getSprite(JSONObject sprite) throws JSONException {
+    public Texture getSprite(JSONObject sprite) throws JSONException {
         String spriteName = sprite.getString("file");
-        if (mGame.spriteManager.has(spriteName))
-            return mGame.spriteManager.get(spriteName);
+        if (mGame.textureManager.has(spriteName))
+            return mGame.textureManager.get(spriteName);
 
-        Texture spriteTex = mGame.getRenderer().addTexture(Utilities.getResourceId(mGame.getActivity(), "drawable", spriteName));
-        GLSprite glSprite = new GLSprite(mGame.getRenderer(), spriteTex, (float) sprite.getDouble("width"), (float) sprite.getDouble("height"));
-        mGame.spriteManager.add(spriteName, glSprite);
+        int spriteTex = Utilities.getResourceId(mGame.getActivity(), "drawable", spriteName);
+        Texture glSprite = mGame.getRenderer().addTexture(spriteTex, (float) sprite.getDouble("width"), (float) sprite.getDouble("height"));
+        mGame.textureManager.add(spriteName, glSprite);
         return glSprite;
     }
 

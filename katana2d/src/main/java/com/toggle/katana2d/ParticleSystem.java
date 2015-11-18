@@ -6,7 +6,7 @@ public class ParticleSystem extends System {
 
     private Random mRandom = new Random();
 
-    public ParticleSystem(Game game) {
+    public ParticleSystem() {
         super(new Class[] {Emitter.class, Transformation.class});
     }
 
@@ -49,7 +49,7 @@ public class ParticleSystem extends System {
 
 
             // Fill the point sprites data
-            int o = i * GLPointSprites.ELEMENTS_PER_POINT;
+            int o = i * PointSprites.ELEMENTS_PER_POINT;
 
             e.pointSpritesData[o] = p.x;
             e.pointSpritesData[o+1] = p.y;
@@ -74,8 +74,7 @@ public class ParticleSystem extends System {
     }
 
     @Override
-    public void update(float deltaTime) {
-        float dt = (float) deltaTime;
+    public void update(float dt) {
 
         for (Entity entity : mEntities) {
             Emitter e = entity.get(Emitter.class);
@@ -91,11 +90,12 @@ public class ParticleSystem extends System {
                 for (int i = 0; i < e.numParticles; ++i) {
                     Emitter.Particle p = e.particles[i];
 
+                    if (p==null)
+                        continue;
+
                     if (p.life >= e.life) {
                         kill(e, i);
-                        if (i == e.numParticles - 1)
-                            break;
-                        p = e.particles[i];
+                        continue;
                     }
                     p.life += dt;
 
@@ -107,7 +107,7 @@ public class ParticleSystem extends System {
 
 
                     // Fill the point sprites data
-                    int o = i * GLPointSprites.ELEMENTS_PER_POINT;
+                    int o = i * PointSprites.ELEMENTS_PER_POINT;
 
                     e.pointSpritesData[o] = p.x;
                     e.pointSpritesData[o + 1] = p.y;
@@ -135,14 +135,11 @@ public class ParticleSystem extends System {
             if (e.additiveBlend)
                 e.pointSprites.getRenderer().setAdditiveBlending();
 
-            /*float x = t.x + t.vel_x * interpolation;
-            float y = t.y + t.vel_y * interpolation;
-            float angle = t.angle + t.vel_angle * interpolation;*/
-
             float minus = 1-interpolation;
             float x = t.x * interpolation + t.lastX * minus;
             float y = t.y * interpolation + t.lastY * minus;
             float angle = t.angle * interpolation + t.lastAngle * minus;
+
             e.pointSprites.draw(e.pointSpritesData, x, y, angle, e.numParticles);
 
             if (e.additiveBlend)

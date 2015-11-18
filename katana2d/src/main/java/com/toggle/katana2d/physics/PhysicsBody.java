@@ -1,7 +1,5 @@
 package com.toggle.katana2d.physics;
 
-import android.util.Log;
-
 import com.toggle.katana2d.Component;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Sprite;
@@ -95,7 +93,7 @@ public class PhysicsBody implements Component {
         Transformation t = entity.get(Transformation.class);
         Sprite s = entity.get(Sprite.class);
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(s.glSprite.width/2 * PhysicsSystem.METERS_PER_PIXEL - 0.01f, s.glSprite.height/2 * PhysicsSystem.METERS_PER_PIXEL - 0.01f);
+        shape.setAsBox(s.texture.width/2 * PhysicsSystem.METERS_PER_PIXEL - 0.01f, s.texture.height/2 * PhysicsSystem.METERS_PER_PIXEL - 0.01f);
 
         init(world, type, t.x, t.y, t.angle, shape, entity, properties);
     }

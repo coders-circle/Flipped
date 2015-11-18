@@ -2,25 +2,25 @@ package com.toggle.katana2d;
 
 // Sprite component that stores sprite-sheet data and a reference to GLSprite
 public class Sprite implements Component{
-    public GLSprite glSprite;
+    public Texture texture;
     public SpriteSheetData spriteSheetData;
     public boolean isReflected = false;
 
-    public Sprite(GLSprite glSprite) {
-        this.glSprite = glSprite;
+    public Sprite(Texture texture) {
+        this.texture = texture;
     }
 
-    public Sprite(GLSprite glSprite, SpriteSheetData spriteSheetData) {
-        this.glSprite = glSprite;
+    public Sprite(Texture texture, SpriteSheetData spriteSheetData) {
+        this.texture = texture;
         this.spriteSheetData = spriteSheetData;
     }
 
-    public Sprite(GLSprite glSprite, int numCols, int numRows) {
-        this(glSprite, numCols, numRows, numCols*numRows);
+    public Sprite(Texture texture, int numCols, int numRows) {
+        this(texture, numCols, numRows, numCols*numRows);
     }
 
-    public Sprite(GLSprite glSprite, int numCols, int numRows, int numImages) {
-        this.glSprite = glSprite;
+    public Sprite(Texture texture, int numCols, int numRows, int numImages) {
+        this.texture = texture;
         spriteSheetData = new SpriteSheetData();
         spriteSheetData.numRows = numRows;
         spriteSheetData.numCols = numCols;
@@ -30,15 +30,15 @@ public class Sprite implements Component{
         spriteSheetData.imgHeight = 1f/numRows;
     }
 
-    public Sprite(GLSprite glSprite, int numCols, int numRows, int numImages, int index, float animationSpeed) {
-        this(glSprite, numCols, numRows, numImages);
+    public Sprite(Texture texture, int numCols, int numRows, int numImages, int index, float animationSpeed) {
+        this(texture, numCols, numRows, numImages);
         spriteSheetData.index = index;
         spriteSheetData.animationSpeed = animationSpeed;
     }
 
-    public Sprite(GLSprite glSprite, int numCols, int numRows, int numImages, int index, float animationSpeed,
+    public Sprite(Texture texture, int numCols, int numRows, int numImages, int index, float animationSpeed,
                   float offsetX, float offsetY, float hSpacing, float vSpacing) {
-        this(glSprite, numCols, numRows, numImages);
+        this(texture, numCols, numRows, numImages);
         spriteSheetData.index = index;
         spriteSheetData.animationSpeed = animationSpeed;
         spriteSheetData.offsetX = offsetX;
@@ -90,9 +90,9 @@ public class Sprite implements Component{
         public int index = 0;	// the index of image to draw next
     }
 
-    public void changeSprite(GLSprite sprite, SpriteSheetData newSpriteSheetData) {
+    public void changeSprite(Texture sprite, SpriteSheetData newSpriteSheetData) {
         if (sprite != null)
-            glSprite = sprite;
+            texture = sprite;
 
         if (spriteSheetData == newSpriteSheetData || newSpriteSheetData == null)
             return;
@@ -105,17 +105,17 @@ public class Sprite implements Component{
     }
 
 
-    public void draw(float x, float y, float angle) {
-        if (glSprite == null)
+    public void draw(GLRenderer renderer, float x, float y, float angle) {
+        if (texture == null)
             return;
 
         if (isReflected) {
-            x += glSprite.width;
-            glSprite.width *= -1;
+            x += texture.width;
+            texture.width *= -1;
         }
 
         if (spriteSheetData == null)
-            glSprite.draw(x, y, angle);
+            texture.draw(renderer, x, y, angle);
         else {
             Sprite.SpriteSheetData ssd = spriteSheetData;
 
@@ -125,10 +125,10 @@ public class Sprite implements Component{
             float clipX = (ssd.imgWidth + ssd.hSpacing) * col + ssd.offsetX;
             float clipY = (ssd.imgHeight + ssd.vSpacing) * row + ssd.offsetY;
 
-            glSprite.draw(x, y, angle, clipX, clipY, ssd.imgWidth, ssd.imgHeight);
+            texture.draw(renderer, x, y, angle, clipX, clipY, ssd.imgWidth, ssd.imgHeight);
         }
 
         if (isReflected)
-            glSprite.width *= -1;
+            texture.width *= -1;
     }
 }

@@ -1,8 +1,8 @@
 package com.toggle.flipped;
 
-import com.toggle.katana2d.GLSprite;
 import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Component;
+import com.toggle.katana2d.Texture;
 
 import org.jbox2d.dynamics.Fixture;
 
@@ -26,5 +26,5 @@ public class Bot implements Component {
 
     // Sprites and sprite-sheet-data for different states
     Sprite.SpriteSheetData ssdIdle, ssdWalk, ssdJump, ssdPush;
-    GLSprite sprIdle, sprWalk, sprJump, sprPush;
+    Texture sprIdle, sprWalk, sprJump, sprPush;
 }

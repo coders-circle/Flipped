@@ -3,16 +3,20 @@ package com.toggle.katana2d;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.Semaphore;
 
 public class Game implements TimerCallback {
     // Some common resources
-    // Sprites
-    public Manager<GLSprite> spriteManager = new Manager<>();
+    // Textures
+    public Manager<Texture> textureManager = new Manager<>();
 
     // A reference to the renderer
     private final GLRenderer mRenderer;
     // Timer with 60 FPS as target
-    private Timer mTimer = new Timer(40f);
+    private Timer mTimer = new Timer(60f);
+
+    private boolean mStop = false;
 
     // The activity that runs this game
     private GameActivity mActivity;
@@ -58,6 +62,10 @@ public class Game implements TimerCallback {
         return mScenes.get(index);
     }
 
+    private final Integer drawLock = 1;
+    private boolean drawing = false;
+    private final Integer updateLock = 2;
+
     // called on surface creation
     public void init() {
         if (!mInitialized) {
@@ -66,12 +74,32 @@ public class Game implements TimerCallback {
                 scene.init(this);
             mInitialized = true;
         }
-    }
 
-    // called on each frame
-    public void newFrame() {
-        mTimer.Update(this);
-        //draw();
+        // start updating in separate thread
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(!mStop) {
+                    // If we are already drawing, we sleep and wait to be notified to wakeup
+                    if (drawing)
+                        synchronized (updateLock) {
+                            try {
+                                updateLock.wait();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    // Update using timer
+                    mDrawInterpolation = mTimer.update(Game.this);
+
+                    // After each update, we need to draw, notify the render thread to wakeup if sleeping
+                    synchronized (drawLock) {
+                        drawLock.notify();
+                    }
+                }
+            }
+        }).start();
     }
 
     // update method for updating game logic and animations, which are time dependent
@@ -81,12 +109,31 @@ public class Game implements TimerCallback {
             mActiveScene.update(deltaTime);
     }
 
-    // draw method for all rendering operations
-    @Override
-    public void draw(float interpolation) {
+    // draw method for rendering stuffs
+    public void draw() {
+
+        // sleep till the update thread wakes us up
+        synchronized (drawLock) {
+            try {
+                drawLock.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // draw a frame
+        drawing = true;
         if (mActiveScene != null)
-            mActiveScene.draw(interpolation);
+            mActiveScene.draw(mDrawInterpolation);
+        drawing = false;
+
+        // notifies the update thread to wakeup in case it is sleeping
+        synchronized (updateLock) {
+            updateLock.notify();
+        }
     }
+
+    private float mDrawInterpolation;
 
     // pause and resume events
     public void onPause() {

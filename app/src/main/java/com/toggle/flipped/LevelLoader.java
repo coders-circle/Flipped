@@ -1,7 +1,6 @@
 package com.toggle.flipped;
 
 import com.toggle.katana2d.Entity;
-import com.toggle.katana2d.GLSprite;
 import com.toggle.katana2d.Game;
 import com.toggle.katana2d.Scene;
 import com.toggle.katana2d.Sprite;
@@ -43,9 +42,9 @@ public class LevelLoader {
                 // if custom loader doesn't handle this sprite, just
                 // load the sprite with the key as filename
                 if (!mCustomLoader.loadSprite(game, key, jsonSprite)) {
-                    Texture spriteTex = game.getRenderer().addTexture(Utilities.getResourceId(game.getActivity(), "drawable", key));
-                    GLSprite sprite = new GLSprite(game.getRenderer(), spriteTex, (float) jsonSprite.getDouble("width"), (float) jsonSprite.getDouble("height"));
-                    game.spriteManager.add(key, sprite);
+                    int spriteTex = Utilities.getResourceId(game.getActivity(), "drawable", key);
+                    Texture sprite = game.getRenderer().addTexture(spriteTex, (float) jsonSprite.getDouble("width"), (float) jsonSprite.getDouble("height"));
+                    game.textureManager.add(key, sprite);
                 }
             }
         } catch (JSONException e) {
@@ -87,7 +86,7 @@ public class LevelLoader {
     public void addComponent(Game game, World world, Entity entity, String compName, JSONObject component, JSONObject components) throws JSONException {
         switch (compName) {
             case "Sprite":
-                entity.add(new Sprite(game.spriteManager.get(component.getString("Sprite"))));
+                entity.add(new Sprite(game.textureManager.get(component.getString("Sprite"))));
                 break;
             case "Transformation":
                 entity.add(new Transformation((float) component.getDouble("Translate-X"),

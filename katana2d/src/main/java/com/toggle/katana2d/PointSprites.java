@@ -1,33 +1,29 @@
 package com.toggle.katana2d;
 
 import android.opengl.GLES20;
-import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
-public class GLPointSprites {
+public class PointSprites {
 
     private GLRenderer mRenderer;
     public GLRenderer getRenderer() { return mRenderer; }
 
     public FloatBuffer mPointSpriteVertexBuffer;
-    private Texture mTexture;
+    private int mTextureId;
 
     public static final int ELEMENTS_PER_POINT = 7;
     public static final int BYTES_PER_POINT = ELEMENTS_PER_POINT * 4;
 
-    public GLPointSprites(GLRenderer renderer, Texture texture, int maxPoints) {
+    public PointSprites(GLRenderer renderer, int textureId, int maxPoints) {
         mRenderer = renderer;
 
         mPointSpriteVertexBuffer = ByteBuffer.allocateDirect(maxPoints * BYTES_PER_POINT)
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
 
-        if (texture == null)
-            mTexture = mRenderer.mWhiteTexture;
-        else
-            mTexture = texture;
+        mTextureId = textureId;
     }
 
     public void draw(float[] data, float x, float y, float angle, int numPoints) {
@@ -49,7 +45,7 @@ public class GLPointSprites {
         GLES20.glUseProgram(mRenderer.mPointSpriteProgram);
         mRenderer.setPointSpriteTransform(x, y, angle);
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);  // sample-0
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTexture.textureId);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
         GLES20.glDrawArrays(GLES20.GL_POINTS, 0, numPoints);
 
     }

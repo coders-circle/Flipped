@@ -19,10 +19,10 @@ public class World extends Scene {
     public void onInit() {
         PhysicsSystem physicsSystem = new PhysicsSystem();
         FlipSystem flipSystem = new FlipSystem(mGame.getRenderer().getCamera());
-        ParticleSystem particleSystem = new ParticleSystem(mGame);
+        ParticleSystem particleSystem = new ParticleSystem();
 
         // Add the systems
-        mSystems.add(new RenderSystem());
+        mSystems.add(new RenderSystem(mGame.getRenderer()));
         mSystems.add(physicsSystem);
         mSystems.add(particleSystem);
 
@@ -30,7 +30,7 @@ public class World extends Scene {
         mSystems.add(new PlayerInputSystem(mGame));
         mSystems.add(flipSystem);
         mSystems.add(new WindSystem());
-        mSystems.add(new RopeSystem(physicsSystem.getWorld()));
+        mSystems.add(new RopeSystem(physicsSystem.getWorld(), mGame.getRenderer()));
 
         // Load the entities from the level editor
         mLevelLoader.loadWorld(mWorldName, this, physicsSystem.getWorld());

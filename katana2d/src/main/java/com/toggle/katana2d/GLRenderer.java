@@ -67,8 +67,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     public final float[] mModelMatrix = new float[16];
 
     // A white texture to use when no texture is selected
-    public Texture mWhiteTexture;
-    public Texture mFuzzyTexture;
+    public int mWhiteTextureId;
+    public int mFuzzyTextureId;
 
     // Camera to defining view position and angle
     private Camera mCamera = new Camera();
@@ -162,13 +162,13 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         int pTexHandle = GLES20.glGetUniformLocation(mPointSpriteProgram, "uTexture");
         GLES20.glUniform1i(pTexHandle, 0);
 
+        // Load the standard textures
+        mWhiteTextureId = loadTexture(R.drawable.white);
+        mFuzzyTextureId = loadTexture(R.drawable.fuzzy_circle);
+
+        // Reload the user created textures if any
         for (Texture t: mTextures)
             reloadTexture(t);
-
-        if (mWhiteTexture == null)
-            mWhiteTexture = addTexture(R.drawable.white);
-        if (mFuzzyTexture == null)
-            mFuzzyTexture = addTexture(R.drawable.fuzzy_circle);
 
         // Initialize the Engine
         mGame.init();
@@ -193,7 +193,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
         GLES20.glClearColor(mBackR, mBackG, mBackB, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-        mGame.newFrame();
+        mGame.draw();
     }
 
     public final int width = 480, height = 320;
@@ -225,7 +225,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         Matrix.orthoM(mProjectionMatrix, 0, 0, width, height, 0, -100, 100);
 
         // Scissor the viewport
-        GLES20.glScissor((int)cx, (int)cy, (int)(width*scale), (int)(height*scale));
+        GLES20.glScissor((int) cx, (int) cy, (int) (width * scale), (int) (height * scale));
     }
 
     // Set transform for drawing the rectangle.
@@ -277,9 +277,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
     private List<Texture> mTextures = new ArrayList<>();
 
-    private void loadTexture(Texture texture, int resourceId) {
+    private int loadTexture(int resourceId) {
         int[] textureHandle = new int[1];
-        int width, height;
         GLES20.glGenTextures(1, textureHandle, 0);
         if (textureHandle[0] != 0) {
             Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), resourceId);
@@ -293,35 +292,43 @@ public class GLRenderer implements GLSurfaceView.Renderer {
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
 
-            width = bitmap.getWidth();
-            height = bitmap.getHeight();
             bitmap.recycle();
         }
         else {
             throw new RuntimeException("Error loading texture.");
         }
-        texture.textureId = textureHandle[0];
-        texture.width = width;
-        texture.height = height;
-        texture.resourceId = resourceId;
+        /*texture.textureId = textureHandle[0];
+        texture.resourceId = resourceId;*/
+        return textureHandle[0];
     }
 
-    private Texture createTexture(int resourceId) {
-        Texture t = new Texture();
-        loadTexture(t, resourceId);
+    // create texture from a resource image
+    public Texture addTexture(int resourceId, float width, float height) {
+        Texture t = new Texture(loadTexture(resourceId), width, height);
+        t.resourceId = resourceId;
+        mTextures.add(t);
         return t;
     }
 
-    // load texture from a resource file
-    public Texture addTexture(int resourceId)
-    {
-        Texture t = createTexture(resourceId);
+    // create texture from color
+    public Texture addTexture(float[] color, float width, float height) {
+        Texture t = new Texture(mWhiteTextureId, color, width, height);
+        t.resourceId = -1;
+        mTextures.add(t);
+        return t;
+    }
+
+    // create texture from color and resource image
+    public Texture addTexture(int resourceId, float[] color, float width, float height) {
+        Texture t = new Texture(loadTexture(resourceId), color, width, height);
+        t.resourceId = resourceId;
         mTextures.add(t);
         return t;
     }
 
     private void reloadTexture(Texture t) {
-        loadTexture(t, t.resourceId);
+        if (t.resourceId >= 0)
+            t.textureId = loadTexture(t.resourceId);
     }
 }
 
