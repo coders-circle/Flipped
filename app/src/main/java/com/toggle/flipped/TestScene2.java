@@ -1,7 +1,5 @@
 package com.toggle.flipped;
 
-import android.util.Log;
-
 import com.toggle.katana2d.Emitter;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.ParticleSystem;
@@ -20,7 +18,7 @@ public class TestScene2 extends Scene {
     @Override
     public void onInit() {
         PhysicsSystem physicsSystem = new PhysicsSystem();
-        FlipSystem flipSystem = new FlipSystem(mGame.getRenderer().getCamera());
+        //FlipSystem flipSystem = new FlipSystem(mGame.getRenderer().getCamera());
         ParticleSystem particleSystem = new ParticleSystem();
 
         // Add the systems
@@ -30,7 +28,7 @@ public class TestScene2 extends Scene {
 
         mSystems.add(new BotControlSystem());
         mSystems.add(new PlayerInputSystem(mGame));
-        mSystems.add(flipSystem);
+        //mSystems.add(flipSystem);
         mSystems.add(new WindSystem());
         mSystems.add(new RopeSystem(physicsSystem.getWorld(), mGame.getRenderer()));
 
@@ -65,7 +63,7 @@ public class TestScene2 extends Scene {
         platform.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.STATIC, platform, new PhysicsBody.Properties(0)));
         addEntity(platform);
 
-        Entity mirror1 = new Entity();
+        /*Entity mirror1 = new Entity();
         mirror1.add(new Transformation(w, h / 2 + 2, 0));
         mirror1.add(new Sprite(mGame.textureManager.get(spr4)));
         mirror1.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.STATIC, mirror1, new PhysicsBody.Properties(true)));
@@ -81,7 +79,7 @@ public class TestScene2 extends Scene {
         mirror2.add(new FlipSystem.FlipItem(FlipSystem.FlipItem.FlipItemType.MIRROR));
         addEntity(mirror2);
 
-        mirror2.get(FlipSystem.FlipItem.class).targetAngle = 0;
+        mirror2.get(FlipSystem.FlipItem.class).targetAngle = 0;*/
 
         Entity body = new Entity();
         body.add(new Transformation(w / 2-64, h - 32 - 16, 0));
@@ -97,7 +95,7 @@ public class TestScene2 extends Scene {
 
         // FlipSystem detects player interaction with flip-items like mirrors.
         // Set the player to check interaction with.
-        flipSystem.setPlayer(player);
+        //flipSystem.setPlayer(player);
 
         // Create a emitter
         Entity emitter = new Entity();
@@ -153,8 +151,8 @@ public class TestScene2 extends Scene {
     }
 
     // Uncomment following to display FPS on logcat
-    @Override
+    /*@Override
     public void onDraw() {
         Log.d("FPS", mGame.getTimer().getFPS() + "");
-    }
+    }*/
 }

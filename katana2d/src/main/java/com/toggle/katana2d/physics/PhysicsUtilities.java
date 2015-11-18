@@ -1,7 +1,5 @@
 package com.toggle.katana2d.physics;
 
-import android.util.Log;
-
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Settings;

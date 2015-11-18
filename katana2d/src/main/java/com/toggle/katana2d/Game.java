@@ -1,6 +1,8 @@
 package com.toggle.katana2d;
 
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -97,6 +99,9 @@ public class Game implements TimerCallback {
                     synchronized (drawLock) {
                         drawLock.notify();
                     }
+
+                    Log.d("interpolation", ""+mDrawInterpolation);
+                    // TODO: Sleep for some time here perhaps
                 }
             }
         }).start();
@@ -111,18 +116,17 @@ public class Game implements TimerCallback {
 
     // draw method for rendering stuffs
     public void draw() {
-
         // sleep till the update thread wakes us up
         synchronized (drawLock) {
             try {
                 drawLock.wait();
+                drawing = true;
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
         // draw a frame
-        drawing = true;
         if (mActiveScene != null)
             mActiveScene.draw(mDrawInterpolation);
         drawing = false;

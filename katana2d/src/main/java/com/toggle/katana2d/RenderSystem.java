@@ -22,6 +22,7 @@ public class RenderSystem extends System {
             Sprite s = entity.get(Sprite.class);
             Transformation t = entity.get(Transformation.class);
 
+            // Interpolation to fix temporal aliasing
             float minus = 1-interpolation;
             float x = t.x * interpolation + t.lastX * minus;
             float y = t.y * interpolation + t.lastY * minus;

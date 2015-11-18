@@ -10,18 +10,14 @@ public class MainActivity extends GameActivity {
 
     private List<Level> mLevels = new ArrayList<>();
     private Level mActiveLevel;
-    private CommonLoader mCommonLoader = new CommonLoader();
 
     @Override
     public void onGameStart() {
         Game game = mEngine.getGame();
-        /*game.addScene(new TestScene());
-        game.addScene(new TestScene2());*/
 
-        //TestLevel testLevel = new TestLevel(game, mCommonLoader);
-        //int i = game.addScene(testLevel.getActiveWorld());
+        TestLevel testLevel = new TestLevel(game);
 
-        int i = game.addScene(new TestScene2());
-        game.setActiveScene(i);
+        /*int i = game.addScene(new TestScene2());
+        game.setActiveScene(i);*/
     }
 }

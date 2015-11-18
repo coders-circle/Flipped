@@ -11,9 +11,8 @@ import org.json.JSONObject;
 
 public class TestLevel extends Level {
 
-    public TestLevel(Game game, CustomLoader commonLoader) {
-        super(game, commonLoader, R.raw.test2);
-
-        setActiveWorld(addWorld("world1"));
+    public TestLevel(Game game) {
+        super(game, R.raw.test2);
+        changeWorld(addWorld("world1"));
     }
 }
