@@ -51,10 +51,8 @@ public class PhysicsSystem extends System implements ContactListener {
             Entity e = (Entity)contact.getFixtureA().getUserData();
             if (e.has(PhysicsBody.class)) {
                 PhysicsBody b = e.get(PhysicsBody.class);
-                PhysicsBody.Collision c = new PhysicsBody.Collision();
-                c.myFixture = contact.getFixtureA();
-                c.otherFixture = contact.getFixtureB();
-                b.collisions.add(c);
+                if (b.contactListener != null)
+                    b.contactListener.beginContact(contact, contact.getFixtureA(), contact.getFixtureB());
             }
         }
 
@@ -63,10 +61,8 @@ public class PhysicsSystem extends System implements ContactListener {
             Entity e = (Entity)contact.getFixtureB().getUserData();
             if (e.has(PhysicsBody.class)) {
                 PhysicsBody b = e.get(PhysicsBody.class);
-                PhysicsBody.Collision c = new PhysicsBody.Collision();
-                c.myFixture = contact.getFixtureB();
-                c.otherFixture = contact.getFixtureA();
-                b.collisions.add(c);
+                if (b.contactListener != null)
+                    b.contactListener.beginContact(contact, contact.getFixtureB(), contact.getFixtureA());
             }
         }
     }
@@ -78,14 +74,8 @@ public class PhysicsSystem extends System implements ContactListener {
             Entity e = (Entity)contact.getFixtureA().getUserData();
             if (e.has(PhysicsBody.class)) {
                 PhysicsBody b = e.get(PhysicsBody.class);
-                Iterator<PhysicsBody.Collision> c = b.collisions.iterator();
-                while (c.hasNext()) {
-                    PhysicsBody.Collision cc = c.next();
-                    if (cc.myFixture == contact.getFixtureA() && cc.otherFixture == contact.getFixtureB()) {
-                        c.remove();
-                        break;
-                    }
-                }
+                if (b.contactListener != null)
+                    b.contactListener.endContact(contact, contact.getFixtureA(), contact.getFixtureB());
             }
         }
 
@@ -94,25 +84,55 @@ public class PhysicsSystem extends System implements ContactListener {
             Entity e = (Entity)contact.getFixtureB().getUserData();
             if (e.has(PhysicsBody.class)) {
                 PhysicsBody b = e.get(PhysicsBody.class);
-                Iterator<PhysicsBody.Collision> c = b.collisions.iterator();
-                while (c.hasNext()) {
-                    PhysicsBody.Collision cc = c.next();
-                    if (cc.myFixture == contact.getFixtureB() && cc.otherFixture == contact.getFixtureA()) {
-                        c.remove();
-                        break;
-                    }
-                }
+                if (b.contactListener != null)
+                    b.contactListener.endContact(contact, contact.getFixtureB(), contact.getFixtureA());
             }
         }
     }
 
     @Override
     public void preSolve(Contact contact, Manifold manifold) {
+        if (contact.getFixtureA().getUserData() != null)
+            if (contact.getFixtureA().getUserData().getClass() == Entity.class) {
+                Entity e = (Entity)contact.getFixtureA().getUserData();
+                if (e.has(PhysicsBody.class)) {
+                    PhysicsBody b = e.get(PhysicsBody.class);
+                    if (b.contactListener != null)
+                        b.contactListener.preSolve(contact, contact.getFixtureA(), contact.getFixtureB());
+                }
+            }
 
+        if (contact.getFixtureB().getUserData() != null)
+            if (contact.getFixtureB().getUserData().getClass() == Entity.class) {
+                Entity e = (Entity)contact.getFixtureB().getUserData();
+                if (e.has(PhysicsBody.class)) {
+                    PhysicsBody b = e.get(PhysicsBody.class);
+                    if (b.contactListener != null)
+                        b.contactListener.preSolve(contact, contact.getFixtureB(), contact.getFixtureA());
+                }
+            }
     }
 
     @Override
     public void postSolve(Contact contact, ContactImpulse contactImpulse) {
+        if (contact.getFixtureA().getUserData() != null)
+            if (contact.getFixtureA().getUserData().getClass() == Entity.class) {
+                Entity e = (Entity)contact.getFixtureA().getUserData();
+                if (e.has(PhysicsBody.class)) {
+                    PhysicsBody b = e.get(PhysicsBody.class);
+                    if (b.contactListener != null)
+                        b.contactListener.postSolve(contact, contact.getFixtureA(), contact.getFixtureB());
+                }
+            }
 
+        if (contact.getFixtureB().getUserData() != null)
+            if (contact.getFixtureB().getUserData().getClass() == Entity.class) {
+                Entity e = (Entity)contact.getFixtureB().getUserData();
+                if (e.has(PhysicsBody.class)) {
+                    PhysicsBody b = e.get(PhysicsBody.class);
+                    if (b.contactListener != null)
+                        b.contactListener.postSolve(contact, contact.getFixtureB(), contact.getFixtureA());
+                }
+            }
     }
 }

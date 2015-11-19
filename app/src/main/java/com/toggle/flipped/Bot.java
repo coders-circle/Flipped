@@ -22,6 +22,9 @@ public class Bot implements Component {
     Fixture groundFixture;
     Fixture leftsideFixture, rightsideFixture;
 
+    // Contacts
+    int groundContacts=0, leftSideContacts=0, rightSideContacts=0;
+
     // Health, damagePoints
 
     // Sprites and sprite-sheet-data for different states

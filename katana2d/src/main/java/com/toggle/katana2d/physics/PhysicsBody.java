@@ -126,10 +126,11 @@ public class PhysicsBody implements Component {
     }
 
     public Body body;
-    public List<Collision> collisions = new ArrayList<>();
+    //public List<Collision> collisions = new ArrayList<>();
+    public ContactListener contactListener;
 
-    public static class Collision {
+    /*public static class Collision {
         public Fixture otherFixture;
         public Fixture myFixture;
-    }
+    }*/
 }

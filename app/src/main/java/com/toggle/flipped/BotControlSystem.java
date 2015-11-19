@@ -1,17 +1,18 @@
 package com.toggle.flipped;
 
-import android.util.Log;
-
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Transformation;
+import com.toggle.katana2d.physics.ContactListener;
 import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
 
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Fixture;
+import org.jbox2d.dynamics.contacts.Contact;
 
-public class BotControlSystem extends com.toggle.katana2d.System {
+public class BotControlSystem extends com.toggle.katana2d.System implements ContactListener {
 
     public BotControlSystem() {
         super(new Class[] { Bot.class, Transformation.class, PhysicsBody.class, Sprite.class });
@@ -39,6 +40,8 @@ public class BotControlSystem extends com.toggle.katana2d.System {
         shape = new PolygonShape();
         shape.setAsBox(sensorSize, ex.y/2, new Vec2(ex.x, 0), 0);
         p.rightsideFixture = b.createSensor(shape);
+
+        b.contactListener = this;
     }
 
     @Override
@@ -51,19 +54,9 @@ public class BotControlSystem extends com.toggle.katana2d.System {
 
             Vec2 v = b.body.getLinearVelocity();
 
-            // Check sensors
-            boolean onGround = false;
-            boolean onLeftSide = false, onRightSide = false;
-            for (PhysicsBody.Collision c: b.collisions) {
-                if (!c.otherFixture.isSensor()) {
-                    if (c.myFixture == bot.groundFixture)
-                        onGround = true;
-                    else if (c.myFixture == bot.leftsideFixture)
-                        onLeftSide = true;
-                    else if (c.myFixture == bot.rightsideFixture)
-                        onRightSide = true;
-                }
-            }
+            boolean onGround = bot.groundContacts>0;
+            boolean onLeftSide = bot.leftSideContacts>0, onRightSide = bot.rightSideContacts>0;
+
             if (onGround)
                 b.body.getFixtureList().setFriction(0.5f);
             else
@@ -77,7 +70,7 @@ public class BotControlSystem extends com.toggle.katana2d.System {
             // linear impulse to jump.
             else if (bot.actionState == Bot.ActionState.JUMP_START) {
                 if (onGround) {
-                    b.body.applyLinearImpulse(new Vec2(0, -3f * b.body.getMass()), b.body.getWorldCenter());
+                    b.body.applyLinearImpulse(new Vec2(0, -3.4f * b.body.getMass()), b.body.getWorldCenter());
 
                     // Change to jumping state
                     bot.actionState = Bot.ActionState.JUMP;
@@ -113,6 +106,50 @@ public class BotControlSystem extends com.toggle.katana2d.System {
             if (speed != 0)
                 s.scaleX = speed < 0? -1 : 1;
         }
+
+    }
+
+    @Override
+    public void beginContact(Contact contact, Fixture me, Fixture other) {
+        if (other.isSensor())
+            return;
+
+        Bot bot = ((Entity)me.getUserData()).get(Bot.class);
+        if (me == bot.groundFixture) {
+            if (!((Entity)other.getUserData()).has(PlatformSystem.OneWayPlatform.class)
+                    || me.getBody().getLinearVelocity().y >= 0)
+                bot.groundContacts++;
+        }
+        else if (me == bot.leftsideFixture)
+            bot.leftSideContacts++;
+        else if (me == bot.rightsideFixture)
+            bot.rightSideContacts++;
+    }
+
+    @Override
+    public void endContact(Contact contact, Fixture me, Fixture other) {
+        if (other.isSensor())
+            return;
+
+        Bot bot = ((Entity)me.getUserData()).get(Bot.class);
+        if (me == bot.groundFixture) {
+            if (!((Entity) other.getUserData()).has(PlatformSystem.OneWayPlatform.class)
+                    || me.getBody().getLinearVelocity().y >= 0)
+                bot.groundContacts--;
+        }
+        else if (me == bot.leftsideFixture)
+            bot.leftSideContacts--;
+        else if (me == bot.rightsideFixture)
+            bot.rightSideContacts--;
+    }
+
+    @Override
+    public void preSolve(Contact contact, Fixture me, Fixture other) {
+
+    }
+
+    @Override
+    public void postSolve(Contact contact, Fixture me, Fixture other) {
 
     }
 }

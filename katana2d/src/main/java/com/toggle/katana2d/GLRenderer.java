@@ -277,11 +277,10 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
     private List<Texture> mTextures = new ArrayList<>();
 
-    private int loadTexture(int resourceId) {
+    private int loadTexture(Bitmap bitmap) {
         int[] textureHandle = new int[1];
         GLES20.glGenTextures(1, textureHandle, 0);
         if (textureHandle[0] != 0) {
-            Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), resourceId);
             if (bitmap == null) {
                 throw new RuntimeException("Error decoding bitmap");
             }
@@ -291,21 +290,32 @@ public class GLRenderer implements GLSurfaceView.Renderer {
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
-
-            bitmap.recycle();
         }
         else {
             throw new RuntimeException("Error loading texture.");
         }
-        /*texture.textureId = textureHandle[0];
-        texture.resourceId = resourceId;*/
         return textureHandle[0];
+    }
+
+    private int loadTexture(int resourceId) {
+        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), resourceId);
+        int texid = loadTexture(bitmap);
+        bitmap.recycle();
+        return texid;
     }
 
     // create texture from a resource image
     public Texture addTexture(int resourceId, float width, float height) {
         Texture t = new Texture(loadTexture(resourceId), width, height);
         t.resourceId = resourceId;
+        mTextures.add(t);
+        return t;
+    }
+
+    // create texture from bitmap
+    public Texture addTexture(Bitmap bitmap, float width, float height) {
+        Texture t = new Texture(loadTexture(bitmap), width, height);
+        t.bitmap = bitmap;
         mTextures.add(t);
         return t;
     }
@@ -329,6 +339,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     private void reloadTexture(Texture t) {
         if (t.resourceId >= 0)
             t.textureId = loadTexture(t.resourceId);
+        else if (t.bitmap != null)
+            t.textureId = loadTexture(t.bitmap);
     }
 }
 

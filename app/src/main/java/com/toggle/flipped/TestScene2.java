@@ -1,7 +1,11 @@
 package com.toggle.flipped;
 
+import android.graphics.Color;
+import android.graphics.Typeface;
+
 import com.toggle.katana2d.Emitter;
 import com.toggle.katana2d.Entity;
+import com.toggle.katana2d.Font;
 import com.toggle.katana2d.ParticleSystem;
 import com.toggle.katana2d.RenderSystem;
 import com.toggle.katana2d.Scene;
@@ -31,6 +35,7 @@ public class TestScene2 extends Scene {
         //mSystems.add(flipSystem);
         mSystems.add(new WindSystem());
         mSystems.add(new RopeSystem(physicsSystem.getWorld(), mGame.getRenderer()));
+        mSystems.add(new PlatformSystem());
 
         // Some sprites which are just colored boxes
         mGame.getRenderer().setBackgroundColor(0, 0, 0);
@@ -61,6 +66,7 @@ public class TestScene2 extends Scene {
         platform.add(new Transformation(w, h / 2 + 16, 0));
         platform.add(new Sprite(mGame.textureManager.get(spr2)));
         platform.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.STATIC, platform, new PhysicsBody.Properties(0)));
+        platform.add(new PlatformSystem.OneWayPlatform());
         addEntity(platform);
 
         /*Entity mirror1 = new Entity();
@@ -122,8 +128,8 @@ public class TestScene2 extends Scene {
         windSource.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.STATIC, windSource, null, null));
         windSource.add(new WindSource(100, 1024, 64));
 
-        addEntity(windSource);*/
-
+        addEntity(windSource);
+*/
 
         // Create a rope
         Texture segmentSprite = mGame.getRenderer().addTexture(R.drawable.rope, 6, 5);
@@ -148,11 +154,16 @@ public class TestScene2 extends Scene {
 
         // Uncomment to start burning
         //ropeEntity.get(Rope.class).startBurning();
-    }
 
-    // Uncomment following to display FPS on logcat
-    /*@Override
+        font = new Font(mGame.getRenderer(), Typeface.create("sans-serif-light", Typeface.NORMAL), 24);
+    }
+    Font font;
+
+    @Override
     public void onDraw() {
-        Log.d("FPS", mGame.getTimer().getFPS() + "");
-    }*/
+        // Uncomment following to display FPS on logcat
+        //Log.d("FPS", mGame.getTimer().getFPS() + "");
+        font.setColor(new float[]{1,0,0,1});
+        font.draw("hello\nworld", 30, 30, 0, 1, 1);
+    }
 }

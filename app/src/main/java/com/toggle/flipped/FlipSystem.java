@@ -2,9 +2,13 @@ package com.toggle.flipped;
 
 
 import com.toggle.katana2d.*;
+import com.toggle.katana2d.physics.ContactListener;
 import com.toggle.katana2d.physics.PhysicsBody;
 
-public class FlipSystem extends com.toggle.katana2d.System {
+import org.jbox2d.dynamics.Fixture;
+import org.jbox2d.dynamics.contacts.Contact;
+
+public class FlipSystem extends com.toggle.katana2d.System implements ContactListener {
 
     public static class Mirror {
         public String nextWorld;
@@ -26,7 +30,7 @@ public class FlipSystem extends com.toggle.katana2d.System {
     private Level mLevel;
 
     public FlipSystem(/*Camera camera, */Level level) {
-        super(new Class[] {FlipItem.class});
+        super(new Class[] {FlipItem.class, PhysicsBody.class});
         // mCamera = camera;
         mLevel = level;
     }
@@ -36,26 +40,33 @@ public class FlipSystem extends com.toggle.katana2d.System {
     }
 
     @Override
-    public void update(float dt) {
-        for (Entity e: mEntities) {
-            FlipItem f = e.get(FlipItem.class);
-            PhysicsBody b = e.get(PhysicsBody.class);
+    public void onEntityAdded(Entity entity) {
+        entity.get(PhysicsBody.class).contactListener = this;
+    }
 
-            if (f.type == FlipItem.FlipItemType.MIRROR) {
-                // For every mirror, check collision with player and change world
-                boolean colliding = false;
-                for (PhysicsBody.Collision c : b.collisions) {
-                    if (c.otherFixture == mBotComponent.groundFixture) {
-                        colliding = true;
-                        break;
-                    }
-                }
-
-                if (colliding) {
-                    Mirror data = (Mirror)f.data;
-                    mLevel.changeWorld(data.nextWorld);
-                }
+    @Override
+    public void beginContact(Contact contact, Fixture me, Fixture other) {
+        FlipItem f = ((Entity)me.getUserData()).get(FlipItem.class);
+        if (f.type == FlipItem.FlipItemType.MIRROR) {
+            if (other == mBotComponent.groundFixture) {
+                Mirror data = (Mirror)f.data;
+                mLevel.changeWorld(data.nextWorld);
             }
         }
+    }
+
+    @Override
+    public void endContact(Contact contact, Fixture me, Fixture other) {
+
+    }
+
+    @Override
+    public void preSolve(Contact contact, Fixture me, Fixture other) {
+
+    }
+
+    @Override
+    public void postSolve(Contact contact, Fixture me, Fixture other) {
+
     }
 }

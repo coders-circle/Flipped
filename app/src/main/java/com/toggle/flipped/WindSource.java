@@ -4,6 +4,9 @@ import com.toggle.katana2d.Component;
 
 import org.jbox2d.dynamics.Fixture;
 
+import java.util.ArrayList;
+import java.util.List;
+
 // A wind source that applies wind force to specific
 // rectangular area
 public class WindSource implements Component {
@@ -27,4 +30,7 @@ public class WindSource implements Component {
     }
 
     public Fixture sensor;
+
+    // List of all fixtures inside the wind area
+    public List<Fixture> bodies = new ArrayList<>();
 }

@@ -1,10 +1,14 @@
 package com.toggle.katana2d;
 
+import android.graphics.Bitmap;
 import android.opengl.GLES20;
 
 public class Texture {
     public int textureId;
+
+    // Data needed to reload
     public int resourceId = -1;
+    public Bitmap bitmap = null;
 
     // The color to blend with the texture
     public float[] color = new float[] { 1.0f, 1.0f, 1.0f, 1.0f };
