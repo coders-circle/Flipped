@@ -14,10 +14,6 @@ public class MainActivity extends GameActivity {
     @Override
     public void onGameStart() {
         Game game = mEngine.getGame();
-
         TestLevel testLevel = new TestLevel(game);
-
-        /*int i = game.addScene(new TestScene2());
-        game.setActiveScene(i);*/
     }
 }

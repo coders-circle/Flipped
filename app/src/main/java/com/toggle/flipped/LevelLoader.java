@@ -27,11 +27,17 @@ public class LevelLoader {
     private JSONObject data;
     private CustomLoader mCustomLoader;     // custom loader to handle loading of specific sprites/entities
 
-    public void load(Game game, String json, CustomLoader customLoader) {
-        mCustomLoader = customLoader;
+    public LevelLoader(String json) {
         try {
             data = new JSONObject(json);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
+    public void load(Game game, CustomLoader customLoader) {
+        mCustomLoader = customLoader;
+        try {
             // load all sprites
             JSONObject sprites = data.getJSONObject("sprites");
             Iterator<String> keys = sprites.keys();
@@ -85,14 +91,23 @@ public class LevelLoader {
 
     public void addComponent(Game game, World world, Entity entity, String compName, JSONObject component, JSONObject components) throws JSONException {
         switch (compName) {
-            case "Sprite":
-                entity.add(new Sprite(game.textureManager.get(component.getString("Sprite"))));
+            case "Sprite": {
+                float scaleX = 1, scaleY = 1;
+                if (components.has("Transformation")) {
+                    scaleX = (float) components.getJSONObject("Transformation").getDouble("Scale-X");
+                    scaleY = (float) components.getJSONObject("Transformation").getDouble("Scale-Y");
+                }
+                Sprite sc = new Sprite(game.textureManager.get(component.getString("Sprite")));
+                sc.scaleX = scaleX;
+                sc.scaleY = scaleY;
+                entity.add(sc);
+            }
                 break;
             case "Transformation":
                 entity.add(new Transformation((float) component.getDouble("Translate-X"),
                         (float) component.getDouble("Translate-Y"), (float) component.getDouble("Angle")));
                 break;
-            case "RigidBody":
+            case "RigidBody": {
                 // Rigidbody is little complicated,
                 // we will need shape data from "Sprite" component, so check if "Sprite" exists
                 if (components.has("Sprite")) {
@@ -104,26 +119,34 @@ public class LevelLoader {
                     Shape shape;
                     String type = jsonShape.getString("type");
 
+                    float scaleX = 1, scaleY = 1;
+                    if (components.has("Transformation")) {
+                        scaleX = (float) components.getJSONObject("Transformation").getDouble("Scale-X");
+                        scaleY = (float) components.getJSONObject("Transformation").getDouble("Scale-Y");
+                    }
+
                     // box and circle shapes are easy. polygon is little bit complicated
                     switch (type) {
                         case "box":
                             shape = new PolygonShape();
                             ((PolygonShape) shape).setAsBox(
-                                    (float) jsonShape.getDouble("width") / 2 * PhysicsSystem.METERS_PER_PIXEL,
-                                    (float) jsonShape.getDouble("height") / 2 * PhysicsSystem.METERS_PER_PIXEL);
+                                    (float) jsonShape.getDouble("width") / 2 * PhysicsSystem.METERS_PER_PIXEL * scaleX,
+                                    (float) jsonShape.getDouble("height") / 2 * PhysicsSystem.METERS_PER_PIXEL * scaleY);
                             break;
 
                         case "circle":
                             shape = new CircleShape();
-                            shape.setRadius((float) jsonShape.getDouble("radius") * PhysicsSystem.METERS_PER_PIXEL);
+                            shape.setRadius((float) jsonShape.getDouble("radius") * PhysicsSystem.METERS_PER_PIXEL * Math.max(scaleX, scaleY));
                             break;
 
                         default:
                             shape = new PolygonShape();
-                            float offsetX = (float)sprite.getDouble("width")/2;
-                            float offsetY = (float)sprite.getDouble("height")/2;
+                            float offsetX = (float) sprite.getDouble("width") / 2;
+                            float offsetY = (float) sprite.getDouble("height") / 2;
                             List<Vec2> vertices = Utilities.parsePoints(jsonShape.getString("points"), offsetX, offsetY);
+                            Utilities.scale(vertices, scaleX, scaleY);
                             ((PolygonShape) shape).set(vertices.toArray(new Vec2[vertices.size()]), vertices.size());
+
                             break;
 
                     }
@@ -141,6 +164,7 @@ public class LevelLoader {
                             (float) component.getDouble("Density"), (float) component.getDouble("Friction"), (float) component.getDouble("Restitution")
                     )));
                 }
+            }
                 break;
         }
     }

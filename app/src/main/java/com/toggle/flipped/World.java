@@ -5,16 +5,21 @@ import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.ParticleSystem;
 import com.toggle.katana2d.RenderSystem;
 import com.toggle.katana2d.Scene;
+import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
+
+import org.jbox2d.common.Vec2;
 
 // On world is one scene, one level contains multiple worlds
 public class World extends Scene {
 
     private LevelLoader mLevelLoader;
     private String mWorldName;
-    public int mSceneId;    // Id corresponding to Game's scenes list
     private Level mParentLevel;
-    private float mAngle;   // Angle of the world: 180 for flip, 0 for normal
+
+    public int mSceneId;    // Id corresponding to Game's scenes list
+    public float mAngle;   // Angle of the world: 180 for flip, 0 for normal
+
     private Entity mPlayer; // Player entity; every world has one
 
     public World(Level parentLevel, LevelLoader levelLoader, String worldName) {
@@ -46,12 +51,19 @@ public class World extends Scene {
 
         mPlayer = mParentLevel.standardEntities.get("player");
         flipSystem.setPlayer(mPlayer);
+
+        startX = mPlayer.get(PhysicsBody.class).body.getPosition().x;
+        startY = mPlayer.get(PhysicsBody.class).body.getPosition().y;
     }
+
+    private float startX, startY;
 
     // When world changes from another world to this
     public void load() {
         Camera camera = mGame.getRenderer().getCamera();
         camera.angle = mAngle;
+
+        mPlayer.get(PhysicsBody.class).body.setTransform(new Vec2(startX, startY), 0);
     }
 
     // When world changes from this to another world

@@ -54,4 +54,11 @@ public class Utilities {
         }
         return vertices;
     }
+
+    public static void scale(List<Vec2> points, float scaleX, float scaleY) {
+        for (Vec2 p: points) {
+            p.x *= scaleX;
+            p.y *= scaleY;
+        }
+    }
 }

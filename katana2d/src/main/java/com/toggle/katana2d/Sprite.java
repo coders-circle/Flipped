@@ -4,7 +4,7 @@ package com.toggle.katana2d;
 public class Sprite implements Component{
     public Texture texture;
     public SpriteSheetData spriteSheetData;
-    public boolean isReflected = false;
+    public float scaleX = 1, scaleY = 1;
 
     public Sprite(Texture texture) {
         this.texture = texture;
@@ -109,13 +109,8 @@ public class Sprite implements Component{
         if (texture == null)
             return;
 
-        if (isReflected) {
-            x += texture.width;
-            texture.width *= -1;
-        }
-
         if (spriteSheetData == null)
-            texture.draw(renderer, x, y, angle);
+            texture.draw(renderer, x, y, angle, scaleX, scaleY);
         else {
             Sprite.SpriteSheetData ssd = spriteSheetData;
 
@@ -125,10 +120,7 @@ public class Sprite implements Component{
             float clipX = (ssd.imgWidth + ssd.hSpacing) * col + ssd.offsetX;
             float clipY = (ssd.imgHeight + ssd.vSpacing) * row + ssd.offsetY;
 
-            texture.draw(renderer, x, y, angle, clipX, clipY, ssd.imgWidth, ssd.imgHeight);
+            texture.draw(renderer, x, y, angle, scaleX, scaleY, clipX, clipY, ssd.imgWidth, ssd.imgHeight);
         }
-
-        if (isReflected)
-            texture.width *= -1;
     }
 }

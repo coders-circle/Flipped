@@ -236,8 +236,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.translateM(mModelMatrix, 0, posX, posY, 0);
         Matrix.rotateM(mModelMatrix, 0, angle, 0, 0, 1);
-        Matrix.translateM(mModelMatrix, 0, -originX, -originY, 0);
         Matrix.scaleM(mModelMatrix, 0, scaleX, scaleY, 1);
+        Matrix.translateM(mModelMatrix, 0, -originX, -originY, 0);
 
         // mMVPMatrix = mProjectionMatrix * mViewMatrix * mModelMatrix
         Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);

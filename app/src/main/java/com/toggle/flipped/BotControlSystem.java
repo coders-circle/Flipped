@@ -111,7 +111,7 @@ public class BotControlSystem extends com.toggle.katana2d.System {
                 s.changeSprite(bot.sprJump, bot.ssdJump);
 
             if (speed != 0)
-                s.isReflected = speed < 0;
+                s.scaleX = speed < 0? -1 : 1;
         }
 
     }

@@ -1,12 +1,13 @@
 package com.toggle.flipped;
 
+
 import com.toggle.katana2d.*;
 import com.toggle.katana2d.physics.PhysicsBody;
 
 public class FlipSystem extends com.toggle.katana2d.System {
 
     public static class Mirror {
-        public int nextWorldId;
+        public String nextWorld;
     }
 
     // Flip-items are items that are processed by this system.
@@ -20,7 +21,7 @@ public class FlipSystem extends com.toggle.katana2d.System {
         public Object data;
     }
 
-    private static Bot mBotComponent;   // Bot component of player, consists the ground fixture to test collision with
+    private Bot mBotComponent;   // Bot component of player, consists the ground fixture to test collision with
     // private static Camera mCamera;
     private Level mLevel;
 
@@ -50,12 +51,10 @@ public class FlipSystem extends com.toggle.katana2d.System {
                     }
                 }
 
-                if (colliding)
-                {
+                if (colliding) {
                     Mirror data = (Mirror)f.data;
-                    mLevel.changeWorld(data.nextWorldId);
+                    mLevel.changeWorld(data.nextWorld);
                 }
-                    //mCamera.angle = f.targetAngle;
             }
         }
     }

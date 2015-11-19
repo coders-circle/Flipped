@@ -1,12 +1,8 @@
 package com.toggle.katana2d;
 
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.Semaphore;
 
 public class Game implements TimerCallback {
     // Some common resources
@@ -71,40 +67,40 @@ public class Game implements TimerCallback {
     // called on surface creation
     public void init() {
         if (!mInitialized) {
-            mActivity.onGameStart();
+            mActivity.onGamePreStart();
             for (Scene scene : mScenes)
                 scene.init(this);
             mInitialized = true;
-        }
+            mActivity.onGameStart();
 
-        // start updating in separate thread
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(!mStop) {
-                    // If we are already drawing, we sleep and wait to be notified to wakeup
-                    if (drawing)
-                        synchronized (updateLock) {
-                            try {
-                                updateLock.wait();
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
+            // start updating in separate thread
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (!mStop) {
+                        // If we are already drawing, we sleep and wait to be notified to wakeup
+                        if (drawing)
+                            synchronized (updateLock) {
+                                try {
+                                    updateLock.wait();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
                             }
+
+                        // Update using timer
+                        mDrawInterpolation = mTimer.update(Game.this);
+
+                        // After each update, we need to draw, notify the render thread to wakeup if sleeping
+                        synchronized (drawLock) {
+                            drawLock.notify();
                         }
 
-                    // Update using timer
-                    mDrawInterpolation = mTimer.update(Game.this);
-
-                    // After each update, we need to draw, notify the render thread to wakeup if sleeping
-                    synchronized (drawLock) {
-                        drawLock.notify();
+                        // TODO: Sleep for some time here perhaps
                     }
-
-                    Log.d("interpolation", ""+mDrawInterpolation);
-                    // TODO: Sleep for some time here perhaps
                 }
-            }
-        }).start();
+            }).start();
+        }
     }
 
     // update method for updating game logic and animations, which are time dependent
