@@ -5,22 +5,26 @@ public class Sprite implements Component{
     public Texture texture;
     public SpriteSheetData spriteSheetData;
     public float scaleX = 1, scaleY = 1;
+    public float z = 0; // z-order
 
-    public Sprite(Texture texture) {
+    public Sprite(Texture texture, float z) {
         this.texture = texture;
+        this.z = z;
     }
 
-    public Sprite(Texture texture, SpriteSheetData spriteSheetData) {
+    public Sprite(Texture texture, float z, SpriteSheetData spriteSheetData) {
         this.texture = texture;
+        this.z = z;
         this.spriteSheetData = spriteSheetData;
     }
 
-    public Sprite(Texture texture, int numCols, int numRows) {
-        this(texture, numCols, numRows, numCols*numRows);
+    public Sprite(Texture texture, float z, int numCols, int numRows) {
+        this(texture, z, numCols, numRows, numCols*numRows);
     }
 
-    public Sprite(Texture texture, int numCols, int numRows, int numImages) {
+    public Sprite(Texture texture, float z, int numCols, int numRows, int numImages) {
         this.texture = texture;
+        this.z = z;
         spriteSheetData = new SpriteSheetData();
         spriteSheetData.numRows = numRows;
         spriteSheetData.numCols = numCols;
@@ -30,15 +34,15 @@ public class Sprite implements Component{
         spriteSheetData.imgHeight = 1f/numRows;
     }
 
-    public Sprite(Texture texture, int numCols, int numRows, int numImages, int index, float animationSpeed) {
-        this(texture, numCols, numRows, numImages);
+    public Sprite(Texture texture, float z, int numCols, int numRows, int numImages, int index, float animationSpeed) {
+        this(texture, z, numCols, numRows, numImages);
         spriteSheetData.index = index;
         spriteSheetData.animationSpeed = animationSpeed;
     }
 
-    public Sprite(Texture texture, int numCols, int numRows, int numImages, int index, float animationSpeed,
+    public Sprite(Texture texture, float z, int numCols, int numRows, int numImages, int index, float animationSpeed,
                   float offsetX, float offsetY, float hSpacing, float vSpacing) {
-        this(texture, numCols, numRows, numImages);
+        this(texture, z, numCols, numRows, numImages);
         spriteSheetData.index = index;
         spriteSheetData.animationSpeed = animationSpeed;
         spriteSheetData.offsetX = offsetX;
@@ -110,7 +114,7 @@ public class Sprite implements Component{
             return;
 
         if (spriteSheetData == null)
-            texture.draw(renderer, x, y, angle, scaleX, scaleY);
+            texture.draw(renderer, x, y, -z, angle, scaleX, scaleY);
         else {
             Sprite.SpriteSheetData ssd = spriteSheetData;
 
@@ -120,7 +124,7 @@ public class Sprite implements Component{
             float clipX = (ssd.imgWidth + ssd.hSpacing) * col + ssd.offsetX;
             float clipY = (ssd.imgHeight + ssd.vSpacing) * row + ssd.offsetY;
 
-            texture.draw(renderer, x, y, angle, scaleX, scaleY, clipX, clipY, ssd.imgWidth, ssd.imgHeight);
+            texture.draw(renderer, x, y, -z, angle, scaleX, scaleY, clipX, clipY, ssd.imgWidth, ssd.imgHeight);
         }
     }
 }

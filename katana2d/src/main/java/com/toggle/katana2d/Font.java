@@ -106,7 +106,7 @@ public class Font {
             }
             else {
                 Char c = mChars[(int) j];
-                texture.draw(renderer, dx, dy, angle, scaleX, scaleY, c.u, c.v, c.w, c.h);
+                texture.draw(renderer, dx, dy, 0, angle, scaleX, scaleY, c.u, c.v, c.w, c.h);
                 dx += c.width + spacing;
             }
         }

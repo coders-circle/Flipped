@@ -28,7 +28,7 @@ public class TestScene extends Scene {
 
         Entity ground = new Entity();
         ground.add(new Transformation(w / 2, h - 16, 0));
-        ground.add(new Sprite(mGame.textureManager.get(spr1)));
+        ground.add(new Sprite(mGame.textureManager.get(spr1), 0));
         ground.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.STATIC, ground, new PhysicsBody.Properties(0)));
         addEntity(ground);
 
@@ -37,7 +37,7 @@ public class TestScene extends Scene {
             float x = w/2 - 32 + (i/5) * 32 - 8*i;
             float y = h/2 - 32*2 + (i%5) * 32;
             body.add(new Transformation(x, y, 48));
-            body.add(new Sprite(mGame.textureManager.get(spr0)));
+            body.add(new Sprite(mGame.textureManager.get(spr0), 0));
             body.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.DYNAMIC, body, new PhysicsBody.Properties(1.0f)));
             addEntity(body);
         }

@@ -123,7 +123,7 @@ public class Level implements CustomLoader {
                         transformation = components.getJSONObject("Transformation");
                         mirror.add(new Transformation((float) transformation.getDouble("Translate-X"),
                                 (float) transformation.getDouble("Translate-Y"), (float) transformation.getDouble("Angle")));
-                        mirror.add(new Sprite(mGame.textureManager.get("mirror")));
+                        mirror.add(new Sprite(mGame.textureManager.get("mirror"), -1));
                         mirror.add(new PhysicsBody(world, BodyType.STATIC, mirror, new PhysicsBody.Properties(true)));
                         mirror.add(new FlipSystem.FlipItem(FlipSystem.FlipItem.FlipItemType.MIRROR));
 

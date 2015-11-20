@@ -76,7 +76,7 @@ public class BotCreator {
 
             // First create the bot entity with required components
             entity.add(new Transformation(x, y, angle));
-            entity.add(new Sprite(getSprite(json.getJSONObject("walk_sprite"))));
+            entity.add(new Sprite(getSprite(json.getJSONObject("walk_sprite")), 0));
             entity.add(new PhysicsBody(mWorld, BodyType.DYNAMIC, entity, new PhysicsBody.Properties(1f, 0f, 0f, false, true)));
             entity.add(new Bot());
 

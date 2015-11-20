@@ -3,6 +3,8 @@ package com.toggle.flipped;
 import android.graphics.Color;
 import android.graphics.Typeface;
 
+import com.toggle.katana2d.Background;
+import com.toggle.katana2d.BackgroundSystem;
 import com.toggle.katana2d.Emitter;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Font;
@@ -26,6 +28,7 @@ public class TestScene2 extends Scene {
         ParticleSystem particleSystem = new ParticleSystem();
 
         // Add the systems
+        mSystems.add(new BackgroundSystem(mGame.getRenderer(), 100));   // Background system must prepend RenderSystem
         mSystems.add(new RenderSystem(mGame.getRenderer()));
         mSystems.add(physicsSystem);
         mSystems.add(particleSystem);
@@ -58,15 +61,15 @@ public class TestScene2 extends Scene {
 
         Entity ground = new Entity();
         ground.add(new Transformation(w, h - 16, 0));
-        ground.add(new Sprite(mGame.textureManager.get(spr3)));
+        ground.add(new Sprite(mGame.textureManager.get(spr3), 3));
         ground.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.STATIC, ground, new PhysicsBody.Properties(0)));
         addEntity(ground);
 
         Entity platform = new Entity();
         platform.add(new Transformation(w, h / 2 + 16, 0));
-        platform.add(new Sprite(mGame.textureManager.get(spr2)));
+        platform.add(new Sprite(mGame.textureManager.get(spr2), 3));
         platform.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.STATIC, platform, new PhysicsBody.Properties(0)));
-        platform.add(new PlatformSystem.OneWayPlatform());
+        //platform.add(new PlatformSystem.OneWayPlatform());
         addEntity(platform);
 
         /*Entity mirror1 = new Entity();
@@ -89,7 +92,7 @@ public class TestScene2 extends Scene {
 
         Entity body = new Entity();
         body.add(new Transformation(w / 2-64, h - 32 - 16, 0));
-        body.add(new Sprite(mGame.textureManager.get(spr0)));
+        body.add(new Sprite(mGame.textureManager.get(spr0), 0));
         body.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.DYNAMIC, body, new PhysicsBody.Properties(0.8f)));
         addEntity(body);
 
@@ -138,7 +141,7 @@ public class TestScene2 extends Scene {
         ropeEntity.add(new Rope(w-128, h/2+32, 8, 4, 4, platform.get(PhysicsBody.class).body, null));
 
         // Set rope segment sprite
-        Sprite segSprite = ropeEntity.get(Rope.class).segmentSprite = new Sprite(segmentSprite, 5, 1);
+        Sprite segSprite = ropeEntity.get(Rope.class).segmentSprite = new Sprite(segmentSprite, 0, 5, 1);
         segSprite.spriteSheetData.animationSpeed = 0;
 
         // Set rope-segment burn time to 1 second
@@ -146,7 +149,7 @@ public class TestScene2 extends Scene {
         burnData.timeToBurn = 1f;
 
         // Set burning segment sprite
-        Sprite burnSegSprite = burnData.burningSegmentSprite = new Sprite(segmentSprite, 5, 1);
+        Sprite burnSegSprite = burnData.burningSegmentSprite = new Sprite(segmentSprite, 0, 5, 1);
         burnSegSprite.spriteSheetData.animationSpeed = 4;   // 1 second to burn, 4 frames on image sheet, hence 4 fps
         burnSegSprite.spriteSheetData.loop = false;
 
@@ -155,15 +158,28 @@ public class TestScene2 extends Scene {
         // Uncomment to start burning
         //ropeEntity.get(Rope.class).startBurning();
 
-        font = new Font(mGame.getRenderer(), Typeface.create("sans-serif-light", Typeface.NORMAL), 24);
+        //font = new Font(mGame.getRenderer(), Typeface.create("sans-serif-light", Typeface.NORMAL), 24);
+
+
+        Entity bk1 = new Entity();
+        bk1.add(new Background(mGame.getRenderer().addTexture(R.drawable.space1, 640, 480), 100));
+        addEntity(bk1);
+
+        Entity bk2 = new Entity();
+        bk2.add(new Background(mGame.getRenderer().addTexture(R.drawable.hills, 640, 480), 50));
+        addEntity(bk2);
+
+        Entity bk3 = new Entity();
+        bk3.add(new Background(mGame.getRenderer().addTexture(R.drawable.trees, 640, 480), 30));
+        addEntity(bk3);
     }
-    Font font;
+    //Font font;
 
     @Override
     public void onDraw() {
         // Uncomment following to display FPS on logcat
         //Log.d("FPS", mGame.getTimer().getFPS() + "");
-        font.setColor(new float[]{1,0,0,1});
-        font.draw("hello\nworld", 30, 30, 0, 1, 1);
+        /*font.setColor(new float[]{1,0,0,1});
+        font.draw("hello\nworld", 30, 30, 0, 1, 1);*/
     }
 }

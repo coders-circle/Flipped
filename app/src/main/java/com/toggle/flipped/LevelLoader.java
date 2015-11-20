@@ -97,7 +97,8 @@ public class LevelLoader {
                     scaleX = (float) components.getJSONObject("Transformation").getDouble("Scale-X");
                     scaleY = (float) components.getJSONObject("Transformation").getDouble("Scale-Y");
                 }
-                Sprite sc = new Sprite(game.textureManager.get(component.getString("Sprite")));
+                Sprite sc = new Sprite(game.textureManager.get(component.getString("Sprite")),
+                        (float)component.optDouble("Z-Order", 0));
                 sc.scaleX = scaleX;
                 sc.scaleY = scaleY;
                 entity.add(sc);

@@ -48,7 +48,7 @@ public class Timer {
         mLeftOver += deltaTime;
 
         // check if we have passed one more frame this second
-        // IMPORTANT: `n't call this for each update call below inside the while loop below
+        // IMPORTANT: don't call this for each update call below inside the while loop below
         // as more calls needed means more time passed, which means slower device, which means less FPS not more
         if (mLeftOver >= mTarget)
             mFrameCounter++;

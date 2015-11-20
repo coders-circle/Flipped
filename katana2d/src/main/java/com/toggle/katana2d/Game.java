@@ -14,8 +14,6 @@ public class Game implements TimerCallback {
     // Timer with 60 FPS as target
     private Timer mTimer = new Timer(60f);
 
-    private boolean mStop = false;
-
     // The activity that runs this game
     private GameActivity mActivity;
 
@@ -60,9 +58,9 @@ public class Game implements TimerCallback {
         return mScenes.get(index);
     }
 
+
+    private boolean mStop = false;
     private final Integer drawLock = 1;
-    private boolean drawing = false;
-    private final Integer updateLock = 2;
 
     // called on surface creation
     public void init() {
@@ -78,16 +76,6 @@ public class Game implements TimerCallback {
                 @Override
                 public void run() {
                     while (!mStop) {
-                        // If we are already drawing, we sleep and wait to be notified to wakeup
-                        if (drawing)
-                            synchronized (updateLock) {
-                                try {
-                                    updateLock.wait();
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
                         // Update using timer
                         mDrawInterpolation = mTimer.update(Game.this);
 
@@ -96,10 +84,15 @@ public class Game implements TimerCallback {
                             drawLock.notify();
                         }
 
-                        // TODO: Sleep for some time here perhaps
+                        try {
+                            Thread.sleep(5);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }).start();
+
         }
     }
 
@@ -111,12 +104,11 @@ public class Game implements TimerCallback {
     }
 
     // draw method for rendering stuffs
-    public void draw() {
+    public void newFrame() {
         // sleep till the update thread wakes us up
         synchronized (drawLock) {
             try {
                 drawLock.wait();
-                drawing = true;
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -125,12 +117,6 @@ public class Game implements TimerCallback {
         // draw a frame
         if (mActiveScene != null)
             mActiveScene.draw(mDrawInterpolation);
-        drawing = false;
-
-        // notifies the update thread to wakeup in case it is sleeping
-        synchronized (updateLock) {
-            updateLock.notify();
-        }
     }
 
     private float mDrawInterpolation;

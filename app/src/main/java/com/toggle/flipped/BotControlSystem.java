@@ -132,14 +132,11 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             return;
 
         Bot bot = ((Entity)me.getUserData()).get(Bot.class);
-        if (me == bot.groundFixture) {
-            if (!((Entity) other.getUserData()).has(PlatformSystem.OneWayPlatform.class)
-                    || me.getBody().getLinearVelocity().y >= 0)
+        if (me == bot.groundFixture && bot.groundContacts > 0)
                 bot.groundContacts--;
-        }
-        else if (me == bot.leftsideFixture)
+        else if (me == bot.leftsideFixture && bot.leftSideContacts > 0)
             bot.leftSideContacts--;
-        else if (me == bot.rightsideFixture)
+        else if (me == bot.rightsideFixture && bot.rightSideContacts > 0)
             bot.rightSideContacts--;
     }
 

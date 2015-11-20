@@ -132,8 +132,10 @@ public class ParticleSystem extends System {
         for (Entity entity : mEntities) {
             Emitter e = entity.get(Emitter.class);
             Transformation t = entity.get(Transformation.class);
-            if (e.additiveBlend)
+            if (e.additiveBlend) {
                 e.pointSprites.getRenderer().setAdditiveBlending();
+                e.pointSprites.getRenderer().disableDepth();
+            }
 
             float minus = 1-interpolation;
             float x = t.x * interpolation + t.lastX * minus;
@@ -142,8 +144,10 @@ public class ParticleSystem extends System {
 
             e.pointSprites.draw(e.pointSpritesData, x, y, angle, e.numParticles);
 
-            if (e.additiveBlend)
+            if (e.additiveBlend) {
                 e.pointSprites.getRenderer().setAlphaBlending();
+                e.pointSprites.getRenderer().enableDepth();
+            }
         }
     }
 }

@@ -89,12 +89,23 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
+    public void disableDepth() {
+        GLES20.glDisable(GLES20.GL_DEPTH_TEST);
+    }
+
+    public void enableDepth() {
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+    }
+
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
 
         // Enable blending for transparency
         GLES20.glEnable(GLES20.GL_BLEND);
         GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+
+        // Enable z buffer
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 
         // Enable scissoring
         GLES20.glEnable(GLES20.GL_SCISSOR_TEST);
@@ -192,8 +203,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         Matrix.translateM(mViewMatrix, 0, -mCamera.x, -mCamera.y, 0);
 
         GLES20.glClearColor(mBackR, mBackG, mBackB, 1.0f);
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-        mGame.draw();
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+        mGame.newFrame();
     }
 
     public final int width = 480, height = 320;
@@ -229,12 +240,12 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     }
 
     // Set transform for drawing the rectangle.
-    public void setSpriteTransform(float posX, float posY, float scaleX, float scaleY, float angle, float originX, float originY) {
+    public void setSpriteTransform(float posX, float posY, float z, float scaleX, float scaleY, float angle, float originX, float originY) {
         // calculate transformation matrix mMVPMatrix that will transform the vertices of the square
 
         // mModelMatrix = Translate(posX, posY) * Rotate(angle) * Translate(-originX, -originY) * Scale(scaleX, scaleY)
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, posX, posY, 0);
+        Matrix.translateM(mModelMatrix, 0, posX, posY, z);
         Matrix.rotateM(mModelMatrix, 0, angle, 0, 0, 1);
         Matrix.scaleM(mModelMatrix, 0, scaleX, scaleY, 1);
         Matrix.translateM(mModelMatrix, 0, -originX, -originY, 0);
