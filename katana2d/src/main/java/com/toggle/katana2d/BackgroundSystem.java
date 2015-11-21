@@ -1,13 +1,32 @@
 package com.toggle.katana2d;
 
+import java.util.Collections;
+
 public class BackgroundSystem extends System {
+    public static final float MAX_Z = 100;
 
     private GLRenderer mRenderer;
-    private float mMaxZ;
-    public BackgroundSystem(GLRenderer renderer, float maxZ) {
+    public BackgroundSystem(GLRenderer renderer) {
         super(new Class[]{Background.class});
         mRenderer = renderer;
-        mMaxZ = maxZ;
+    }
+
+    @Override
+    public void onEntityAdded(Entity entity) {
+        // sort by distance
+        float d = entity.get(Background.class).distance;
+        int i = mEntities.size() - 2;
+        int j = mEntities.size() - 1;
+        if (i >= 0)
+            while (i >= 0) {
+                if (mEntities.get(i).get(Background.class).distance < d) {
+                    Collections.swap(mEntities, i, j);
+                    j = i;
+                }
+                else
+                    break;
+                i--;
+            }
     }
 
     @Override
@@ -15,8 +34,9 @@ public class BackgroundSystem extends System {
         for (Entity entity: mEntities) {
             Background b = entity.get(Background.class);
 
-            b.lastX = b.x;
-            b.x = mRenderer.getCamera().x * (1 - (mMaxZ - b.z) / mMaxZ);
+            b.lastX = b.x; b.lastY = b.y;
+            b.x = mRenderer.getCamera().x * b.distance;
+            b.y = mRenderer.getCamera().y * b.distance;
         }
     }
 
@@ -26,7 +46,8 @@ public class BackgroundSystem extends System {
             Background b = entity.get(Background.class);
 
             float x = b.x * interpolation + b.lastX * (1-interpolation);
-            b.mTexture.draw(mRenderer, x, 0, -b.z, 0, 1, 1);
+            float y = b.y * interpolation + b.lastY * (1-interpolation);
+            b.mTexture.draw(mRenderer, x, y, -b.distance, 0, 1, 1);
         }
     }
 }

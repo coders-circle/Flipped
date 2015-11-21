@@ -17,7 +17,11 @@ import com.toggle.katana2d.Transformation;
 import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
 
+import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestScene2 extends Scene {
 
@@ -28,7 +32,7 @@ public class TestScene2 extends Scene {
         ParticleSystem particleSystem = new ParticleSystem();
 
         // Add the systems
-        mSystems.add(new BackgroundSystem(mGame.getRenderer(), 100));   // Background system must prepend RenderSystem
+        mSystems.add(new BackgroundSystem(mGame.getRenderer()));   // Background system must prepend RenderSystem
         mSystems.add(new RenderSystem(mGame.getRenderer()));
         mSystems.add(physicsSystem);
         mSystems.add(particleSystem);
@@ -135,30 +139,14 @@ public class TestScene2 extends Scene {
 */
 
         // Create a rope
-        Texture segmentSprite = mGame.getRenderer().addTexture(R.drawable.rope, 6, 5);
 
         Entity ropeEntity = new Entity();
-        ropeEntity.add(new Rope(w-128, h/2+32, 8, 4, 4, platform.get(PhysicsBody.class).body, null));
-
-        // Set rope segment sprite
-        Sprite segSprite = ropeEntity.get(Rope.class).segmentSprite = new Sprite(segmentSprite, 0, 5, 1);
-        segSprite.spriteSheetData.animationSpeed = 0;
-
-        // Set rope-segment burn time to 1 second
-        Rope.BurnData burnData = ropeEntity.get(Rope.class).makeBurnable();
-        burnData.timeToBurn = 1f;
-
-        // Set burning segment sprite
-        Sprite burnSegSprite = burnData.burningSegmentSprite = new Sprite(segmentSprite, 0, 5, 1);
-        burnSegSprite.spriteSheetData.animationSpeed = 4;   // 1 second to burn, 4 frames on image sheet, hence 4 fps
-        burnSegSprite.spriteSheetData.loop = false;
-
+        List<Vec2> ropePath = new ArrayList<>();
+        ropePath.add(new Vec2(w-128, h/2+32));
+        ropePath.add(new Vec2(w-128, h/2+32 + Rope.STANDARD_SEGMENT_LENGTH * 4));
+        ropeEntity.add(new Rope(ropePath, Rope.STANDARD_SEGMENT_THICKNESS, Rope.STANDARD_SEGMENT_LENGTH, platform.get(PhysicsBody.class).body, null));
+        ropeEntity.get(Rope.class).segmentSprite = new Sprite(mGame.textureManager.get("rope"), 0);
         addEntity(ropeEntity);
-
-        // Uncomment to start burning
-        //ropeEntity.get(Rope.class).startBurning();
-
-        //font = new Font(mGame.getRenderer(), Typeface.create("sans-serif-light", Typeface.NORMAL), 24);
 
 
         Entity bk1 = new Entity();

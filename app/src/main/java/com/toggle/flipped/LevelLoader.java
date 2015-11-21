@@ -19,6 +19,7 @@ import org.jbox2d.dynamics.World;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import java.util.List;
 public class LevelLoader {
     private JSONObject data;
     private CustomLoader mCustomLoader;     // custom loader to handle loading of specific sprites/entities
+    public HashMap<String, Entity> mEntities = new HashMap<>();
 
     public LevelLoader(String json) {
         try {
@@ -47,7 +49,7 @@ public class LevelLoader {
 
                 // if custom loader doesn't handle this sprite, just
                 // load the sprite with the key as filename
-                if (!mCustomLoader.loadSprite(game, key, jsonSprite)) {
+                if (!mCustomLoader.loadSprite(game, key.toLowerCase(), jsonSprite)) {
                     int spriteTex = Utilities.getResourceId(game.getActivity(), "drawable", key);
                     Texture sprite = game.getRenderer().addTexture(spriteTex, (float) jsonSprite.getDouble("width"), (float) jsonSprite.getDouble("height"));
                     game.textureManager.add(key, sprite);
@@ -71,8 +73,9 @@ public class LevelLoader {
 
                 // if custom-loader doesn't handle this entity,
                 // load the entity by creating new one and adding components
-                if (!mCustomLoader.loadEntity(scene, boxWorld, key, jsonEntity)) {
-                    Entity e = new Entity();
+                Entity e = mCustomLoader.loadEntity(scene, boxWorld, key.toLowerCase(), jsonEntity);
+                if (e == null) {
+                    e = new Entity();
                     JSONObject jsonComponents = jsonEntity.getJSONObject("components");
 
                     Iterator<String> ckeys = jsonComponents.keys();
@@ -83,6 +86,7 @@ public class LevelLoader {
 
                     scene.addEntity(e);
                 }
+                mEntities.put(key.toLowerCase(), e);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -144,7 +148,7 @@ public class LevelLoader {
                             shape = new PolygonShape();
                             float offsetX = (float) sprite.getDouble("width") / 2;
                             float offsetY = (float) sprite.getDouble("height") / 2;
-                            List<Vec2> vertices = Utilities.parsePoints(jsonShape.getString("points"), offsetX, offsetY);
+                            List<Vec2> vertices = Utilities.parsePoints(jsonShape.getString("points"), true, offsetX, offsetY);
                             Utilities.scale(vertices, scaleX, scaleY);
                             ((PolygonShape) shape).set(vertices.toArray(new Vec2[vertices.size()]), vertices.size());
 

@@ -1,5 +1,6 @@
 package com.toggle.flipped;
 
+import android.util.Log;
 
 import com.toggle.katana2d.*;
 import com.toggle.katana2d.physics.PhysicsSystem;
@@ -12,6 +13,8 @@ import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
+
+import java.util.List;
 
 public class RopeSystem extends com.toggle.katana2d.System {
 
@@ -29,8 +32,6 @@ public class RopeSystem extends com.toggle.katana2d.System {
 
         float w = rope.thickness * PhysicsSystem.METERS_PER_PIXEL;
         float h = rope.segmentLength * PhysicsSystem.METERS_PER_PIXEL;
-        float x = rope.initX * PhysicsSystem.METERS_PER_PIXEL;
-        float y = rope.initY * PhysicsSystem.METERS_PER_PIXEL;
 
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(w/2, h/2);
@@ -43,27 +44,36 @@ public class RopeSystem extends com.toggle.katana2d.System {
         fixtureDef.userData = entity;
 
         BodyDef bodyDef = new BodyDef();
-        bodyDef.position.x = x;
         bodyDef.type = BodyType.DYNAMIC;
         bodyDef.userData = entity;
 
         RevoluteJointDef jointDef = new RevoluteJointDef();
 
+        List<Vec2> segmentsPath = Utilities.getPoints(rope.path, rope.segmentLength, true);
+        rope.numSegments = segmentsPath.size() - 1;
+
         Body link = rope.startBody;
-        float lastY = y;
+        float lastY = segmentsPath.get(0).y; float lastX = segmentsPath.get(0).x;
         for (int i=0; i<rope.numSegments; ++i) {
-            bodyDef.position.y = y + h/2 + h * i;
+            Vec2 p0 = segmentsPath.get(i);
+            Vec2 p1 = segmentsPath.get(i + 1);
+
+            Vec2 center = Utilities.getCenter(p0, p1);
+            bodyDef.position.x = center.x;
+            bodyDef.position.y = center.y;
+            bodyDef.angle = (float)Math.atan2(p1.y-p0.y, p1.x-p0.x);
 
             Body body = mWorld.createBody(bodyDef);
             body.createFixture(fixtureDef);
 
             rope.segments.add(body);
 
-            jointDef.initialize(link, body, new Vec2(x, lastY));
+            jointDef.initialize(link, body, new Vec2(lastX, lastY));
             mWorld.createJoint(jointDef);
 
             link = body;
-            lastY = bodyDef.position.y;
+            lastY = segmentsPath.get(i + 1).y;
+            lastX = segmentsPath.get(i + 1).x;
         }
 
         if (rope.endBody != null) {
@@ -91,9 +101,10 @@ public class RopeSystem extends com.toggle.katana2d.System {
                     // If enough time has passed, burn a segment
                     if (bd.timePassed > bd.timeToBurn) {
                         // first remove the segment
-                        Body body = rope.segments.get(rope.segments.size()-1);
+                        /*Body body = rope.segments.get(rope.segments.size()-1);
                         mWorld.destroyBody(body);
-                        rope.segments.remove(body);
+                        rope.segments.remove(body);*/
+                        rope.removeSegment(rope.segments.size()-1);
 
                         bd.timePassed = 0; // -= bd.timeToBurn;
 

@@ -2,14 +2,15 @@ package com.toggle.katana2d;
 
 public class Background implements Component {
     public Texture mTexture;
-    public float z;
+    public final float distance;
     public float x = 0;
-    public float lastX = 0;
+    public float y = 0;
+    public float lastX = 0, lastY = 0;
 
     public Background(Texture texture, float zOrder) {
         mTexture = texture;
         mTexture.originX = 0;
         mTexture.originY = 0;
-        z = zOrder;
+        distance = (1 - (BackgroundSystem.MAX_Z - zOrder) / BackgroundSystem.MAX_Z);
     }
 }

@@ -3,6 +3,7 @@ package com.toggle.flipped;
 import com.toggle.katana2d.Component;
 import com.toggle.katana2d.Sprite;
 
+import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
 import java.util.ArrayList;
@@ -13,35 +14,39 @@ import java.util.List;
 // and the last segment can be optionally joined to endBody (can be set to null).
 public class Rope implements Component {
 
+    public static final float STANDARD_SEGMENT_LENGTH = 10f;
+    public static final float STANDARD_SEGMENT_THICKNESS = 4f;
     Sprite segmentSprite;
 
-    public Rope(float x, float y, int numberOfSegments, float thickness, float segmentLength,
-                Body startBody, Body endBody) {
-        numSegments = numberOfSegments;
-        this.thickness = thickness;
+    // Create a rope along given path using small rope segments of
+    // given length and thickness
+    public Rope(List<Vec2> path, float thickness, float segmentLength, Body startBody,
+                Body endBody) {this.thickness = thickness;
         this.segmentLength = segmentLength;
-
-        this.initX = x; this.initY = y;
         this.startBody = startBody;
         this.endBody = endBody;
+        this.path = path;
     }
 
     final Body startBody;
     final Body endBody;
-
-    final float initX, initY;       // initial position for the first segment.
+    final List<Vec2> path;    // path for the rope segment
 
     // Segments data
-    final int numSegments;
+    int numSegments;
     final float thickness;
     final float segmentLength;
 
     // List of box2d bodies representing each segment
     final List<Body> segments = new ArrayList<>();
 
+    public void removeSegment(int i) {
+        Body body = segments.get(i);
+        body.getWorld().destroyBody(body);
+        segments.remove(body);
+    }
 
     // Burn data for burning the rope
-    // TODO
     public static class BurnData {
         float timeToBurn;       // time to burn a segment
         float timePassed = 0;   // time passed since burning current segment started

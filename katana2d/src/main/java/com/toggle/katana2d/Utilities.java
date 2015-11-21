@@ -38,8 +38,8 @@ public class Utilities {
         return s;
     }
 
-    public static List<Vec2> parsePoints(String string, float offsetX, float offsetY) {
-        // parse the points and create vertices, also convert from pixels to meters
+    public static List<Vec2> parsePoints(String string, boolean meters, float offsetX, float offsetY) {
+        // parse the points and create vertices, also convert from pixels to meters if necessary
         // TODO: This needs to be verified
 
         // Regex matching to get every x, y
@@ -48,8 +48,14 @@ public class Utilities {
 
         List<Vec2> vertices = new ArrayList<>();
         while (matcher.find()) {
-            float x = Float.parseFloat(matcher.group(1)) * PhysicsSystem.METERS_PER_PIXEL - offsetX;
-            float y = Float.parseFloat(matcher.group(2)) * PhysicsSystem.METERS_PER_PIXEL - offsetY;
+            float x = Float.parseFloat(matcher.group(1)) - offsetX;
+            float y = Float.parseFloat(matcher.group(2)) - offsetY;
+
+            if (meters) {
+                x *= PhysicsSystem.METERS_PER_PIXEL;
+                y *= PhysicsSystem.METERS_PER_PIXEL;
+            }
+
             vertices.add(new Vec2(x, y));
         }
         return vertices;

@@ -42,14 +42,14 @@ public class World extends Scene {
 
         mSystems.add(new BotControlSystem());
         mSystems.add(new PlayerInputSystem(mGame));
-        mSystems.add(flipSystem);
+        //mSystems.add(flipSystem);
         mSystems.add(new WindSystem());
         mSystems.add(new RopeSystem(physicsSystem.getWorld(), mGame.getRenderer()));
 
         // Load the entities from the level editor
         mLevelLoader.loadWorld(mWorldName, this, physicsSystem.getWorld());
 
-        mPlayer = mParentLevel.standardEntities.get("player");
+        mPlayer = mParentLevel.levelLoader.mEntities.get("player");
         flipSystem.setPlayer(mPlayer);
 
         startX = mPlayer.get(PhysicsBody.class).body.getPosition().x;

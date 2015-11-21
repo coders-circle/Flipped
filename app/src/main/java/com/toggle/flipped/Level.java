@@ -6,31 +6,33 @@ import com.toggle.katana2d.Manager;
 import com.toggle.katana2d.Scene;
 import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Transformation;
-import com.toggle.katana2d.Utilities;
 import com.toggle.katana2d.physics.PhysicsBody;
 
 import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyType;
 import org.json.JSONObject;
 
+import java.util.List;
+
 public class Level implements CustomLoader {
 
-    protected LevelLoader mLevelLoader;
+    public LevelLoader levelLoader;
     protected Game mGame;
-    public Manager<Entity> standardEntities = new Manager<>();  // Some standard entities that need to be recorded
 
     public Level(Game game, int levelFileId) {
         mGame = game;
-        String level = Utilities.getRawFileText(game.getActivity(), levelFileId);
-        mLevelLoader = new LevelLoader(level);
-        mLevelLoader.load(mGame, this);
+        String level = com.toggle.katana2d.Utilities.getRawFileText(game.getActivity(), levelFileId);
+        levelLoader = new LevelLoader(level);
+        levelLoader.load(mGame, this);
     }
 
     protected Manager<World> mWorlds = new Manager<>();
     protected World mActiveWorld = null;
 
     public int addWorld(String worldName, float angle) {
-        World newWorld = new World(this, mLevelLoader, worldName);
+        World newWorld = new World(this, levelLoader, worldName);
         int id = mWorlds.add(worldName, newWorld);
         newWorld.mSceneId = mGame.addScene(newWorld);
         newWorld.mAngle = angle;
@@ -69,7 +71,6 @@ public class Level implements CustomLoader {
 
     @Override
     public boolean loadSprite(Game game, String spriteName, JSONObject sprite) {
-        spriteName = spriteName.toLowerCase();
         switch (spriteName) {
             case "player":
                 return true;
@@ -91,9 +92,8 @@ public class Level implements CustomLoader {
     }
 
     @Override
-    public boolean loadEntity(Scene scene, org.jbox2d.dynamics.World world, String entityName, JSONObject entity) {
+    public Entity loadEntity(Scene scene, org.jbox2d.dynamics.World world, String entityName, JSONObject entity) {
         try {
-            entityName = entityName.toLowerCase();
             JSONObject components = entity.getJSONObject("components");
             JSONObject transformation;
 
@@ -106,16 +106,16 @@ public class Level implements CustomLoader {
                     player.add(new Player());
                     scene.addEntity(player);
 
-                    standardEntities.add("player", player);
-                    return true;
+                    //standardEntities.add("player", player);
+                    return player;
 
                 case "ground":
                     Entity ground = new Entity();
-                    Shape shape = com.toggle.flipped.Utilities.createChainShape(components.getJSONObject("Path").getString("Points"));
+                    Shape shape = Utilities.createChainShape(components.getJSONObject("Path").getString("Points"));
                     ground.add(new Transformation(0, 0, 0));
                     ground.add(new PhysicsBody(world, BodyType.STATIC, ground, shape, new PhysicsBody.Properties(0)));
                     scene.addEntity(ground);
-                    return true;
+                    return ground;
 
                 default:
                     if (components.has("Mirror")) {
@@ -132,14 +132,31 @@ public class Level implements CustomLoader {
                         mrr.nextWorld = components.getJSONObject("Mirror").getString("Next world");
 
                         scene.addEntity(mirror);
-                        return true;
+                        return mirror;
+                    }
+                    else if (components.has("Rope") && components.has("Path")) {
+                        Entity rope = new Entity();
+
+                        JSONObject r = components.getJSONObject("Rope");
+                        Body startBody = levelLoader.mEntities.get(r.getString("Start Body")).get(PhysicsBody.class).body;
+                        Body endBody = null;
+                        if (r.getString("End Body").trim().length() > 0)
+                            endBody = levelLoader.mEntities.get(r.getString("End Body")).get(PhysicsBody.class).body;
+
+                        List<Vec2> path = com.toggle.katana2d.Utilities.parsePoints(components.getJSONObject("Path").getString("Points"), false, 0, 0);
+                        rope.add(new Rope(path, Rope.STANDARD_SEGMENT_THICKNESS, Rope.STANDARD_SEGMENT_LENGTH,
+                                startBody, endBody));
+
+                        Sprite segSprite = rope.get(Rope.class).segmentSprite = new Sprite(mGame.textureManager.get("rope"), 0);
+                        scene.addEntity(rope);
+                        return rope;
                     }
             }
         }
         catch (Exception e){
             e.printStackTrace();
         }
-        return false;
+        return null;
     }
 
 }

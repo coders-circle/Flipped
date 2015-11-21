@@ -5,16 +5,17 @@ public class Sprite implements Component{
     public Texture texture;
     public SpriteSheetData spriteSheetData;
     public float scaleX = 1, scaleY = 1;
-    public float z = 0; // z-order
+    public final float distance; // z-order
+    public boolean scroll = false;  // Note that scrolling doesn't work well with Physics System
 
     public Sprite(Texture texture, float z) {
         this.texture = texture;
-        this.z = z;
+        this.distance = (1 - (BackgroundSystem.MAX_Z - z) / BackgroundSystem.MAX_Z);
     }
 
     public Sprite(Texture texture, float z, SpriteSheetData spriteSheetData) {
         this.texture = texture;
-        this.z = z;
+        this.distance = (1 - (BackgroundSystem.MAX_Z - z) / BackgroundSystem.MAX_Z);
         this.spriteSheetData = spriteSheetData;
     }
 
@@ -24,7 +25,7 @@ public class Sprite implements Component{
 
     public Sprite(Texture texture, float z, int numCols, int numRows, int numImages) {
         this.texture = texture;
-        this.z = z;
+        this.distance = (1 - (BackgroundSystem.MAX_Z - z) / BackgroundSystem.MAX_Z);
         spriteSheetData = new SpriteSheetData();
         spriteSheetData.numRows = numRows;
         spriteSheetData.numCols = numCols;
@@ -113,8 +114,15 @@ public class Sprite implements Component{
         if (texture == null)
             return;
 
+        if (scroll) {
+            float xOffset = renderer.getCamera().x * distance;
+            float yOffset = renderer.getCamera().y * distance;
+            x += xOffset;
+            y += yOffset;
+        }
+
         if (spriteSheetData == null)
-            texture.draw(renderer, x, y, -z, angle, scaleX, scaleY);
+            texture.draw(renderer, x, y, -distance, angle, scaleX, scaleY);
         else {
             Sprite.SpriteSheetData ssd = spriteSheetData;
 
@@ -124,7 +132,7 @@ public class Sprite implements Component{
             float clipX = (ssd.imgWidth + ssd.hSpacing) * col + ssd.offsetX;
             float clipY = (ssd.imgHeight + ssd.vSpacing) * row + ssd.offsetY;
 
-            texture.draw(renderer, x, y, -z, angle, scaleX, scaleY, clipX, clipY, ssd.imgWidth, ssd.imgHeight);
+            texture.draw(renderer, x, y, -distance, angle, scaleX, scaleY, clipX, clipY, ssd.imgWidth, ssd.imgHeight);
         }
     }
 }
