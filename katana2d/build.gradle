@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+configurations { natives }
 
 android {
     compileSdkVersion 21
@@ -20,6 +21,4 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:22.2.0'
-    compile files('libs/jbox2d-library-2.2.1.1.jar')
 }

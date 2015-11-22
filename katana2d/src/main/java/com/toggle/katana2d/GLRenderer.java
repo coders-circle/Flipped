@@ -51,9 +51,12 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     // index buffer data
     private static short mSquareDrawOrder[] = { 0, 2, 1, 0, 3, 2 };
 
-    //vertex and index buffer objects
+    // vertex and index buffers
     public FloatBuffer mSpriteVertexBuffer;
     public ShortBuffer mSpriteIndexBuffer;
+
+    // VBO and IBO
+    public final int[] mSpriteBO = new int[2];
 
     // Attribute handles
     public int mSpritePositionHandle;
@@ -132,18 +135,22 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         mSpriteClipHandle = GLES20.glGetUniformLocation(mSpriteProgram, "uClip");
 
         // Create the vertex buffer
-        ByteBuffer bb = ByteBuffer.allocateDirect(mSquareCoords.length*4);
-        bb.order(ByteOrder.nativeOrder());
-        mSpriteVertexBuffer = bb.asFloatBuffer();
-        mSpriteVertexBuffer.put(mSquareCoords);
-        mSpriteVertexBuffer.position(0);
+        mSpriteVertexBuffer = ByteBuffer.allocateDirect(mSquareCoords.length*4).order(ByteOrder.nativeOrder()).asFloatBuffer();
+        mSpriteVertexBuffer.put(mSquareCoords).position(0);
 
         // Create the index buffer
-        ByteBuffer dlb = ByteBuffer.allocateDirect(mSquareDrawOrder.length * 2);
-        dlb.order(ByteOrder.nativeOrder());
-        mSpriteIndexBuffer = dlb.asShortBuffer();
-        mSpriteIndexBuffer.put(mSquareDrawOrder);
-        mSpriteIndexBuffer.position(0);
+        mSpriteIndexBuffer = ByteBuffer.allocateDirect(mSquareDrawOrder.length*2).order(ByteOrder.nativeOrder()).asShortBuffer();
+        mSpriteIndexBuffer.put(mSquareDrawOrder).position(0);
+
+        // Create VBO and IBO
+        GLES20.glGenBuffers(2, mSpriteBO, 0);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mSpriteBO[0]);
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, mSpriteVertexBuffer.capacity() * 4, mSpriteVertexBuffer, GLES20.GL_STATIC_DRAW);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, mSpriteBO[1]);
+        GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER, mSpriteIndexBuffer.capacity() * 2, mSpriteIndexBuffer, GLES20.GL_STATIC_DRAW);
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
 
         // get the texture uniform handle and set it to use the sample-0
         int texHandle = GLES20.glGetUniformLocation(mSpriteProgram, "uTexture");
