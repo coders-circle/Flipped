@@ -1,5 +1,10 @@
 package com.toggle.flipped;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.Shape;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Game;
 import com.toggle.katana2d.Scene;
@@ -9,13 +14,16 @@ import com.toggle.katana2d.Transformation;
 import com.toggle.katana2d.Utilities;
 import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
+import com.toggle.katana2d.physics.PhysicsUtilities;
 
-import org.jbox2d.collision.shapes.CircleShape;
+import com.badlogic.gdx.physics.box2d.World;
+
+/*import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
-import org.jbox2d.common.Vec2;
+import org.jbox2d.common.Vector2;
 import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.World;*/
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -148,22 +156,22 @@ public class LevelLoader {
                             shape = new PolygonShape();
                             float offsetX = (float) sprite.getDouble("width") / 2;
                             float offsetY = (float) sprite.getDouble("height") / 2;
-                            List<Vec2> vertices = Utilities.parsePoints(jsonShape.getString("points"), true, offsetX, offsetY);
-                            Utilities.scale(vertices, scaleX, scaleY);
-                            ((PolygonShape) shape).set(vertices.toArray(new Vec2[vertices.size()]), vertices.size());
+                            List<Vector2> vertices = PhysicsUtilities.parsePoints(jsonShape.getString("points"), true, offsetX, offsetY);
+                            PhysicsUtilities.scale(vertices, scaleX, scaleY);
+                            ((PolygonShape) shape).set(vertices.toArray(new Vector2[vertices.size()]));
 
                             break;
 
                     }
 
                     // Finally create the rigid body
-                    BodyType bodyType;
+                    BodyDef.BodyType bodyType;
                     if (component.getString("Type").equals("Static"))
-                        bodyType = BodyType.STATIC;
+                        bodyType = BodyDef.BodyType.StaticBody;
                     else if (component.getString("Type").equals("Dynamic"))
-                        bodyType = BodyType.DYNAMIC;
+                        bodyType = BodyDef.BodyType.DynamicBody;
                     else
-                        bodyType = BodyType.KINEMATIC;
+                        bodyType = BodyDef.BodyType.KinematicBody;
 
                     entity.add(new PhysicsBody(world, bodyType, entity, shape, new PhysicsBody.Properties(
                             (float) component.getDouble("Density"), (float) component.getDouble("Friction"), (float) component.getDouble("Restitution")

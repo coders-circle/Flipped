@@ -1,10 +1,12 @@
 package com.toggle.flipped;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.toggle.katana2d.Component;
 import com.toggle.katana2d.Sprite;
 
-import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
+/*import org.jbox2d.common.Vector2;
+import org.jbox2d.dynamics.Body;*/
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,13 +16,13 @@ import java.util.List;
 // and the last segment can be optionally joined to endBody (can be set to null).
 public class Rope implements Component {
 
-    public static final float STANDARD_SEGMENT_LENGTH = 10f;
+    public static final float STANDARD_SEGMENT_LENGTH = 5f;
     public static final float STANDARD_SEGMENT_THICKNESS = 4f;
     Sprite segmentSprite;
 
     // Create a rope along given path using small rope segments of
     // given length and thickness
-    public Rope(List<Vec2> path, float thickness, float segmentLength, Body startBody,
+    public Rope(List<Vector2> path, float thickness, float segmentLength, Body startBody,
                 Body endBody) {this.thickness = thickness;
         this.segmentLength = segmentLength;
         this.startBody = startBody;
@@ -30,7 +32,7 @@ public class Rope implements Component {
 
     final Body startBody;
     final Body endBody;
-    final List<Vec2> path;    // path for the rope segment
+    final List<Vector2> path;    // path for the rope segment
 
     // Segments data
     int numSegments;

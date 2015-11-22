@@ -1,11 +1,12 @@
 package com.toggle.flipped;
 
 
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.toggle.katana2d.*;
 import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
 
-import org.jbox2d.dynamics.BodyType;
+//import org.jbox2d.dynamics.BodyType;
 
 public class TestScene extends Scene {
 
@@ -29,7 +30,7 @@ public class TestScene extends Scene {
         Entity ground = new Entity();
         ground.add(new Transformation(w / 2, h - 16, 0));
         ground.add(new Sprite(mGame.textureManager.get(spr1), 0));
-        ground.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.STATIC, ground, new PhysicsBody.Properties(0)));
+        ground.add(new PhysicsBody(physicsSystem.getWorld(), BodyDef.BodyType.StaticBody, ground, new PhysicsBody.Properties(0)));
         addEntity(ground);
 
         for (int i=0; i<10; ++i) {
@@ -38,7 +39,7 @@ public class TestScene extends Scene {
             float y = h/2 - 32*2 + (i%5) * 32;
             body.add(new Transformation(x, y, 48));
             body.add(new Sprite(mGame.textureManager.get(spr0), 0));
-            body.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.DYNAMIC, body, new PhysicsBody.Properties(1.0f)));
+            body.add(new PhysicsBody(physicsSystem.getWorld(), BodyDef.BodyType.StaticBody, body, new PhysicsBody.Properties(1.0f)));
             addEntity(body);
         }
     }

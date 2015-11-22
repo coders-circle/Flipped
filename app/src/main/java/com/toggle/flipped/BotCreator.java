@@ -1,5 +1,6 @@
 package com.toggle.flipped;
 
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Game;
 import com.toggle.katana2d.Sprite;
@@ -8,8 +9,10 @@ import com.toggle.katana2d.Transformation;
 import com.toggle.katana2d.Utilities;
 import com.toggle.katana2d.physics.PhysicsBody;
 
-import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.World;
+import com.badlogic.gdx.physics.box2d.World;
+
+/*import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.World;*/
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -77,7 +80,7 @@ public class BotCreator {
             // First create the bot entity with required components
             entity.add(new Transformation(x, y, angle));
             entity.add(new Sprite(getSprite(json.getJSONObject("walk_sprite")), 0));
-            entity.add(new PhysicsBody(mWorld, BodyType.DYNAMIC, entity, new PhysicsBody.Properties(1f, 0f, 0f, false, true)));
+            entity.add(new PhysicsBody(mWorld, BodyDef.BodyType.DynamicBody, entity, new PhysicsBody.Properties(1f, 0f, 0f, false, true)));
             entity.add(new Bot());
 
             Bot bot = entity.get(Bot.class);

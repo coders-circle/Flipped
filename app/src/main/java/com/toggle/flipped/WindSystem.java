@@ -1,17 +1,23 @@
 package com.toggle.flipped;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.physics.ContactListener;
 import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
 import com.toggle.katana2d.physics.PhysicsUtilities;
 
-import org.jbox2d.collision.shapes.PolygonShape;
-import org.jbox2d.common.Vec2;
+/*import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.common.Vector2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.dynamics.contacts.Contact;
+import org.jbox2d.dynamics.contacts.Contact;*/
 
 import java.util.List;
 
@@ -29,7 +35,7 @@ public class WindSystem extends com.toggle.katana2d.System implements ContactLis
         PolygonShape shape = new PolygonShape();
         float md = wind.max_distance/2 * PhysicsSystem.METERS_PER_PIXEL;
         float wd = wind.width/2 * PhysicsSystem.METERS_PER_PIXEL;
-        shape.setAsBox(md, wd, new Vec2(md, wd), 0);
+        shape.setAsBox(md, wd, new Vector2(md, wd), 0);
         wind.sensor = b.createSensor(shape);
 
         b.contactListener = this;
@@ -42,19 +48,19 @@ public class WindSystem extends com.toggle.katana2d.System implements ContactLis
             PhysicsBody b = entity.get(PhysicsBody.class);
 
             if (wind.active) {
-                Vec2 direction = b.body.getWorldVector(new Vec2(1, 0));
+                Vector2 direction = b.body.getWorldVector(new Vector2(1, 0));
                 float windforce = wind.force;
 
                 for (Fixture otherFixture : wind.bodies) {
                     Body otherBody = otherFixture.getBody();
-                    if (otherBody.getType() != BodyType.STATIC) {
+                    if (otherBody.getType() != BodyDef.BodyType.StaticBody) {
                         // For each non-static body in the wind sensor area, apply some force on it.
 
                         // Suppose that not all of a body is inside the wind area
                         // Then force needs to be applies in partial area only (this can for e.g. give rotational effect).
 
                         // Get the boundary points that are inside the wind area
-                        List<Vec2> points = PhysicsUtilities.getIntersectionOfFixtures(wind.sensor, otherFixture);
+                        List<Vector2> points = PhysicsUtilities.getIntersectionOfFixtures(wind.sensor, otherFixture);
                         if (points != null) {
                             // Find area and centroid of the points
                             PhysicsUtilities.CentroidResult result = PhysicsUtilities.getCentroid(points);
@@ -62,7 +68,7 @@ public class WindSystem extends com.toggle.katana2d.System implements ContactLis
                             // Apply force that is proportional to the intersecting area
                             if (result != null && result.area > 0) {
                                 float force = windforce * result.area;
-                                otherBody.applyForce(direction.mul(force), result.centroid);
+                                otherBody.applyForce(direction.scl(force), result.centroid, false);
                             }
                         }
                     }

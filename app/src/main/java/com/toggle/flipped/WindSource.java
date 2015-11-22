@@ -1,8 +1,9 @@
 package com.toggle.flipped;
 
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.toggle.katana2d.Component;
 
-import org.jbox2d.dynamics.Fixture;
+//import org.jbox2d.dynamics.Fixture;
 
 import java.util.ArrayList;
 import java.util.List;

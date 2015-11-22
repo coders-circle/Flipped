@@ -1,5 +1,9 @@
 package com.toggle.flipped;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Shape;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Game;
 import com.toggle.katana2d.Manager;
@@ -7,11 +11,12 @@ import com.toggle.katana2d.Scene;
 import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Transformation;
 import com.toggle.katana2d.physics.PhysicsBody;
+import com.toggle.katana2d.physics.PhysicsUtilities;
 
-import org.jbox2d.collision.shapes.Shape;
+/*import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.BodyType;*/
 import org.json.JSONObject;
 
 import java.util.List;
@@ -92,7 +97,7 @@ public class Level implements CustomLoader {
     }
 
     @Override
-    public Entity loadEntity(Scene scene, org.jbox2d.dynamics.World world, String entityName, JSONObject entity) {
+    public Entity loadEntity(Scene scene, com.badlogic.gdx.physics.box2d.World world, String entityName, JSONObject entity) {
         try {
             JSONObject components = entity.getJSONObject("components");
             JSONObject transformation;
@@ -113,7 +118,7 @@ public class Level implements CustomLoader {
                     Entity ground = new Entity();
                     Shape shape = Utilities.createChainShape(components.getJSONObject("Path").getString("Points"));
                     ground.add(new Transformation(0, 0, 0));
-                    ground.add(new PhysicsBody(world, BodyType.STATIC, ground, shape, new PhysicsBody.Properties(0)));
+                    ground.add(new PhysicsBody(world, BodyDef.BodyType.StaticBody, ground, shape, new PhysicsBody.Properties(0)));
                     scene.addEntity(ground);
                     return ground;
 
@@ -124,7 +129,7 @@ public class Level implements CustomLoader {
                         mirror.add(new Transformation((float) transformation.getDouble("Translate-X"),
                                 (float) transformation.getDouble("Translate-Y"), (float) transformation.getDouble("Angle")));
                         mirror.add(new Sprite(mGame.textureManager.get("mirror"), -1));
-                        mirror.add(new PhysicsBody(world, BodyType.STATIC, mirror, new PhysicsBody.Properties(true)));
+                        mirror.add(new PhysicsBody(world, BodyDef.BodyType.StaticBody, mirror, new PhysicsBody.Properties(true)));
                         mirror.add(new FlipSystem.FlipItem(FlipSystem.FlipItem.FlipItemType.MIRROR));
 
                         FlipSystem.Mirror mrr;
@@ -143,7 +148,7 @@ public class Level implements CustomLoader {
                         if (r.getString("End Body").trim().length() > 0)
                             endBody = levelLoader.mEntities.get(r.getString("End Body")).get(PhysicsBody.class).body;
 
-                        List<Vec2> path = com.toggle.katana2d.Utilities.parsePoints(components.getJSONObject("Path").getString("Points"), false, 0, 0);
+                        List<Vector2> path = PhysicsUtilities.parsePoints(components.getJSONObject("Path").getString("Points"), false, 0, 0);
                         rope.add(new Rope(path, Rope.STANDARD_SEGMENT_THICKNESS, Rope.STANDARD_SEGMENT_LENGTH,
                                 startBody, endBody));
 

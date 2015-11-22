@@ -1,15 +1,19 @@
 package com.toggle.katana2d.physics;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.System;
 import com.toggle.katana2d.Transformation;
 
-import org.jbox2d.callbacks.ContactImpulse;
+/*import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.collision.Manifold;
-import org.jbox2d.common.Vec2;
+import org.jbox2d.common.Vector2;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.dynamics.contacts.Contact;
+import org.jbox2d.dynamics.contacts.Contact;*/
 
 import java.util.Iterator;
 
@@ -18,7 +22,7 @@ public class PhysicsSystem extends System implements ContactListener {
     public static final float PIXELS_PER_METER = 32f;               // 32 pixels = 1 meter
     public static final float METERS_PER_PIXEL = 1 / PIXELS_PER_METER;
 
-    private World world = new World(new Vec2(0, 10));
+    private World world = new World(new Vector2(0, 10), false);
 
     public PhysicsSystem()
     {

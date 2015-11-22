@@ -1,5 +1,11 @@
 package com.toggle.flipped;
 
+import android.util.Log;
+
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Transformation;
@@ -7,10 +13,10 @@ import com.toggle.katana2d.physics.ContactListener;
 import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
 
-import org.jbox2d.collision.shapes.PolygonShape;
-import org.jbox2d.common.Vec2;
+/*import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.common.Vector2;
 import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.dynamics.contacts.Contact;
+import org.jbox2d.dynamics.contacts.Contact;*/
 
 public class BotControlSystem extends com.toggle.katana2d.System implements ContactListener {
 
@@ -23,22 +29,25 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
         // Add sensors
         Bot p = e.get(Bot.class);
         PhysicsBody b = e.get(PhysicsBody.class);
-        Vec2 ex = b.body.getFixtureList().getAABB(0).getExtents();
+        //Vector2 ex = b.body.getFixtureList().get(0).getAABB(0).getExtents();
+
+        Sprite s = e.get(Sprite.class);
+        Vector2 ex = new Vector2(s.texture.width/2 * PhysicsSystem.METERS_PER_PIXEL - 0.01f, s.texture.height/2 * PhysicsSystem.METERS_PER_PIXEL - 0.01f);
 
         float sensorSize =  2 * PhysicsSystem.METERS_PER_PIXEL;
 
         PolygonShape shape = new PolygonShape();
 
         // A sensor at the bottom to sense the ground
-        shape.setAsBox(ex.x*0.8f, sensorSize, new Vec2(0, ex.y), 0);
+        shape.setAsBox(ex.x*0.8f, sensorSize, new Vector2(0, ex.y), 0);
         p.groundFixture = b.createSensor(shape);
 
         // Side sensors
         shape = new PolygonShape();
-        shape.setAsBox(sensorSize, ex.y/2, new Vec2(-ex.x, 0), 0);
+        shape.setAsBox(sensorSize, ex.y/2, new Vector2(-ex.x, 0), 0);
         p.leftsideFixture = b.createSensor(shape);
         shape = new PolygonShape();
-        shape.setAsBox(sensorSize, ex.y/2, new Vec2(ex.x, 0), 0);
+        shape.setAsBox(sensorSize, ex.y/2, new Vector2(ex.x, 0), 0);
         p.rightsideFixture = b.createSensor(shape);
 
         b.contactListener = this;
@@ -52,15 +61,15 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             Sprite s = e.get(Sprite.class);
             Bot bot = e.get(Bot.class);
 
-            Vec2 v = b.body.getLinearVelocity();
+            Vector2 v = b.body.getLinearVelocity();
 
             boolean onGround = bot.groundContacts>0;
             boolean onLeftSide = bot.leftSideContacts>0, onRightSide = bot.rightSideContacts>0;
 
             if (onGround)
-                b.body.getFixtureList().setFriction(0.5f);
+                b.body.getFixtureList().get(0).setFriction(0.5f);
             else
-                b.body.getFixtureList().setFriction(0.0f);
+                b.body.getFixtureList().get(0).setFriction(0.0f);
 
             // If we are on ground but we are in JUMP state, revert to NOTHING action state
             if (bot.actionState == Bot.ActionState.JUMP && onGround)
@@ -70,7 +79,8 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             // linear impulse to jump.
             else if (bot.actionState == Bot.ActionState.JUMP_START) {
                 if (onGround) {
-                    b.body.applyLinearImpulse(new Vec2(0, -3.4f * b.body.getMass()), b.body.getWorldCenter());
+                    //Log.d("jumping", "true");
+                    b.body.applyLinearImpulse(new Vector2(0, -3.4f * b.body.getMass()), b.body.getWorldCenter(), false);
 
                     // Change to jumping state
                     bot.actionState = Bot.ActionState.JUMP;
@@ -83,11 +93,13 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             float speed = 0;
             if (bot.motionState == Bot.MotionState.MOVE) {
                 if (bot.direction == Bot.Direction.LEFT)
-                    speed = -3;
+                    speed = -5;
                 else
-                    speed = 3;
+                    speed = 5;
             }
-            b.body.setLinearVelocity(new Vec2(speed, v.y));
+            //b.body.setLinearVelocity(new Vector2(speed, v.y));
+
+            b.body.applyForce(new Vector2(speed, 0), b.body.getPosition(), false);
 
             // change sprites
             if (onGround) {

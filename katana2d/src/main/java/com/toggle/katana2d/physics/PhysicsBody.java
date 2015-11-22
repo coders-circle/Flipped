@@ -1,19 +1,29 @@
 package com.toggle.katana2d.physics;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.Shape;
+import com.badlogic.gdx.physics.box2d.World;
 import com.toggle.katana2d.Component;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Transformation;
 
+/*
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
-import org.jbox2d.common.Vec2;
+import org.jbox2d.common.Vector2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+*/
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,21 +67,23 @@ public class PhysicsBody implements Component {
         this.body = body;
     }
 
-    private void init(World world, BodyType type, float posX, float posY, float angle,
+    private void init(World world, BodyDef.BodyType type, float posX, float posY, float angle,
                       Shape shape, Object object, Properties properties) {
         posX = posX * PhysicsSystem.METERS_PER_PIXEL;
         posY = posY * PhysicsSystem.METERS_PER_PIXEL;
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = type;
-        bodyDef.position = new Vec2(posX, posY);
+        bodyDef.position.x = posX;
+        bodyDef.position.y = posY;
         bodyDef.angle = (float)Math.toRadians(angle);
-        bodyDef.userData = object;
+        //bodyDef.userData = object;
         if (properties != null) {
             bodyDef.bullet = properties.bullet;
             bodyDef.fixedRotation = properties.fixedRotation;
         }
         body = world.createBody(bodyDef);
+        body.setUserData(object);
 
         if (properties != null) {
             FixtureDef fixtureDef = new FixtureDef();
@@ -83,13 +95,14 @@ public class PhysicsBody implements Component {
                 fixtureDef.restitution = properties.restitution;
             }
             fixtureDef.shape = shape;
-            fixtureDef.userData = object;
-            body.createFixture(fixtureDef);
+            //fixtureDef.userData = object;
+            Fixture f = body.createFixture(fixtureDef);
+            f.setUserData(object);
         }
     }
 
     // Make sure entity has sprite and transformation
-    public PhysicsBody(World world, BodyType type, Entity entity, Properties properties) {
+    public PhysicsBody(World world, BodyDef.BodyType type, Entity entity, Properties properties) {
         Transformation t = entity.get(Transformation.class);
         Sprite s = entity.get(Sprite.class);
         PolygonShape shape = new PolygonShape();
@@ -99,13 +112,13 @@ public class PhysicsBody implements Component {
     }
 
     // Make sure entity has transformation
-    public PhysicsBody(World world, BodyType type, Entity entity, Shape shape, Properties properties) {
+    public PhysicsBody(World world, BodyDef.BodyType type, Entity entity, Shape shape, Properties properties) {
         Transformation t = entity.get(Transformation.class);
         init(world, type, t.x, t.y, t.angle, shape, entity, properties);
     }
 
     // Make sure entity has transformation
-    public PhysicsBody(World world, BodyType type, Entity entity, float width, float height, Properties properties) {
+    public PhysicsBody(World world, BodyDef.BodyType type, Entity entity, float width, float height, Properties properties) {
         Transformation t = entity.get(Transformation.class);
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(width/2 * PhysicsSystem.METERS_PER_PIXEL - 0.01f, height/2 * PhysicsSystem.METERS_PER_PIXEL - 0.01f);
@@ -113,7 +126,7 @@ public class PhysicsBody implements Component {
         init(world, type, t.x, t.y, t.angle, shape, entity, properties);
     }
 
-    public PhysicsBody(World world, BodyType type, float posX, float posY, float angle, Shape shape, Object object, Properties properties) {
+    public PhysicsBody(World world, BodyDef.BodyType type, float posX, float posY, float angle, Shape shape, Object object, Properties properties) {
         init(world, type, posX, posY, angle, shape, object, properties);
     }
 
@@ -121,8 +134,10 @@ public class PhysicsBody implements Component {
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
         fdef.isSensor = true;
-        fdef.userData = body.getUserData();
-        return body.createFixture(fdef);
+        //fdef.userData = body.getUserData();
+        Fixture f = body.createFixture(fdef);
+        f.setUserData(body.getUserData());
+        return f;
     }
 
     public Body body;

@@ -4,7 +4,7 @@ import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Game;
 import com.toggle.katana2d.Scene;
 
-import org.jbox2d.dynamics.World;
+import com.badlogic.gdx.physics.box2d.World;
 
 import org.json.JSONObject;
 

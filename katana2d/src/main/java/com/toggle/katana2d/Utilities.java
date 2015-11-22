@@ -5,7 +5,8 @@ import android.util.Log;
 
 import com.toggle.katana2d.physics.PhysicsSystem;
 
-import org.jbox2d.common.Vec2;
+//import org.jbox2d.common.Vector2;
+import com.badlogic.gdx.math.Vector2;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,33 +39,4 @@ public class Utilities {
         return s;
     }
 
-    public static List<Vec2> parsePoints(String string, boolean meters, float offsetX, float offsetY) {
-        // parse the points and create vertices, also convert from pixels to meters if necessary
-        // TODO: This needs to be verified
-
-        // Regex matching to get every x, y
-        Pattern pattern = Pattern.compile("(\\-?\\d+\\.?\\d*),?\\s*(\\-?\\d+\\.?\\d*)");
-        Matcher matcher = pattern.matcher(string);
-
-        List<Vec2> vertices = new ArrayList<>();
-        while (matcher.find()) {
-            float x = Float.parseFloat(matcher.group(1)) - offsetX;
-            float y = Float.parseFloat(matcher.group(2)) - offsetY;
-
-            if (meters) {
-                x *= PhysicsSystem.METERS_PER_PIXEL;
-                y *= PhysicsSystem.METERS_PER_PIXEL;
-            }
-
-            vertices.add(new Vec2(x, y));
-        }
-        return vertices;
-    }
-
-    public static void scale(List<Vec2> points, float scaleX, float scaleY) {
-        for (Vec2 p: points) {
-            p.x *= scaleX;
-            p.y *= scaleY;
-        }
-    }
 }

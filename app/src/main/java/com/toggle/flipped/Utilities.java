@@ -1,10 +1,14 @@
 package com.toggle.flipped;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.ChainShape;
+import com.badlogic.gdx.physics.box2d.Shape;
 import com.toggle.katana2d.physics.PhysicsSystem;
+import com.toggle.katana2d.physics.PhysicsUtilities;
 
-import org.jbox2d.collision.shapes.ChainShape;
+/*import org.jbox2d.collision.shapes.ChainShape;
 import org.jbox2d.collision.shapes.Shape;
-import org.jbox2d.common.Vec2;
+import org.jbox2d.common.Vector2;*/
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,27 +16,27 @@ import java.util.List;
 public class Utilities {
     public static Shape createChainShape(String points) {
         ChainShape shape = new ChainShape();
-        List<Vec2> vertices = com.toggle.katana2d.Utilities.parsePoints(points, true, 0, 0);
-        shape.createChain(vertices.toArray(new Vec2[vertices.size()]), vertices.size());
+        List<Vector2> vertices = PhysicsUtilities.parsePoints(points, true, 0, 0);
+        shape.createChain(vertices.toArray(new Vector2[vertices.size()]));
         return shape;
     }
 
-    public static Vec2 getCenter(Vec2 p0, Vec2 p1) {
-        return new Vec2((p0.x+p1.x)/2, (p0.y+p1.y)/2);
+    public static Vector2 getCenter(Vector2 p0, Vector2 p1) {
+        return new Vector2((p0.x+p1.x)/2, (p0.y+p1.y)/2);
     }
 
-    public static List<Vec2> getPoints(List<Vec2> path, float length, boolean meters) {
+    public static List<Vector2> getPoints(List<Vector2> path, float length, boolean meters) {
         float factor = 1;
         if (meters)
             factor = PhysicsSystem.METERS_PER_PIXEL;
 
         length *= factor;
-        List<Vec2> result = new ArrayList<>();
-        result.add(path.get(0).mul(factor));
+        List<Vector2> result = new ArrayList<>();
+        result.add(path.get(0).scl(factor));
 
         for (int i=0; i<path.size()-1; ++i) {
-            Vec2 p0 = result.get(result.size() - 1);
-            Vec2 p1 = path.get(i+1).mul(factor);
+            Vector2 p0 = result.get(result.size() - 1);
+            Vector2 p1 = path.get(i+1).scl(factor);
 
             float dx = p1.x - p0.x;
             float dy = p1.y - p0.y;
@@ -48,7 +52,7 @@ public class Utilities {
             for (int j=0; j<np; ++j) {
                 x += stepX;
                 y += stepY;
-                result.add(new Vec2(x, y));
+                result.add(new Vector2(x, y));
             }
         }
 

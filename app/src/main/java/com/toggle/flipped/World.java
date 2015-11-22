@@ -1,5 +1,6 @@
 package com.toggle.flipped;
 
+import com.badlogic.gdx.math.Vector2;
 import com.toggle.katana2d.Camera;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.ParticleSystem;
@@ -8,7 +9,7 @@ import com.toggle.katana2d.Scene;
 import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
 
-import org.jbox2d.common.Vec2;
+//import org.jbox2d.common.Vec2;
 
 // On world is one scene, one level contains multiple worlds
 public class World extends Scene {
@@ -63,7 +64,7 @@ public class World extends Scene {
         Camera camera = mGame.getRenderer().getCamera();
         camera.angle = mAngle;
 
-        mPlayer.get(PhysicsBody.class).body.setTransform(new Vec2(startX, startY), 0);
+        mPlayer.get(PhysicsBody.class).body.setTransform(new Vector2(startX, startY), 0);
     }
 
     // When world changes from this to another world

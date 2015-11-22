@@ -1,12 +1,14 @@
 package com.toggle.flipped;
 
 
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.toggle.katana2d.*;
 import com.toggle.katana2d.physics.ContactListener;
 import com.toggle.katana2d.physics.PhysicsBody;
 
-import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.dynamics.contacts.Contact;
+/*import org.jbox2d.dynamics.Fixture;
+import org.jbox2d.dynamics.contacts.Contact;*/
 
 public class FlipSystem extends com.toggle.katana2d.System implements ContactListener {
 

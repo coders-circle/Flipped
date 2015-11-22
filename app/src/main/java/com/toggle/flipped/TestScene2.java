@@ -3,6 +3,8 @@ package com.toggle.flipped;
 import android.graphics.Color;
 import android.graphics.Typeface;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.toggle.katana2d.Background;
 import com.toggle.katana2d.BackgroundSystem;
 import com.toggle.katana2d.Emitter;
@@ -17,8 +19,8 @@ import com.toggle.katana2d.Transformation;
 import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
 
-import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.BodyType;
+/*import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.BodyType;*/
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,13 +68,13 @@ public class TestScene2 extends Scene {
         Entity ground = new Entity();
         ground.add(new Transformation(w, h - 16, 0));
         ground.add(new Sprite(mGame.textureManager.get(spr3), 3));
-        ground.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.STATIC, ground, new PhysicsBody.Properties(0)));
+        ground.add(new PhysicsBody(physicsSystem.getWorld(), BodyDef.BodyType.StaticBody, ground, new PhysicsBody.Properties(0)));
         addEntity(ground);
 
         Entity platform = new Entity();
         platform.add(new Transformation(w, h / 2 + 16, 0));
         platform.add(new Sprite(mGame.textureManager.get(spr2), 3));
-        platform.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.STATIC, platform, new PhysicsBody.Properties(0)));
+        platform.add(new PhysicsBody(physicsSystem.getWorld(), BodyDef.BodyType.StaticBody, platform, new PhysicsBody.Properties(0)));
         //platform.add(new PlatformSystem.OneWayPlatform());
         addEntity(platform);
 
@@ -97,7 +99,7 @@ public class TestScene2 extends Scene {
         Entity body = new Entity();
         body.add(new Transformation(w / 2-64, h - 32 - 16, 0));
         body.add(new Sprite(mGame.textureManager.get(spr0), 0));
-        body.add(new PhysicsBody(physicsSystem.getWorld(), BodyType.DYNAMIC, body, new PhysicsBody.Properties(0.8f)));
+        body.add(new PhysicsBody(physicsSystem.getWorld(), BodyDef.BodyType.DynamicBody, body, new PhysicsBody.Properties(0.8f)));
         addEntity(body);
 
         // Use botceator to create a bot from "bot_player.json" file
@@ -141,9 +143,9 @@ public class TestScene2 extends Scene {
         // Create a rope
 
         Entity ropeEntity = new Entity();
-        List<Vec2> ropePath = new ArrayList<>();
-        ropePath.add(new Vec2(w-128, h/2+32));
-        ropePath.add(new Vec2(w-128, h/2+32 + Rope.STANDARD_SEGMENT_LENGTH * 4));
+        List<Vector2> ropePath = new ArrayList<>();
+        ropePath.add(new Vector2(w-128, h/2+32));
+        ropePath.add(new Vector2(w-128, h/2+32 + Rope.STANDARD_SEGMENT_LENGTH * 4));
         ropeEntity.add(new Rope(ropePath, Rope.STANDARD_SEGMENT_THICKNESS, Rope.STANDARD_SEGMENT_LENGTH, platform.get(PhysicsBody.class).body, null));
         ropeEntity.get(Rope.class).segmentSprite = new Sprite(mGame.textureManager.get("rope"), 0);
         addEntity(ropeEntity);
