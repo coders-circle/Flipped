@@ -19,9 +19,6 @@ import com.toggle.katana2d.Transformation;
 import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
 
-/*import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.BodyType;*/
-
 import java.util.ArrayList;
 import java.util.List;
 

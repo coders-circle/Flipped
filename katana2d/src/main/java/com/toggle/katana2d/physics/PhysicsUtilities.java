@@ -1,13 +1,5 @@
 package com.toggle.katana2d.physics;
 
-/*
-import org.jbox2d.collision.shapes.PolygonShape;
-import org.jbox2d.collision.shapes.ShapeType;
-import org.jbox2d.common.Settings;
-import org.jbox2d.common.Vector2;
-import org.jbox2d.dynamics.Fixture;
-*/
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;

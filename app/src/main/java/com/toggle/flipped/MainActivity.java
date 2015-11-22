@@ -2,7 +2,6 @@ package com.toggle.flipped;
 
 import com.toggle.katana2d.Game;
 import com.toggle.katana2d.GameActivity;
-import com.toggle.katana2d.Texture;
 
 import java.util.ArrayList;
 import java.util.List;

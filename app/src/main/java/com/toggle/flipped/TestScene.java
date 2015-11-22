@@ -6,8 +6,6 @@ import com.toggle.katana2d.*;
 import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
 
-//import org.jbox2d.dynamics.BodyType;
-
 public class TestScene extends Scene {
 
     @Override

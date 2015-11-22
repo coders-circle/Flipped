@@ -11,8 +11,6 @@ import com.toggle.katana2d.physics.PhysicsBody;
 
 import com.badlogic.gdx.physics.box2d.World;
 
-/*import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.World;*/
 import org.json.JSONException;
 import org.json.JSONObject;
 

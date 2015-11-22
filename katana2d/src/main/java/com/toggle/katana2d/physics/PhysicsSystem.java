@@ -8,15 +8,6 @@ import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.System;
 import com.toggle.katana2d.Transformation;
 
-/*import org.jbox2d.callbacks.ContactImpulse;
-import org.jbox2d.callbacks.ContactListener;
-import org.jbox2d.collision.Manifold;
-import org.jbox2d.common.Vector2;
-import org.jbox2d.dynamics.World;
-import org.jbox2d.dynamics.contacts.Contact;*/
-
-import java.util.Iterator;
-
 // Uses box2d to update all entities with PhysicsBody and Transformation components
 public class PhysicsSystem extends System implements ContactListener {
     public static final float PIXELS_PER_METER = 32f;               // 32 pixels = 1 meter

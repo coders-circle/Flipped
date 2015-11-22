@@ -9,8 +9,6 @@ import com.toggle.katana2d.Scene;
 import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
 
-//import org.jbox2d.common.Vec2;
-
 // On world is one scene, one level contains multiple worlds
 public class World extends Scene {
 

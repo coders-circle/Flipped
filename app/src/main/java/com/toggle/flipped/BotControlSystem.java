@@ -1,7 +1,5 @@
 package com.toggle.flipped;
 
-import android.util.Log;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -12,11 +10,6 @@ import com.toggle.katana2d.Transformation;
 import com.toggle.katana2d.physics.ContactListener;
 import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
-
-/*import org.jbox2d.collision.shapes.PolygonShape;
-import org.jbox2d.common.Vector2;
-import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.dynamics.contacts.Contact;*/
 
 public class BotControlSystem extends com.toggle.katana2d.System implements ContactListener {
 
@@ -90,16 +83,16 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             }
 
             // set horizontal velocity according to current moving direction.
+            Vector2 vel = b.body.getLinearVelocity();
             float speed = 0;
             if (bot.motionState == Bot.MotionState.MOVE) {
                 if (bot.direction == Bot.Direction.LEFT)
-                    speed = -5;
+                    speed = -3f;
                 else
-                    speed = 5;
+                    speed = 3f;
             }
-            //b.body.setLinearVelocity(new Vector2(speed, v.y));
-
-            b.body.applyForce(new Vector2(speed, 0), b.body.getPosition(), false);
+            float force = b.body.getMass()*(speed-vel.x) / dt;    // f = mv/t ; v = required change in velocity
+            b.body.applyForce(new Vector2(force, 0), b.body.getWorldCenter(), false);
 
             // change sprites
             if (onGround) {

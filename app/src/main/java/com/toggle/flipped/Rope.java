@@ -5,9 +5,6 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.toggle.katana2d.Component;
 import com.toggle.katana2d.Sprite;
 
-/*import org.jbox2d.common.Vector2;
-import org.jbox2d.dynamics.Body;*/
-
 import java.util.ArrayList;
 import java.util.List;
 

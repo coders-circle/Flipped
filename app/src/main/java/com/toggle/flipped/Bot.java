@@ -5,8 +5,6 @@ import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Component;
 import com.toggle.katana2d.Texture;
 
-//import org.jbox2d.dynamics.Fixture;
-
 public class Bot implements Component {
     enum Direction { LEFT, RIGHT };
 

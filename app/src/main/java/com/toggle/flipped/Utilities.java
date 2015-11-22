@@ -6,10 +6,6 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import com.toggle.katana2d.physics.PhysicsSystem;
 import com.toggle.katana2d.physics.PhysicsUtilities;
 
-/*import org.jbox2d.collision.shapes.ChainShape;
-import org.jbox2d.collision.shapes.Shape;
-import org.jbox2d.common.Vector2;*/
-
 import java.util.ArrayList;
 import java.util.List;
 

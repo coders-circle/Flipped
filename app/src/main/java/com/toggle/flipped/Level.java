@@ -13,10 +13,6 @@ import com.toggle.katana2d.Transformation;
 import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsUtilities;
 
-/*import org.jbox2d.collision.shapes.Shape;
-import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.BodyType;*/
 import org.json.JSONObject;
 
 import java.util.List;

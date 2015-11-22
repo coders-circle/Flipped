@@ -4,24 +4,15 @@ package com.toggle.flipped;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.toggle.katana2d.*;
 import com.toggle.katana2d.physics.PhysicsSystem;
-
-import com.badlogic.gdx.physics.box2d.World;
-
-/*import org.jbox2d.collision.shapes.PolygonShape;
-import org.jbox2d.common.Vector2;
-import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.BodyDef;
-import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.FixtureDef;
-import org.jbox2d.dynamics.World;
-import org.jbox2d.dynamics.joints.RevoluteJointDef;*/
 
 import java.util.List;
 
@@ -57,6 +48,7 @@ public class RopeSystem extends com.toggle.katana2d.System {
         //bodyDef.userData = entity;
 
         RevoluteJointDef jointDef = new RevoluteJointDef();
+        DistanceJointDef djointDef = new DistanceJointDef();
 
         List<Vector2> segmentsPath = Utilities.getPoints(rope.path, rope.segmentLength, true);
         rope.numSegments = segmentsPath.size() - 1;
@@ -81,6 +73,9 @@ public class RopeSystem extends com.toggle.katana2d.System {
 
             jointDef.initialize(link, body, new Vector2(lastX, lastY));
             mWorld.createJoint(jointDef);
+
+            djointDef.initialize(link, body, link.getWorldCenter(), body.getWorldCenter());
+            mWorld.createJoint(djointDef);
 
             link = body;
             lastY = segmentsPath.get(i + 1).y;

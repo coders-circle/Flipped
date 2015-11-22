@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-configurations { natives }
 
 android {
     compileSdkVersion 21
@@ -20,5 +19,6 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile files('libs/gdx.jar')
+    compile files('libs/gdx-box2d.jar')
 }

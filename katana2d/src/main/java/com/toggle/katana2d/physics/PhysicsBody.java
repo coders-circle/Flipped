@@ -1,6 +1,5 @@
 package com.toggle.katana2d.physics;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -12,21 +11,6 @@ import com.toggle.katana2d.Component;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Transformation;
-
-/*
-import org.jbox2d.collision.shapes.PolygonShape;
-import org.jbox2d.collision.shapes.Shape;
-import org.jbox2d.common.Vector2;
-import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.BodyDef;
-import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.dynamics.FixtureDef;
-import org.jbox2d.dynamics.World;
-*/
-
-import java.util.ArrayList;
-import java.util.List;
 
 // PhysicsBody component that represents a box-2d body
 // with mass, friction etc.

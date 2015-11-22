@@ -12,13 +12,6 @@ import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
 import com.toggle.katana2d.physics.PhysicsUtilities;
 
-/*import org.jbox2d.collision.shapes.PolygonShape;
-import org.jbox2d.common.Vector2;
-import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.dynamics.contacts.Contact;*/
-
 import java.util.List;
 
 public class WindSystem extends com.toggle.katana2d.System implements ContactListener {

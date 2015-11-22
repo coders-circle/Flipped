@@ -5,6 +5,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
+import com.badlogic.gdx.physics.box2d.World;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Game;
 import com.toggle.katana2d.Scene;
@@ -16,14 +17,6 @@ import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
 import com.toggle.katana2d.physics.PhysicsUtilities;
 
-import com.badlogic.gdx.physics.box2d.World;
-
-/*import org.jbox2d.collision.shapes.CircleShape;
-import org.jbox2d.collision.shapes.PolygonShape;
-import org.jbox2d.collision.shapes.Shape;
-import org.jbox2d.common.Vector2;
-import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.World;*/
 import org.json.JSONException;
 import org.json.JSONObject;
 
