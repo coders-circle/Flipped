@@ -9,9 +9,12 @@ public class Scene {
 
     // List of all systems
     protected List<System> mSystems = new ArrayList<>();
+    // List of all entities
+    protected List<Entity> mEntities = new ArrayList<>();
 
     // Add entity to all valid systems
     public void addEntity(Entity entity) {
+        mEntities.add(entity);
         for (System system : mSystems) {
             system.addEntity(entity);
         }
@@ -31,7 +34,12 @@ public class Scene {
     protected void onInit() {
     }
 
-    public void update(double deltaTime) {
+    public void update(float deltaTime) {
+
+        for (Entity entity : mEntities) {
+            if (entity.has(Transformation.class))
+                entity.get(Transformation.class).saveState();
+        }
         // update all systems
         for (System system : mSystems) {
             system.update(deltaTime);
@@ -40,13 +48,13 @@ public class Scene {
         onUpdate(deltaTime);
     }
 
-    protected void onUpdate(double deltaTime) {
+    protected void onUpdate(float deltaTime) {
     }
 
-    public void draw() {
+    public void draw(float interpolation) {
         // call draw method of all systems
         for (System system : mSystems) {
-            system.draw();
+            system.draw(interpolation);
         }
 
         onDraw();

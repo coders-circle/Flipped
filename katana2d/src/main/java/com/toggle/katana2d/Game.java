@@ -4,15 +4,15 @@ package com.toggle.katana2d;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Game  implements TimerCallback {
+public class Game implements TimerCallback {
     // Some common resources
-    // Sprites
-    public Manager<GLSprite> spriteManager = new Manager<>();
+    // Textures
+    public Manager<Texture> textureManager = new Manager<>();
 
     // A reference to the renderer
     private final GLRenderer mRenderer;
     // Timer with 60 FPS as target
-    private Timer mTimer = new Timer(60.0);
+    private Timer mTimer = new Timer(60f);
 
     // The activity that runs this game
     private GameActivity mActivity;
@@ -25,6 +25,8 @@ public class Game  implements TimerCallback {
     public GameActivity getActivity() { return mActivity; }
 
     public GLRenderer getRenderer() { return mRenderer; }
+
+    public Timer getTimer() { return mTimer; }
 
     public TouchInputData getTouchInputData() { return mRenderer.touchInputData; }
 
@@ -56,34 +58,68 @@ public class Game  implements TimerCallback {
         return mScenes.get(index);
     }
 
+
+    private boolean mStop = false;
+    private final Integer drawLock = 1;
+
     // called on surface creation
     public void init() {
         if (!mInitialized) {
-            mActivity.onGameStart();
+            mActivity.onGamePreStart();
             for (Scene scene : mScenes)
                 scene.init(this);
             mInitialized = true;
-        }
-    }
+            mActivity.onGameStart();
 
-    // called on each frame
-    public void newFrame() {
-        mTimer.Update(this);
-        draw();
+            // start updating in separate thread
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (!mStop) {
+                        // Update using timer
+                        mDrawInterpolation = mTimer.update(Game.this);
+
+                        // After each update, we need to draw, notify the render thread to wakeup if sleeping
+                        synchronized (drawLock) {
+                            drawLock.notify();
+                        }
+
+                        try {
+                            Thread.sleep(5);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }).start();
+
+        }
     }
 
     // update method for updating game logic and animations, which are time dependent
     @Override
-    public void update(double deltaTime) {
+    public void update(float deltaTime) {
         if (mActiveScene != null)
             mActiveScene.update(deltaTime);
     }
 
-    // draw method for all rendering operations
-    public void draw() {
+    // draw method for rendering stuffs
+    public void newFrame() {
+        // sleep till the update thread wakes us up
+        synchronized (drawLock) {
+            try {
+                drawLock.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // draw a frame
         if (mActiveScene != null)
-            mActiveScene.draw();
+            mActiveScene.draw(mDrawInterpolation);
     }
+
+    private float mDrawInterpolation;
 
     // pause and resume events
     public void onPause() {
@@ -95,7 +131,5 @@ public class Game  implements TimerCallback {
         for (Scene scene: mScenes)
             scene.onResume();
     }
-
-    /*TODO: Get Touch input data and generate input events for the active scene.*/
 }
 

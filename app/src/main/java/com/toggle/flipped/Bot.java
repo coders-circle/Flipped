@@ -1,10 +1,9 @@
 package com.toggle.flipped;
 
-import com.toggle.katana2d.GLSprite;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Component;
-
-import org.jbox2d.dynamics.Fixture;
+import com.toggle.katana2d.Texture;
 
 public class Bot implements Component {
     enum Direction { LEFT, RIGHT };
@@ -14,16 +13,20 @@ public class Bot implements Component {
     enum MotionState { IDLE, MOVE };
     enum ActionState { NOTHING, JUMP_START, JUMP, FIGHT};
 
-    Direction direction;
-    MotionState motionState;
-    ActionState actionState;
+    Direction direction = Direction.RIGHT;
+    MotionState motionState = MotionState.IDLE;
+    ActionState actionState = ActionState.NOTHING;
 
     // Sensors required to sense if bot is colliding on ground or on sides
     Fixture groundFixture;
     Fixture leftsideFixture, rightsideFixture;
 
+    // Contacts
+    int groundContacts=0, leftSideContacts=0, rightSideContacts=0;
+
     // Health, damagePoints
 
-    Sprite.SpriteSheetData ssdIdle, ssdWalk, ssdJump, fight, ssdPush;
-    GLSprite sprIdle, sprWalk, sprJump, sprFight, sprPush;
+    // Sprites and sprite-sheet-data for different states
+    Sprite.SpriteSheetData ssdIdle, ssdWalk, ssdJump, ssdPush;
+    Texture sprIdle, sprWalk, sprJump, sprPush;
 }

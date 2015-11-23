@@ -1,18 +1,20 @@
 package com.toggle.flipped;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Transformation;
+import com.toggle.katana2d.physics.ContactListener;
 import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
 
-import org.jbox2d.collision.shapes.PolygonShape;
-import org.jbox2d.common.Vec2;
-
-public class BotControlSystem extends com.toggle.katana2d.System {
+public class BotControlSystem extends com.toggle.katana2d.System implements ContactListener {
 
     public BotControlSystem() {
-        super(new Class[] { Player.class, Bot.class, Transformation.class, PhysicsBody.class, Sprite.class });
+        super(new Class[] { Bot.class, Transformation.class, PhysicsBody.class, Sprite.class });
     }
 
     @Override
@@ -20,47 +22,47 @@ public class BotControlSystem extends com.toggle.katana2d.System {
         // Add sensors
         Bot p = e.get(Bot.class);
         PhysicsBody b = e.get(PhysicsBody.class);
-        Vec2 ex = b.body.getFixtureList().getAABB(0).getExtents();
+        //Vector2 ex = b.body.getFixtureList().get(0).getAABB(0).getExtents();
 
-        float twopixels =  2 * PhysicsSystem.METERS_PER_PIXEL;
+        Sprite s = e.get(Sprite.class);
+        Vector2 ex = new Vector2(s.texture.width/2 * PhysicsSystem.METERS_PER_PIXEL - 0.01f, s.texture.height/2 * PhysicsSystem.METERS_PER_PIXEL - 0.01f);
 
-        // A 2 pixel sensor at the bottom to sense the ground
+        float sensorSize =  2 * PhysicsSystem.METERS_PER_PIXEL;
+
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(ex.x*0.7f, twopixels, new Vec2(0, ex.y), 0);
+
+        // A sensor at the bottom to sense the ground
+        shape.setAsBox(ex.x*0.8f, sensorSize, new Vector2(0, ex.y), 0);
         p.groundFixture = b.createSensor(shape);
 
         // Side sensors
         shape = new PolygonShape();
-        shape.setAsBox(twopixels, ex.y/2, new Vec2(-ex.x, 0), 0);
+        shape.setAsBox(sensorSize, ex.y/2, new Vector2(-ex.x, 0), 0);
         p.leftsideFixture = b.createSensor(shape);
         shape = new PolygonShape();
-        shape.setAsBox(twopixels, ex.y/2, new Vec2(ex.x, 0), 0);
+        shape.setAsBox(sensorSize, ex.y/2, new Vector2(ex.x, 0), 0);
         p.rightsideFixture = b.createSensor(shape);
+
+        b.contactListener = this;
     }
 
     @Override
-    public void update(double dt) {
+    public void update(float dt) {
         for (Entity e : mEntities) {
-            Transformation t = e.get(Transformation.class);
+            //Transformation t = e.get(Transformation.class);
             PhysicsBody b = e.get(PhysicsBody.class);
-            Player p = e.get(Player.class);
             Sprite s = e.get(Sprite.class);
             Bot bot = e.get(Bot.class);
 
-            Vec2 v = b.body.getLinearVelocity();
+            Vector2 v = b.body.getLinearVelocity();
 
-            // Check if the bot foot is touching something solid.
-            // that is, if the groundFixture has collided with something.
-            boolean onGround = false;
-            boolean onLeftSide = false, onRightSide = false;
-            for (PhysicsBody.Collision c: b.collisions) {
-                if (c.myFixture == bot.groundFixture)
-                    onGround = true;
-                else if (c.myFixture == bot.leftsideFixture)
-                    onLeftSide = true;
-                else if (c.myFixture == bot.rightsideFixture)
-                    onRightSide = true;
-            }
+            boolean onGround = bot.groundContacts>0;
+            boolean onLeftSide = bot.leftSideContacts>0, onRightSide = bot.rightSideContacts>0;
+
+            if (onGround)
+                b.body.getFixtureList().get(0).setFriction(0.5f);
+            else
+                b.body.getFixtureList().get(0).setFriction(0.0f);
 
             // If we are on ground but we are in JUMP state, revert to NOTHING action state
             if (bot.actionState == Bot.ActionState.JUMP && onGround)
@@ -70,7 +72,8 @@ public class BotControlSystem extends com.toggle.katana2d.System {
             // linear impulse to jump.
             else if (bot.actionState == Bot.ActionState.JUMP_START) {
                 if (onGround) {
-                    b.body.applyLinearImpulse(new Vec2(0, -3f * b.body.getMass()), b.body.getWorldCenter());
+                    //Log.d("jumping", "true");
+                    b.body.applyLinearImpulse(new Vector2(0, -3.4f * b.body.getMass()), b.body.getWorldCenter(), false);
 
                     // Change to jumping state
                     bot.actionState = Bot.ActionState.JUMP;
@@ -80,14 +83,16 @@ public class BotControlSystem extends com.toggle.katana2d.System {
             }
 
             // set horizontal velocity according to current moving direction.
+            Vector2 vel = b.body.getLinearVelocity();
             float speed = 0;
             if (bot.motionState == Bot.MotionState.MOVE) {
                 if (bot.direction == Bot.Direction.LEFT)
-                    speed = -3;
+                    speed = -3f;
                 else
-                    speed = 3;
+                    speed = 3f;
             }
-            b.body.setLinearVelocity(new Vec2(speed, v.y));
+            float force = b.body.getMass()*(speed-vel.x) / dt;    // f = mv/t ; v = required change in velocity
+            b.body.applyForce(new Vector2(force, 0), b.body.getWorldCenter(), false);
 
             // change sprites
             if (onGround) {
@@ -104,8 +109,49 @@ public class BotControlSystem extends com.toggle.katana2d.System {
                 s.changeSprite(bot.sprJump, bot.ssdJump);
 
             if (speed != 0)
-                s.isReflected = speed < 0;
+                s.scaleX = speed < 0? -1 : 1;
         }
+
+    }
+
+    @Override
+    public void beginContact(Contact contact, Fixture me, Fixture other) {
+        if (other.isSensor())
+            return;
+
+        Bot bot = ((Entity)me.getUserData()).get(Bot.class);
+        if (me == bot.groundFixture) {
+            if (!((Entity)other.getUserData()).has(PlatformSystem.OneWayPlatform.class)
+                    || me.getBody().getLinearVelocity().y >= 0)
+                bot.groundContacts++;
+        }
+        else if (me == bot.leftsideFixture)
+            bot.leftSideContacts++;
+        else if (me == bot.rightsideFixture)
+            bot.rightSideContacts++;
+    }
+
+    @Override
+    public void endContact(Contact contact, Fixture me, Fixture other) {
+        if (other.isSensor())
+            return;
+
+        Bot bot = ((Entity)me.getUserData()).get(Bot.class);
+        if (me == bot.groundFixture && bot.groundContacts > 0)
+                bot.groundContacts--;
+        else if (me == bot.leftsideFixture && bot.leftSideContacts > 0)
+            bot.leftSideContacts--;
+        else if (me == bot.rightsideFixture && bot.rightSideContacts > 0)
+            bot.rightSideContacts--;
+    }
+
+    @Override
+    public void preSolve(Contact contact, Fixture me, Fixture other) {
+
+    }
+
+    @Override
+    public void postSolve(Contact contact, Fixture me, Fixture other) {
 
     }
 }

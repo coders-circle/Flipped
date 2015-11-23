@@ -7,10 +7,7 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
-import android.util.Log;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -54,9 +51,12 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     // index buffer data
     private static short mSquareDrawOrder[] = { 0, 2, 1, 0, 3, 2 };
 
-    //vertex and index buffer objects
+    // vertex and index buffers
     public FloatBuffer mSpriteVertexBuffer;
     public ShortBuffer mSpriteIndexBuffer;
+
+    // VBO and IBO
+    public final int[] mSpriteBO = new int[2];
 
     // Attribute handles
     public int mSpritePositionHandle;
@@ -70,8 +70,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     public final float[] mModelMatrix = new float[16];
 
     // A white texture to use when no texture is selected
-    public Texture mWhiteTexture;
-    public Texture mFuzzyTexture;
+    public int mWhiteTextureId;
+    public int mFuzzyTextureId;
 
     // Camera to defining view position and angle
     private Camera mCamera = new Camera();
@@ -92,12 +92,23 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
+    public void disableDepth() {
+        GLES20.glDisable(GLES20.GL_DEPTH_TEST);
+    }
+
+    public void enableDepth() {
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+    }
+
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
 
         // Enable blending for transparency
         GLES20.glEnable(GLES20.GL_BLEND);
         GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+
+        // Enable z buffer
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 
         // Enable scissoring
         GLES20.glEnable(GLES20.GL_SCISSOR_TEST);
@@ -106,8 +117,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         GLES20.glClearColor(100.0f / 255, 149.0f / 255, 237.0f / 255, 1.0f);
 
         // Compile the sprite shaders
-        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, getRawFileText(mContext, R.raw.vs_sprite));
-        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, getRawFileText(mContext, R.raw.fs_sprite));
+        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, Utilities.getRawFileText(mContext, R.raw.vs_sprite));
+        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, Utilities.getRawFileText(mContext, R.raw.fs_sprite));
 
         // Link the shaders to a program
         mSpriteProgram = GLES20.glCreateProgram();
@@ -124,26 +135,30 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         mSpriteClipHandle = GLES20.glGetUniformLocation(mSpriteProgram, "uClip");
 
         // Create the vertex buffer
-        ByteBuffer bb = ByteBuffer.allocateDirect(mSquareCoords.length*4);
-        bb.order(ByteOrder.nativeOrder());
-        mSpriteVertexBuffer = bb.asFloatBuffer();
-        mSpriteVertexBuffer.put(mSquareCoords);
-        mSpriteVertexBuffer.position(0);
+        mSpriteVertexBuffer = ByteBuffer.allocateDirect(mSquareCoords.length*4).order(ByteOrder.nativeOrder()).asFloatBuffer();
+        mSpriteVertexBuffer.put(mSquareCoords).position(0);
 
         // Create the index buffer
-        ByteBuffer dlb = ByteBuffer.allocateDirect(mSquareDrawOrder.length * 2);
-        dlb.order(ByteOrder.nativeOrder());
-        mSpriteIndexBuffer = dlb.asShortBuffer();
-        mSpriteIndexBuffer.put(mSquareDrawOrder);
-        mSpriteIndexBuffer.position(0);
+        mSpriteIndexBuffer = ByteBuffer.allocateDirect(mSquareDrawOrder.length*2).order(ByteOrder.nativeOrder()).asShortBuffer();
+        mSpriteIndexBuffer.put(mSquareDrawOrder).position(0);
+
+        // Create VBO and IBO
+        GLES20.glGenBuffers(2, mSpriteBO, 0);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mSpriteBO[0]);
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, mSpriteVertexBuffer.capacity() * 4, mSpriteVertexBuffer, GLES20.GL_STATIC_DRAW);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, mSpriteBO[1]);
+        GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER, mSpriteIndexBuffer.capacity() * 2, mSpriteIndexBuffer, GLES20.GL_STATIC_DRAW);
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
 
         // get the texture uniform handle and set it to use the sample-0
         int texHandle = GLES20.glGetUniformLocation(mSpriteProgram, "uTexture");
         GLES20.glUniform1i(texHandle, 0);
 
         // Shaders for point sprites
-        int pVertexShader = loadShader(GLES20.GL_VERTEX_SHADER, getRawFileText(mContext, R.raw.vs_point_sprite));
-        int pFragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, getRawFileText(mContext, R.raw.fs_point_sprite));
+        int pVertexShader = loadShader(GLES20.GL_VERTEX_SHADER, Utilities.getRawFileText(mContext, R.raw.vs_point_sprite));
+        int pFragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, Utilities.getRawFileText(mContext, R.raw.fs_point_sprite));
 
         // Link the shaders to a program
         mPointSpriteProgram = GLES20.glCreateProgram();
@@ -165,13 +180,13 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         int pTexHandle = GLES20.glGetUniformLocation(mPointSpriteProgram, "uTexture");
         GLES20.glUniform1i(pTexHandle, 0);
 
+        // Load the standard textures
+        mWhiteTextureId = loadTexture(R.drawable.white);
+        mFuzzyTextureId = loadTexture(R.drawable.fuzzy_circle);
+
+        // Reload the user created textures if any
         for (Texture t: mTextures)
             reloadTexture(t);
-
-        if (mWhiteTexture == null)
-            mWhiteTexture = addTexture(R.drawable.white);
-        if (mFuzzyTexture == null)
-            mFuzzyTexture = addTexture(R.drawable.fuzzy_circle);
 
         // Initialize the Engine
         mGame.init();
@@ -195,7 +210,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         Matrix.translateM(mViewMatrix, 0, -mCamera.x, -mCamera.y, 0);
 
         GLES20.glClearColor(mBackR, mBackG, mBackB, 1.0f);
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         mGame.newFrame();
     }
 
@@ -228,19 +243,19 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         Matrix.orthoM(mProjectionMatrix, 0, 0, width, height, 0, -100, 100);
 
         // Scissor the viewport
-        GLES20.glScissor((int)cx, (int)cy, (int)(width*scale), (int)(height*scale));
+        GLES20.glScissor((int) cx, (int) cy, (int) (width * scale), (int) (height * scale));
     }
 
     // Set transform for drawing the rectangle.
-    public void setSpriteTransform(float posX, float posY, float scaleX, float scaleY, float angle, float originX, float originY) {
+    public void setSpriteTransform(float posX, float posY, float z, float scaleX, float scaleY, float angle, float originX, float originY) {
         // calculate transformation matrix mMVPMatrix that will transform the vertices of the square
 
         // mModelMatrix = Translate(posX, posY) * Rotate(angle) * Translate(-originX, -originY) * Scale(scaleX, scaleY)
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, posX, posY, 0);
+        Matrix.translateM(mModelMatrix, 0, posX, posY, z);
         Matrix.rotateM(mModelMatrix, 0, angle, 0, 0, 1);
-        Matrix.translateM(mModelMatrix, 0, -originX, -originY, 0);
         Matrix.scaleM(mModelMatrix, 0, scaleX, scaleY, 1);
+        Matrix.translateM(mModelMatrix, 0, -originX, -originY, 0);
 
         // mMVPMatrix = mProjectionMatrix * mViewMatrix * mModelMatrix
         Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
@@ -263,19 +278,6 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         GLES20.glUniformMatrix4fv(mPointSpriteMVPMatrixHandle, 1, false, mMVPMatrix, 0);
     }
 
-    // Read text from a raw resource file
-    public static String getRawFileText(Context context, int rawResId) {
-        InputStream inputStream  = context.getResources().openRawResource(rawResId);
-        String s = new java.util.Scanner(inputStream).useDelimiter("\\A").next();
-
-        try {
-            inputStream.close();
-        } catch (IOException e) {
-            Log.e("Raw File read Error", e.getMessage());
-        }
-        return s;
-    }
-
     // Create shader object from shader program
     public static int loadShader(int type, String shaderCode) {
         int shader = GLES20.glCreateShader(type);
@@ -293,12 +295,10 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
     private List<Texture> mTextures = new ArrayList<>();
 
-    private void loadTexture(Texture texture, int resourceId) {
+    private int loadTexture(Bitmap bitmap) {
         int[] textureHandle = new int[1];
-        int width, height;
         GLES20.glGenTextures(1, textureHandle, 0);
         if (textureHandle[0] != 0) {
-            Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), resourceId);
             if (bitmap == null) {
                 throw new RuntimeException("Error decoding bitmap");
             }
@@ -308,36 +308,57 @@ public class GLRenderer implements GLSurfaceView.Renderer {
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
-
-            width = bitmap.getWidth();
-            height = bitmap.getHeight();
-            bitmap.recycle();
         }
         else {
             throw new RuntimeException("Error loading texture.");
         }
-        texture.textureId = textureHandle[0];
-        texture.width = width;
-        texture.height = height;
-        texture.resourceId = resourceId;
+        return textureHandle[0];
     }
 
-    private Texture createTexture(int resourceId) {
-        Texture t = new Texture();
-        loadTexture(t, resourceId);
+    private int loadTexture(int resourceId) {
+        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), resourceId);
+        int texid = loadTexture(bitmap);
+        bitmap.recycle();
+        return texid;
+    }
+
+    // create texture from a resource image
+    public Texture addTexture(int resourceId, float width, float height) {
+        Texture t = new Texture(loadTexture(resourceId), width, height);
+        t.resourceId = resourceId;
+        mTextures.add(t);
         return t;
     }
 
-    // load texture from a resource file
-    public Texture addTexture(int resourceId)
-    {
-        Texture t = createTexture(resourceId);
+    // create texture from bitmap
+    public Texture addTexture(Bitmap bitmap, float width, float height) {
+        Texture t = new Texture(loadTexture(bitmap), width, height);
+        t.bitmap = bitmap;
+        mTextures.add(t);
+        return t;
+    }
+
+    // create texture from color
+    public Texture addTexture(float[] color, float width, float height) {
+        Texture t = new Texture(mWhiteTextureId, color, width, height);
+        t.resourceId = -1;
+        mTextures.add(t);
+        return t;
+    }
+
+    // create texture from color and resource image
+    public Texture addTexture(int resourceId, float[] color, float width, float height) {
+        Texture t = new Texture(loadTexture(resourceId), color, width, height);
+        t.resourceId = resourceId;
         mTextures.add(t);
         return t;
     }
 
     private void reloadTexture(Texture t) {
-        loadTexture(t, t.resourceId);
+        if (t.resourceId >= 0)
+            t.textureId = loadTexture(t.resourceId);
+        else if (t.bitmap != null)
+            t.textureId = loadTexture(t.bitmap);
     }
 }
 

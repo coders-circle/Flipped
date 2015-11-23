@@ -28,33 +28,14 @@ public class SurfaceView extends GLSurfaceView {
         int pointerId = e.getPointerId(pointerIndex);
 
         switch (e.getAction()) {
-//            case MotionEvent.ACTION_DOWN:
-//                mTouchInputData.x = e.getX();
-//                mTouchInputData.y = e.getY();
-//                mTouchInputData.dx = mTouchInputData.dy = 0;
-//                mTouchInputData.isTouchDown = true;
-//                break;
-//            case MotionEvent.ACTION_UP:
-//                mTouchInputData.isTouchDown = false;
-//                mTouchInputData.dx = 0;
-//                mTouchInputData.dy = 0;
-//                break;
-//            case MotionEvent.ACTION_MOVE:
-//                float lastX = mTouchInputData.x;
-//                float lastY = mTouchInputData.y;
-//                mTouchInputData.x = e.getX();
-//                mTouchInputData.y = e.getY();
-//                mTouchInputData.dx = e.getX() - lastX;
-//                mTouchInputData.dy = e.getY() - lastY;
-//                break;
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_POINTER_DOWN: {
                 // We have a new pointer. Add it to the list of pointers
                 TouchInputData.Pointer pointer = new TouchInputData.Pointer();
                 pointer.x = e.getX(pointerIndex);
                 pointer.y = e.getY(pointerIndex);
-                pointer.dx = e.getX(pointerIndex);
-                pointer.dy = e.getY(pointerIndex);
+                pointer.dx = 0;
+                pointer.dy = 0;
                 mTouchInputData.pointers.put(pointerId, pointer);
                 break;
             }

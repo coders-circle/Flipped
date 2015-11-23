@@ -3,7 +3,7 @@ package com.toggle.katana2d;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class GameActivity  extends Activity {
+public abstract class GameActivity  extends Activity {
     protected Engine mEngine = new Engine();
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -21,7 +21,7 @@ public class GameActivity  extends Activity {
         mEngine.start();
     }
 
-    public void onGameStart() {
+    public void onGamePreStart() {
 
     }
 
@@ -35,5 +35,9 @@ public class GameActivity  extends Activity {
     public void onResume() {
         super.onResume();
         mEngine.onResume();
+    }
+
+    public void onGameStart() {
+
     }
 }

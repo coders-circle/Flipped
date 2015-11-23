@@ -1,71 +1,54 @@
 package com.toggle.katana2d;
 
-import android.util.Log;
+import java.util.Collections;
 
 // Uses sprite and transformation components of entities to render them
 public class RenderSystem extends System {
-    public RenderSystem() {
+    private GLRenderer mRenderer;
+    public RenderSystem(GLRenderer renderer) {
         super(new Class[]{Sprite.class, Transformation.class});
+        mRenderer = renderer;
     }
 
     @Override
-    public void update(double dt) {
-        for (Entity entity : mEntities) {
-            Sprite sc = entity.get(Sprite.class);
-            Sprite.SpriteSheetData ssd = sc.spriteSheetData;
-
-            // animate a sprite sheet by advancing the image index when required time has elapsed
-            if (ssd != null && ssd.animationSpeed > 0) {
-                if (ssd.numImages < 0)
-                    ssd.numImages = ssd.numRows * ssd.numCols;
-
-                ssd.timePassed += (float) dt;
-                if (ssd.timePassed >= 1.0/ssd.animationSpeed) {
-                    ssd.timePassed = 0;
-                    ssd.index = (ssd.index+1)%(ssd.numImages);
-                }
+    public void onEntityAdded(Entity entity) {
+        // sort by distance
+        float d = entity.get(Sprite.class).distance;
+        int i = mEntities.size() - 2;
+        int j = mEntities.size() - 1;
+        if (i >= 0)
+        while (i >= 0) {
+            if (mEntities.get(i).get(Sprite.class).distance < d) {
+                Collections.swap(mEntities, i, j);
+                j = i;
             }
+            else
+                break;
+            i--;
         }
     }
 
     @Override
-    public void draw() {
+    public void update(float dt) {
         for (Entity entity : mEntities) {
             Sprite sc = entity.get(Sprite.class);
-            Transformation tc = entity.get(Transformation.class);
+            sc.animate(dt);
+        }
+    }
 
-            if (sc.glSprite == null)
-                continue;
+    @Override
+    public void draw(float interpolation) {
+        for (Entity entity : mEntities) {
+            Sprite s = entity.get(Sprite.class);
+            Transformation t = entity.get(Transformation.class);
 
-            if (sc.isReflected) {
-                tc.x += sc.glSprite.width;
-                sc.glSprite.width *= -1;
-            }
+            // Interpolation to fix temporal aliasing
+            float minus = 1-interpolation;
+            float x = t.x * interpolation + t.lastX * minus;
+            float y = t.y * interpolation + t.lastY * minus;
+            float angle = t.angle * interpolation + t.lastAngle * minus;
 
-            if (sc.spriteSheetData == null)
-                sc.glSprite.draw(tc.x, tc.y, tc.angle);
-            else {
-                Sprite.SpriteSheetData ssd = sc.spriteSheetData;
-
-                int col = ssd.index % ssd.numCols;
-                int row = ssd.index / ssd.numCols;
-
-                float clipX = (ssd.imgWidth + ssd.hSpacing) * col + ssd.offsetX;
-                float clipY = (ssd.imgHeight + ssd.vShacing) * row + ssd.offsetY;
-
-                clipX /= sc.glSprite.mTexture.width;
-                clipY /= sc.glSprite.mTexture.height;
-
-                float clipW = ssd.imgWidth / sc.glSprite.mTexture.width;
-                float clipH = ssd.imgHeight / sc.glSprite.mTexture.height;
-
-                sc.glSprite.draw(tc.x, tc.y, tc.angle, clipX, clipY, clipW, clipH);
-            }
-
-            if (sc.isReflected) {
-                tc.x += sc.glSprite.width;
-                sc.glSprite.width *= -1;
-            }
+            s.draw(mRenderer, x, y, angle);
         }
     }
 }

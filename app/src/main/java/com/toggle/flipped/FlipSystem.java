@@ -1,9 +1,17 @@
 package com.toggle.flipped;
 
+
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.toggle.katana2d.*;
+import com.toggle.katana2d.physics.ContactListener;
 import com.toggle.katana2d.physics.PhysicsBody;
 
-public class FlipSystem extends com.toggle.katana2d.System {
+public class FlipSystem extends com.toggle.katana2d.System implements ContactListener {
+
+    public static class Mirror {
+        public String nextWorld;
+    }
 
     // Flip-items are items that are processed by this system.
     // Example: Mirror, HyperObjects
@@ -13,15 +21,17 @@ public class FlipSystem extends com.toggle.katana2d.System {
         public FlipItem(FlipItemType type) { this.type = type; }
 
         public FlipItemType type;
-        public float targetAngle = 180; // target angle for mirror
+        public Object data;
     }
 
-    private static Bot mBotComponent;
-    private static Camera mCamera;
+    private Bot mBotComponent;   // Bot component of player, consists the ground fixture to test collision with
+    // private static Camera mCamera;
+    private Level mLevel;
 
-    public FlipSystem(Camera camera) {
-        super(new Class[] {FlipItem.class});
-        mCamera = camera;
+    public FlipSystem(/*Camera camera, */Level level) {
+        super(new Class[] {FlipItem.class, PhysicsBody.class});
+        // mCamera = camera;
+        mLevel = level;
     }
 
     public void setPlayer(Entity player) {
@@ -29,30 +39,33 @@ public class FlipSystem extends com.toggle.katana2d.System {
     }
 
     @Override
-    public void update(double dt) {
-        for (Entity e: mEntities) {
-            FlipItem f = e.get(FlipItem.class);
-            PhysicsBody b = e.get(PhysicsBody.class);
+    public void onEntityAdded(Entity entity) {
+        entity.get(PhysicsBody.class).contactListener = this;
+    }
 
-            if (f.type == FlipItem.FlipItemType.MIRROR) {
-                // For every mirror
-                // If current camera angle is not the target angle
-                // Then check for collision with player's foot (groundFixture)
-                // and set angle to target angle on collision.
-                
-                if (mCamera.angle != f.targetAngle) {
-                    boolean colliding = false;
-                    for (PhysicsBody.Collision c : b.collisions) {
-                        if (c.otherFixture == mBotComponent.groundFixture) {
-                            colliding = true;
-                            break;
-                        }
-                    }
-
-                    if (colliding)
-                        mCamera.angle = f.targetAngle;
-                }
+    @Override
+    public void beginContact(Contact contact, Fixture me, Fixture other) {
+        FlipItem f = ((Entity)me.getUserData()).get(FlipItem.class);
+        if (f.type == FlipItem.FlipItemType.MIRROR) {
+            if (other == mBotComponent.groundFixture) {
+                Mirror data = (Mirror)f.data;
+                mLevel.changeWorld(data.nextWorld);
             }
         }
+    }
+
+    @Override
+    public void endContact(Contact contact, Fixture me, Fixture other) {
+
+    }
+
+    @Override
+    public void preSolve(Contact contact, Fixture me, Fixture other) {
+
+    }
+
+    @Override
+    public void postSolve(Contact contact, Fixture me, Fixture other) {
+
     }
 }

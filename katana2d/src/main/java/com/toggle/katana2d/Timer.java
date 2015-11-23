@@ -3,33 +3,33 @@ package com.toggle.katana2d;
 import static java.lang.System.nanoTime;
 
 public class Timer {
+    private static final int ONE_SECOND = 1000000000;
 
-    public Timer(double targetFPS) {
-        Reset(targetFPS);
+    public Timer(float targetFPS) {
+        reset(targetFPS);
     }
 
     // Reset the timer with given target-FPS
-    public void Reset(double targetFPS) {
-        mLeftOver = 0.0;
-        mTotalTime = 0.0;
+    public void reset(float targetFPS) {
+        mLeftOver = 0f;
+        mTotalTime = 0f;
         mLastTime = nanoTime();
         mTarget = ONE_SECOND / targetFPS;
         mFps = mFrameCounter = mSecondCounter = 0;
     }
 
     // Get actual FPS calculated
-    int GetFPS() {
+    public int getFPS() {
         return mFps;
     }
     // Get total time elapsed since reset
-    double GetTotalTime() { return mTotalTime; }
+    public float getTotalTime() { return mTotalTime; }
 
-    private static final int ONE_SECOND = 1000000000;
-    void Update(TimerCallback callback) {
+    public float update(TimerCallback callback) {
 
         // get current and delta times
-        double currentTime = nanoTime();
-        double deltaTime = currentTime - mLastTime;
+        float currentTime = nanoTime();
+        float deltaTime = currentTime - mLastTime;
         mLastTime = currentTime;
 
         // second counter is used to keep track whether we have crossed a second
@@ -41,7 +41,7 @@ public class Timer {
             deltaTime = ONE_SECOND;
 
         // stop accumulation of small error
-        if (Math.abs(deltaTime - mTarget) < 0.000004)
+        if (Math.abs(deltaTime - mTarget) < 0.000004f)
             deltaTime = mTarget;
 
         // add deltaTime and leftOver time from previous frame
@@ -60,6 +60,8 @@ public class Timer {
             callback.update(mTarget/ONE_SECOND);
         }
 
+        float alpha = mLeftOver/mTarget;
+
         // calculate FPS using frameCounter and secondCounter
         if (mSecondCounter >= ONE_SECOND) {
             mFps = mFrameCounter;
@@ -67,8 +69,9 @@ public class Timer {
             mSecondCounter %= ONE_SECOND;
         }
 
+        return alpha;
     }
 
-    private double mLastTime, mTarget, mLeftOver, mTotalTime;
+    private float mLastTime, mTarget, mLeftOver, mTotalTime;
     private int mFps, mFrameCounter, mSecondCounter;
 }

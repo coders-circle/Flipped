@@ -24,7 +24,15 @@ public class Manager<T> {
     }
     public T get(String key) { return get(map.get(key)); }
 
+    public boolean has(String key) { return map.containsKey(key); }
+
+    public int getId(String key) { return map.get(key); }
+
     public void clear() {
         objects.clear();
+    }
+
+    public int size() {
+        return objects.size();
     }
 }
