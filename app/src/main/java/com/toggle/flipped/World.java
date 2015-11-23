@@ -35,13 +35,16 @@ public class World extends Scene {
         ParticleSystem particleSystem = new ParticleSystem();
 
         // Add the systems
+
+        // The standard systems provided by Katana-2D
         mSystems.add(new RenderSystem(mGame.getRenderer()));
         mSystems.add(physicsSystem);
         mSystems.add(particleSystem);
 
+        // Flipped's systems, controlling inputs, player, mirror, wind, rope etc.
         mSystems.add(new BotControlSystem());
         mSystems.add(new PlayerInputSystem(mGame));
-        //mSystems.add(flipSystem);
+        mSystems.add(flipSystem);
         mSystems.add(new WindSystem());
         mSystems.add(new RopeSystem(physicsSystem.getWorld(), mGame.getRenderer()));
 

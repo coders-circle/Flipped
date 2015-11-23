@@ -39,7 +39,7 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
                     b.motionState = Bot.MotionState.MOVE;
                 }
 
-                // if vertical sliding direction is up, and sliding magnitude is more than 8
+                // if vertical sliding direction is up, and sliding magnitude is big enough
                 // then jump
                 if (touch.dy < -8 )
                     b.actionState = Bot.ActionState.JUMP_START;
