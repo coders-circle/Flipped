@@ -26,8 +26,6 @@ public class Game implements TimerCallback {
 
     public GLRenderer getRenderer() { return mRenderer; }
 
-    public Timer getTimer() { return mTimer; }
-
     public TouchInputData getTouchInputData() { return mRenderer.touchInputData; }
 
     // List of all scenes
@@ -45,12 +43,17 @@ public class Game implements TimerCallback {
             scene.init(this);
         }
 
-        return mScenes.size()-1;
+        int id = mScenes.size()-1;
+        scene.sceneId = id;
+        return id;
     }
 
     // Set active scene
     public void setActiveScene(int index) {
+        if (mActiveScene != null)
+            mActiveScene.onActiveStateChanged(false);
         mActiveScene = getScene(index);
+        mActiveScene.onActiveStateChanged(true);
     }
 
     // Get a scene from index
