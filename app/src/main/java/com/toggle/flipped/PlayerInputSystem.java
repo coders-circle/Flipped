@@ -60,8 +60,9 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
             Camera camera = mGame.getRenderer().getCamera();
             float w = mGame.getRenderer().width;
             float h = mGame.getRenderer().height;
-            camera.x = Math.min(Math.max(w/2, t.x), w*2-w/2) - w/2;
-            camera.y = Math.min(h/2, t.y) - h/2;
+            float maxW = 7520, maxH = 640-140;
+            camera.x = Math.min(Math.max(w/2, t.x), maxW-w/2) - w/2;
+            camera.y = Math.min(Math.max(h/2, t.y), maxH-h/2) - h/2;
         }
     }
 

@@ -6,6 +6,7 @@ import java.util.List;
 public class Scene {
 
     protected Game mGame;
+    public int sceneId; // id corresponding to collection stored in parent Game class
 
     // List of all systems
     protected List<System> mSystems = new ArrayList<>();
@@ -70,5 +71,6 @@ public class Scene {
         return mGame;
     }
 
-    /*TODO: Pass input events to all systems.*/
+    public void onActiveStateChanged(boolean isActive) {
+    }
 }

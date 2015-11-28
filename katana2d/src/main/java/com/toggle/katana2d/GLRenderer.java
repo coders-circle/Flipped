@@ -3,10 +3,14 @@ package com.toggle.katana2d;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
+import android.view.WindowManager;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -40,6 +44,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     public int mSpriteClipHandle;
 
     public int mPointSpriteMVPMatrixHandle;
+    public int mPointSpriteScaleHandle;
 
     // vertex buffer data
     private static float mSquareCoords[] = {
@@ -68,6 +73,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     public final float[] mMVPMatrix = new float[16];
     public final float[] mProjectionMatrix = new float[16];
     public final float[] mModelMatrix = new float[16];
+    public float mScaling = 1;
 
     // A white texture to use when no texture is selected
     public int mWhiteTextureId;
@@ -102,7 +108,6 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
-
         // Enable blending for transparency
         GLES20.glEnable(GLES20.GL_BLEND);
         GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
@@ -112,6 +117,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
         // Enable scissoring
         GLES20.glEnable(GLES20.GL_SCISSOR_TEST);
+
+        //GLES20.glDisable(GLES20.GL_DITHER);
 
         // Set the background frame color
         GLES20.glClearColor(100.0f / 255, 149.0f / 255, 237.0f / 255, 1.0f);
@@ -175,6 +182,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         mPointSpriteSizeHandle = GLES20.glGetAttribLocation(mPointSpriteProgram, "vSize");
         GLES20.glEnableVertexAttribArray(mPointSpriteSizeHandle);
         mPointSpriteMVPMatrixHandle = GLES20.glGetUniformLocation(mPointSpriteProgram, "uMVPMatrix");
+        mPointSpriteScaleHandle = GLES20.glGetUniformLocation(mPointSpriteProgram, "uScale");
 
         // get the texture uniform handle and set it to use the sample-0
         int pTexHandle = GLES20.glGetUniformLocation(mPointSpriteProgram, "uTexture");
@@ -214,7 +222,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         mGame.newFrame();
     }
 
-    public final int width = 480, height = 320;
+    public final int width = 580, height = 320;
 
     public Camera getCamera() { return mCamera; }
 
@@ -244,6 +252,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
         // Scissor the viewport
         GLES20.glScissor((int) cx, (int) cy, (int) (width * scale), (int) (height * scale));
+
+        mScaling = scale;
     }
 
     // Set transform for drawing the rectangle.
@@ -276,6 +286,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
         // finally set the value of mvpMatrix uniform to the mMVPMatrix
         GLES20.glUniformMatrix4fv(mPointSpriteMVPMatrixHandle, 1, false, mMVPMatrix, 0);
+        GLES20.glUniform1f(mPointSpriteScaleHandle, mScaling);
     }
 
     // Create shader object from shader program
@@ -303,8 +314,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
                 throw new RuntimeException("Error decoding bitmap");
             }
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0]);
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);

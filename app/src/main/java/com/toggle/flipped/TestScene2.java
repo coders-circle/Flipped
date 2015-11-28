@@ -117,7 +117,7 @@ public class TestScene2 extends Scene {
 
         Emitter e = emitter.get(Emitter.class);
         e.var_startColor[3] = 0.3f;
-        e.size = 30;
+        e.size = 20;
         e.var_size = 5;
         e.var_angle = 90;
         e.speed = 10;
@@ -149,7 +149,7 @@ public class TestScene2 extends Scene {
 
 
         Entity bk1 = new Entity();
-        bk1.add(new Background(mGame.getRenderer().addTexture(R.drawable.space1, 640, 480), 100));
+        bk1.add(new Background(mGame.getRenderer().addTexture(R.drawable.main_background, 640, 400), 100));
         addEntity(bk1);
 
         Entity bk2 = new Entity();
@@ -159,6 +159,10 @@ public class TestScene2 extends Scene {
         Entity bk3 = new Entity();
         bk3.add(new Background(mGame.getRenderer().addTexture(R.drawable.trees, 640, 480), 30));
         addEntity(bk3);
+
+        Entity bk4 = new Entity();
+        bk4.add(new Background(mGame.getRenderer().addTexture(R.drawable.pa1th, 640, 480), 0));
+        addEntity(bk4);
     }
     //Font font;
 
