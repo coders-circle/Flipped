@@ -19,6 +19,7 @@ android {
 }
 
 dependencies {
+    compile 'com.android.support:appcompat-v7:22.2.0'
     compile files('libs/gdx.jar')
     compile files('libs/gdx-box2d.jar')
 }

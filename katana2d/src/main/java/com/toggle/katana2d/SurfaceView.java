@@ -3,6 +3,8 @@ package com.toggle.katana2d;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 //import android.support.v4.view.MotionEventCompat;
+import android.support.v4.view.MotionEventCompat;
+import android.util.Log;
 import android.view.MotionEvent;
 
 public class SurfaceView extends GLSurfaceView {
@@ -29,7 +31,8 @@ public class SurfaceView extends GLSurfaceView {
         // get pointer ID
         int pointerId = e.getPointerId(pointerIndex);
 
-        switch (e.getAction()) {
+        int action = MotionEventCompat.getActionMasked(e);
+        switch (action) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_POINTER_DOWN: {
                 // We have a new pointer. Add it to the list of pointers
