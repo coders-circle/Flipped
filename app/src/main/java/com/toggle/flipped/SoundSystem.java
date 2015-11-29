@@ -2,9 +2,6 @@ package com.toggle.flipped;
 
 import com.toggle.katana2d.*;
 
-/**
- * Created by Ankit on 11/27/2015.
- */
 public class SoundSystem extends com.toggle.katana2d.System {
     public SoundSystem(){
         super(new Class[]{Sound.class});
@@ -17,7 +14,7 @@ public class SoundSystem extends com.toggle.katana2d.System {
             Sound sound = entity.get(Sound.class);
             for(SoundSource soundSource: sound.soundSources){
                 if((soundSource.type() & sound.state) != 0){
-                    if(soundSource.isFinished() == false && soundSource.isPlaying() == false){
+                    if(!soundSource.isFinished() && !soundSource.isPlaying()){
                         soundSource.start();
                     }
 

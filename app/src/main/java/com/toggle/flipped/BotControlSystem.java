@@ -1,9 +1,15 @@
 package com.toggle.flipped;
 
+import android.util.Log;
+
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
+import com.badlogic.gdx.physics.box2d.joints.PrismaticJointDef;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Transformation;
@@ -43,6 +49,11 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
         shape.setAsBox(sensorSize, ex.y/2, new Vector2(ex.x, 0), 0);
         p.rightsideFixture = b.createSensor(shape);
 
+        // Top sensor
+        shape = new PolygonShape();
+        shape.setAsBox(ex.x*1.2f, sensorSize, new Vector2(0, -ex.y - sensorSize*5), 0);
+        p.topFixture = b.createSensor(shape);
+
         b.contactListener = this;
     }
 
@@ -54,15 +65,53 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             Sprite s = e.get(Sprite.class);
             Bot bot = e.get(Bot.class);
 
-            Vector2 v = b.body.getLinearVelocity();
-
             boolean onGround = bot.groundContacts>0;
             boolean onLeftSide = bot.leftSideContacts>0, onRightSide = bot.rightSideContacts>0;
+            boolean onTop = bot.topContacts>0;
 
+            boolean toHang = false;
             if (onGround)
                 b.body.getFixtureList().get(0).setFriction(0.5f);
-            else
+            else {
                 b.body.getFixtureList().get(0).setFriction(0.0f);
+
+                // If not hanging already, check if we should
+                if (!onTop && bot.wall != null && bot.wall.getBody().getType() == BodyDef.BodyType.StaticBody)
+                if ((onRightSide && bot.direction == Bot.Direction.RIGHT)
+                    || (onLeftSide && bot.direction == Bot.Direction.LEFT)) {
+                    toHang = true;
+
+                    if (bot.actionState != Bot.ActionState.HANG && bot.actionState != Bot.ActionState.HANG_UP)
+                        bot.actionState = Bot.ActionState.HANG;
+
+                    if (bot.hangingJoint == null) {
+                        // create a joint with the wall
+                        DistanceJointDef jdef = new DistanceJointDef();
+                        jdef.initialize(bot.wall.getBody(), b.body, bot.wallPoint,
+                                b.body.getWorldCenter());
+                        b.body.setGravityScale(0);
+
+                        /*RevoluteJointDef jdef = new RevoluteJointDef();
+                        jdef.initialize(bot.wall.getBody(), b.body, bot.wallPoint);*/
+
+                        jdef.collideConnected = true;
+                        bot.hangingJoint = b.body.getWorld().createJoint(jdef);
+                    }
+                }
+            }
+
+            if (!toHang && bot.hangingJoint != null) {
+                b.body.getWorld().destroyJoint(bot.hangingJoint);
+                bot.hangingJoint = null;
+                b.body.setGravityScale(1);
+            }
+
+            if (bot.actionState == Bot.ActionState.HANG_UP && bot.hangingJoint != null) {
+                b.body.getWorld().destroyJoint(bot.hangingJoint);
+                bot.hangingJoint = null;
+                b.body.setGravityScale(1);
+                b.body.applyForce(new Vector2(0, -25f), b.body.getWorldCenter(), false);
+            }
 
             // If we are on ground but we are in JUMP state, revert to NOTHING action state
             if (bot.actionState == Bot.ActionState.JUMP && onGround)
@@ -72,7 +121,6 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             // linear impulse to jump.
             else if (bot.actionState == Bot.ActionState.JUMP_START) {
                 if (onGround) {
-                    //Log.d("jumping", "true");
                     b.body.applyLinearImpulse(new Vector2(0, -3.4f * b.body.getMass()), b.body.getWorldCenter(), false);
 
                     // Change to jumping state
@@ -125,10 +173,16 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
                     || me.getBody().getLinearVelocity().y >= 0)
                 bot.groundContacts++;
         }
-        else if (me == bot.leftsideFixture)
+        else if (me == bot.leftsideFixture) {
             bot.leftSideContacts++;
-        else if (me == bot.rightsideFixture)
+            bot.wall = other; bot.wallPoint = contact.getWorldManifold().getPoints()[0];
+        }
+        else if (me == bot.rightsideFixture) {
             bot.rightSideContacts++;
+            bot.wall = other; bot.wallPoint = contact.getWorldManifold().getPoints()[0];
+        }
+        else if (me == bot.topFixture)
+            bot.topContacts++;
     }
 
     @Override
@@ -143,6 +197,8 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             bot.leftSideContacts--;
         else if (me == bot.rightsideFixture && bot.rightSideContacts > 0)
             bot.rightSideContacts--;
+        else if (me == bot.topFixture)
+            bot.topContacts--;
     }
 
     @Override

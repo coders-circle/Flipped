@@ -36,6 +36,7 @@ public class BotCreator {
 
         int spriteTex = Utilities.getResourceId(mGame.getActivity(), "drawable", spriteName);
         Texture glSprite = mGame.getRenderer().addTexture(spriteTex, (float) sprite.getDouble("width"), (float) sprite.getDouble("height"));
+        glSprite.color = new float[]{209f/255,209f/255,209f/255,1};
         mGame.textureManager.add(spriteName, glSprite);
         return glSprite;
     }

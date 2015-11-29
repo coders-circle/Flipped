@@ -1,7 +1,5 @@
 package com.toggle.flipped;
 
-import android.util.Log;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.World;
@@ -76,7 +74,9 @@ public class ExplosionSystem extends com.toggle.katana2d.System {
                         bodyDef.linearVelocity.y = e.blastPower * direction.y;
 
                         Body b = mWorld.createBody(bodyDef);
-                        b.createFixture(fixtureDef);
+                        Fixture f = b.createFixture(fixtureDef);
+                        b.setUserData(entity);
+                        f.setUserData(entity);
                         e.particles.add(b);
                     }
                 }
@@ -88,7 +88,7 @@ public class ExplosionSystem extends com.toggle.katana2d.System {
                     for (int i=0; i<inputData.pointers.size(); ++i) {
                         TouchInputData.Pointer p = inputData.pointers.valueAt(i);
 
-                        if (new Vector2(p.x+camera.x-t.x, p.y+camera.y-t.y).len() < 10) {
+                        if (new Vector2(p.x+camera.x-t.x, p.y+camera.y-t.y).len() < 20) {
                             e.isExploding = true;
                             break;
                         }

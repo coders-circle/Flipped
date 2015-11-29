@@ -3,10 +3,6 @@ package com.toggle.flipped;
 import android.content.Context;
 import android.media.MediaPlayer;
 
-/**
- * Created by Ankit on 11/27/2015.
- */
-
 // note: a source at (+/- 1, y) will not be heard
 // for source to be heard the x coordinate of position should be < |1|
 

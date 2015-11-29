@@ -4,10 +4,6 @@ import android.content.Context;
 import com.toggle.katana2d.Component;
 import java.util.List;
 
-/**
- * Created by Ankit on 11/27/2015.
- *
- */
 public class Sound implements Component {
     List<SoundSource> soundSources;
 

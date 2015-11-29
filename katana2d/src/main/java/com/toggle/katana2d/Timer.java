@@ -31,10 +31,10 @@ public class Timer {
         float currentTime = nanoTime();
         float deltaTime = currentTime - mLastTime;
         mLastTime = currentTime;
-        /*callback.update(deltaTime/ONE_SECOND);
-        return 1;*/
+        callback.update(mTarget/ONE_SECOND);
+        return 1;
 
-        // second counter is used to keep track whether we have crossed a second
+        /*// second counter is used to keep track whether we have crossed a second
         mSecondCounter += deltaTime;
 
         // deltaTime exceeding 1 second can give very bad results,
@@ -71,7 +71,7 @@ public class Timer {
             mSecondCounter %= ONE_SECOND;
         }
 
-        return alpha;
+        return alpha;*/
     }
 
     private float mLastTime, mTarget, mLeftOver, mTotalTime;
