@@ -223,11 +223,14 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     }
 
     public final int width = 580, height = 320;
+    public int devWidth = 580, devHeight = 320;
 
     public Camera getCamera() { return mCamera; }
 
     @Override
     public void onSurfaceChanged(GL10 unused, int dev_width, int dev_height) {
+        devWidth = dev_width;
+        devHeight = dev_height;
         float ar = (float)dev_width/(float)dev_height;
         float cx = 0, cy = 0, scale;
 
