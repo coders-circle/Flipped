@@ -10,7 +10,6 @@ public class ParticleSystem extends System {
         super(new Class[] {Emitter.class, Transformation.class});
     }
 
-
     private float getRandomVar(float var) {
         return mRandom.nextFloat() * var - var/2;
     }

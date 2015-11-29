@@ -31,6 +31,8 @@ public class Timer {
         float currentTime = nanoTime();
         float deltaTime = currentTime - mLastTime;
         mLastTime = currentTime;
+        /*callback.update(deltaTime/ONE_SECOND);
+        return 1;*/
 
         // second counter is used to keep track whether we have crossed a second
         mSecondCounter += deltaTime;

@@ -7,6 +7,7 @@ import android.view.MotionEvent;
 
 public class SurfaceView extends GLSurfaceView {
     private TouchInputData mTouchInputData = new TouchInputData();
+    private GLRenderer mRenderer;
 
     public SurfaceView(Context context, GLRenderer renderer){
         super(context);
@@ -17,6 +18,7 @@ public class SurfaceView extends GLSurfaceView {
         // Set the Renderer for drawing on the GLSurfaceView
         setRenderer(renderer);
         renderer.touchInputData = mTouchInputData;
+        mRenderer = renderer;
     }
 
     @Override
@@ -32,8 +34,8 @@ public class SurfaceView extends GLSurfaceView {
             case MotionEvent.ACTION_POINTER_DOWN: {
                 // We have a new pointer. Add it to the list of pointers
                 TouchInputData.Pointer pointer = new TouchInputData.Pointer();
-                pointer.x = e.getX(pointerIndex);
-                pointer.y = e.getY(pointerIndex);
+                pointer.x = e.getX(pointerIndex) / mRenderer.getViewportScale() - mRenderer.getViewportX();
+                pointer.y = e.getY(pointerIndex) / mRenderer.getViewportScale() - mRenderer.getViewportY();
                 pointer.dx = 0;
                 pointer.dy = 0;
                 mTouchInputData.pointers.put(pointerId, pointer);
@@ -46,8 +48,8 @@ public class SurfaceView extends GLSurfaceView {
                     if (pointer != null) {
                         float lastX = pointer.x;
                         float lastY = pointer.y;
-                        pointer.x = e.getX(i);
-                        pointer.y = e.getY(i);
+                        pointer.x = e.getX(i) / mRenderer.getViewportScale() - mRenderer.getViewportX();
+                        pointer.y = e.getY(i) / mRenderer.getViewportScale() - mRenderer.getViewportY();
                         pointer.dx = pointer.x - lastX;
                         pointer.dy = pointer.y - lastY;
                     }

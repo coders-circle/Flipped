@@ -11,7 +11,7 @@ public class Game implements TimerCallback {
 
     // A reference to the renderer
     private final GLRenderer mRenderer;
-    // Timer with 60 FPS as target
+    // Timer with fixed target FPS
     private Timer mTimer = new Timer(60f);
 
     // The activity that runs this game
@@ -74,7 +74,7 @@ public class Game implements TimerCallback {
             mInitialized = true;
             mActivity.onGameStart();
 
-            // start updating in separate thread
+            /*// start updating in separate thread
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -94,7 +94,7 @@ public class Game implements TimerCallback {
                         }
                     }
                 }
-            }).start();
+            }).start();*/
 
         }
     }
@@ -108,15 +108,16 @@ public class Game implements TimerCallback {
 
     // draw method for rendering stuffs
     public void newFrame() {
-        // sleep till the update thread wakes us up
+        /*// sleep till the update thread wakes us up
         synchronized (drawLock) {
             try {
                 drawLock.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
 
+        mDrawInterpolation = mTimer.update(this);
         // draw a frame
         if (mActiveScene != null)
             mActiveScene.draw(mDrawInterpolation);

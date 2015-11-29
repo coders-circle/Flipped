@@ -32,7 +32,7 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
         PolygonShape shape = new PolygonShape();
 
         // A sensor at the bottom to sense the ground
-        shape.setAsBox(ex.x*0.8f, sensorSize, new Vector2(0, ex.y), 0);
+        shape.setAsBox(ex.x*0.93f, sensorSize, new Vector2(0, ex.y), 0);
         p.groundFixture = b.createSensor(shape);
 
         // Side sensors

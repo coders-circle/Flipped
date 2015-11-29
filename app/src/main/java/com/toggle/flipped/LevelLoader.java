@@ -1,5 +1,7 @@
 package com.toggle.flipped;
 
+import android.util.Log;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
@@ -28,7 +30,8 @@ import java.util.List;
 public class LevelLoader {
     private JSONObject data;
     private CustomLoader mCustomLoader;     // custom loader to handle loading of specific sprites/entities
-    public HashMap<String, Entity> mEntities = new HashMap<>();
+    public HashMap<String, Entity> mCurrentEntities = new HashMap<>();  // entities being currently added to a world
+    public Scene mCurrentScene;     // scene where entities are currently being added to
 
     public LevelLoader(String json) {
         try {
@@ -63,38 +66,49 @@ public class LevelLoader {
 
     public void loadWorld(String worldName, Scene scene, World boxWorld) {
         try {
+            mCurrentEntities.clear();
+            mCurrentScene = scene;
             JSONObject world = data.getJSONObject("worlds").getJSONObject(worldName);
             JSONObject entities = world.getJSONObject("entities");
 
-            // load every entity
+            // add each entity
             Iterator<String> keys = entities.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                Entity e = new Entity();
+                mCurrentEntities.put(key.toLowerCase(), e);
+            }
+
+            // load components for entity
+            keys = entities.keys();
             while (keys.hasNext()) {
                 String key = keys.next();
                 JSONObject jsonEntity = entities.getJSONObject(key);
 
                 // if custom-loader doesn't handle this entity,
-                // load the entity by creating new one and adding components
-                Entity e = mCustomLoader.loadEntity(scene, boxWorld, key.toLowerCase(), jsonEntity);
-                if (e == null) {
-                    e = new Entity();
+                // load the entity by adding components
+                Entity e = mCurrentEntities.get(key.toLowerCase());
+                if (!mCustomLoader.loadEntity(e, boxWorld, key.toLowerCase(), jsonEntity)) {
                     JSONObject jsonComponents = jsonEntity.getJSONObject("components");
 
                     Iterator<String> ckeys = jsonComponents.keys();
                     while (ckeys.hasNext()) {
                         String ckey = ckeys.next();
-                        addComponent(scene.getGame(), boxWorld, e, ckey, jsonComponents.getJSONObject(ckey), jsonComponents);
-                    }
 
-                    scene.addEntity(e);
+                        // again if custom loader doesn't handle this type of component, then we add it ourself
+                        if (!mCustomLoader.addComponent(boxWorld, e, ckey, jsonComponents.getJSONObject(ckey), jsonComponents))
+                            addComponent(boxWorld, e, ckey, jsonComponents.getJSONObject(ckey), jsonComponents);
+                    }
                 }
-                mEntities.put(key.toLowerCase(), e);
+                scene.addEntity(e);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    public void addComponent(Game game, World world, Entity entity, String compName, JSONObject component, JSONObject components) throws JSONException {
+    public void addComponent(World world, Entity entity, String compName, JSONObject component, JSONObject components) throws JSONException {
+        Game game = mCurrentScene.getGame();
         switch (compName) {
             case "Sprite": {
                 float scaleX = 1, scaleY = 1;
@@ -103,7 +117,7 @@ public class LevelLoader {
                     scaleY = (float) components.getJSONObject("Transformation").getDouble("Scale-Y");
                 }
                 Sprite sc = new Sprite(game.textureManager.get(component.getString("Sprite")),
-                        (float)component.optDouble("Z-Order", 0));
+                        (float)component.optDouble("Z-Order", -1));
                 sc.scaleX = scaleX;
                 sc.scaleY = scaleY;
                 entity.add(sc);
@@ -171,7 +185,7 @@ public class LevelLoader {
                     )));
                 }
             }
-                break;
+            break;
         }
     }
 

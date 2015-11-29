@@ -3,6 +3,7 @@ package com.toggle.flipped;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.toggle.katana2d.Component;
+import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Sprite;
 
 import java.util.ArrayList;
@@ -19,16 +20,16 @@ public class Rope implements Component {
 
     // Create a rope along given path using small rope segments of
     // given length and thickness
-    public Rope(List<Vector2> path, float thickness, float segmentLength, Body startBody,
-                Body endBody) {this.thickness = thickness;
+    public Rope(List<Vector2> path, float thickness, float segmentLength, Entity startBody,
+                Entity endBody) {this.thickness = thickness;
         this.segmentLength = segmentLength;
         this.startBody = startBody;
         this.endBody = endBody;
         this.path = path;
     }
 
-    final Body startBody;
-    final Body endBody;
+    final Entity startBody;
+    final Entity endBody;
     final List<Vector2> path;    // path for the rope segment
 
     // Segments data

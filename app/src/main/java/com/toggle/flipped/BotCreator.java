@@ -66,10 +66,9 @@ public class BotCreator {
 
     // Create a new bot of type 'type'
     // The bot_'type'.json file must exists;
-    public Entity createBot(String type, float x, float y, float angle) {
+    public void createBot(Entity entity, String type, float x, float y, float angle) {
         type = type.toLowerCase();
         String jsonFile = "bot_" + type;
-        Entity entity = new Entity();
 
         try {
             JSONObject json = new JSONObject(Utilities.getRawFileText(mGame.getActivity(),
@@ -77,7 +76,7 @@ public class BotCreator {
 
             // First create the bot entity with required components
             entity.add(new Transformation(x, y, angle));
-            entity.add(new Sprite(getSprite(json.getJSONObject("walk_sprite")), -1));
+            entity.add(new Sprite(getSprite(json.getJSONObject("walk_sprite")), -1.5f));
             entity.add(new PhysicsBody(mWorld, BodyDef.BodyType.DynamicBody, entity, new PhysicsBody.Properties(1f, 0f, 0f, false, true)));
             entity.add(new Bot());
 
@@ -134,7 +133,5 @@ public class BotCreator {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        return entity;
     }
 }

@@ -1,20 +1,15 @@
 package com.toggle.flipped;
 
-import android.graphics.Color;
-import android.graphics.Typeface;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.toggle.katana2d.Background;
 import com.toggle.katana2d.BackgroundSystem;
 import com.toggle.katana2d.Emitter;
 import com.toggle.katana2d.Entity;
-import com.toggle.katana2d.Font;
 import com.toggle.katana2d.ParticleSystem;
 import com.toggle.katana2d.RenderSystem;
 import com.toggle.katana2d.Scene;
 import com.toggle.katana2d.Sprite;
-import com.toggle.katana2d.Texture;
 import com.toggle.katana2d.Transformation;
 import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
@@ -100,7 +95,8 @@ public class TestScene2 extends Scene {
         addEntity(body);
 
         // Use botceator to create a bot from "bot_player.json" file
-        Entity player = new BotCreator(mGame, physicsSystem.getWorld()).createBot("player", w / 4, h - 32 - 16,0);
+        Entity player = new Entity();
+        new BotCreator(mGame, physicsSystem.getWorld()).createBot(player, "player", w / 4, h - 32 - 16, 0);
         player.add(new Player());
         addEntity(player);
 
@@ -143,7 +139,7 @@ public class TestScene2 extends Scene {
         List<Vector2> ropePath = new ArrayList<>();
         ropePath.add(new Vector2(w-128, h/2+32));
         ropePath.add(new Vector2(w-128, h/2+32 + Rope.STANDARD_SEGMENT_LENGTH * 4));
-        ropeEntity.add(new Rope(ropePath, Rope.STANDARD_SEGMENT_THICKNESS, Rope.STANDARD_SEGMENT_LENGTH, platform.get(PhysicsBody.class).body, null));
+        ropeEntity.add(new Rope(ropePath, Rope.STANDARD_SEGMENT_THICKNESS, Rope.STANDARD_SEGMENT_LENGTH, platform, null));
         ropeEntity.get(Rope.class).segmentSprite = new Sprite(mGame.textureManager.get("rope"), 0);
         addEntity(ropeEntity);
 

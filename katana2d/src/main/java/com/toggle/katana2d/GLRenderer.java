@@ -3,15 +3,17 @@ package com.toggle.katana2d;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PixelFormat;
+import android.graphics.BitmapRegionDecoder;
+import android.graphics.Rect;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
-import android.view.WindowManager;
+import android.util.Log;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -110,18 +112,19 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         // Enable blending for transparency
         GLES20.glEnable(GLES20.GL_BLEND);
-        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+        setAlphaBlending();
+
 
         // Enable z buffer
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
 
         // Enable scissoring
         GLES20.glEnable(GLES20.GL_SCISSOR_TEST);
 
-        //GLES20.glDisable(GLES20.GL_DITHER);
-
         // Set the background frame color
         GLES20.glClearColor(100.0f / 255, 149.0f / 255, 237.0f / 255, 1.0f);
+        GLES20.glClearDepthf(1.0f);
 
         // Compile the sprite shaders
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, Utilities.getRawFileText(mContext, R.raw.vs_sprite));
@@ -226,10 +229,16 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
     public Camera getCamera() { return mCamera; }
 
+    private float cx = 0, cy = 0;
+    private float scale = 1;
+    public float getViewportX() { return cx; }
+    public float getViewportY() { return cy; }
+    public float getViewportScale() { return scale; }
+
+
     @Override
     public void onSurfaceChanged(GL10 unused, int dev_width, int dev_height) {
         float ar = (float)dev_width/(float)dev_height;
-        float cx = 0, cy = 0, scale;
 
         // Fit one dimension and maintain the ratio with other dimension
         float aspect_ratio = (float) width / (float) height;
@@ -333,9 +342,39 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         return texid;
     }
 
+    private List<Integer> loadTexture(int resourceId, int width, int height, int numCols, int numRows) {
+        List<Integer> ids = new ArrayList<>();
+        try {
+            InputStream is = mContext.getResources().openRawResource(resourceId);
+            BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(new BufferedInputStream(is), true);
+
+            for (int i=0; i<numRows; ++i)
+                for (int j=0; j<numCols; ++j) {
+                    Rect rect = new Rect(j*width, i*height, j*width+width, i*height+height);
+                    Bitmap bitmap = decoder.decodeRegion(rect, new BitmapFactory.Options());
+                    ids.add(loadTexture(bitmap));
+                    bitmap.recycle();
+                }
+
+            decoder.recycle();
+        } catch (IOException e) {
+            throw new RuntimeException("Could not create BitmapRegionDecoder", e);
+        }
+
+        return ids;
+    }
+
     // create texture from a resource image
     public Texture addTexture(int resourceId, float width, float height) {
-        Texture t = new Texture(loadTexture(resourceId), width, height);
+        SimpleTexture t = new SimpleTexture(loadTexture(resourceId), width, height);
+        t.resourceId = resourceId;
+        mTextures.add(t);
+        return t;
+    }
+
+    // create multi-texture from a resource image
+    public Texture addTexture(int resourceId, float width, float height, int numCols, int numRows) {
+        MultiTexture t = new MultiTexture(loadTexture(resourceId, (int)width, (int)height, numCols, numRows), width, height, numCols, numRows);
         t.resourceId = resourceId;
         mTextures.add(t);
         return t;
@@ -343,7 +382,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
     // create texture from bitmap
     public Texture addTexture(Bitmap bitmap, float width, float height) {
-        Texture t = new Texture(loadTexture(bitmap), width, height);
+        SimpleBitmapTexture t = new SimpleBitmapTexture(loadTexture(bitmap), width, height);
         t.bitmap = bitmap;
         mTextures.add(t);
         return t;
@@ -351,7 +390,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
     // create texture from color
     public Texture addTexture(float[] color, float width, float height) {
-        Texture t = new Texture(mWhiteTextureId, color, width, height);
+        SimpleTexture t = new SimpleTexture(mWhiteTextureId, color, width, height);
         t.resourceId = -1;
         mTextures.add(t);
         return t;
@@ -359,17 +398,25 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
     // create texture from color and resource image
     public Texture addTexture(int resourceId, float[] color, float width, float height) {
-        Texture t = new Texture(loadTexture(resourceId), color, width, height);
+        SimpleTexture t = new SimpleTexture(loadTexture(resourceId), color, width, height);
         t.resourceId = resourceId;
         mTextures.add(t);
         return t;
     }
 
     private void reloadTexture(Texture t) {
-        if (t.resourceId >= 0)
-            t.textureId = loadTexture(t.resourceId);
-        else if (t.bitmap != null)
-            t.textureId = loadTexture(t.bitmap);
+        if (t.getClass() == SimpleBitmapTexture.class) {
+            SimpleBitmapTexture tt = (SimpleBitmapTexture)t;
+            tt.textureId = loadTexture(tt.bitmap);
+        }
+        else if (t.getClass() == SimpleTexture.class) {
+            SimpleTexture tt = (SimpleTexture)t;
+            tt.textureId = loadTexture(tt.resourceId);
+        }
+        else if (t.getClass() == MultiTexture.class) {
+            MultiTexture tt = (MultiTexture)t;
+            tt.textureIds = loadTexture(tt.resourceId, (int)tt.width, (int)tt.height, tt.numCols, tt.numRows);
+        }
     }
 }
 

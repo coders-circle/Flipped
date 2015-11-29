@@ -1,7 +1,5 @@
 package com.toggle.flipped;
 
-// import android.util.Log;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
@@ -12,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.toggle.katana2d.*;
+import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
 
 import java.util.List;
@@ -33,6 +32,12 @@ public class RopeSystem extends com.toggle.katana2d.System {
         float w = rope.thickness * PhysicsSystem.METERS_PER_PIXEL;
         float h = rope.segmentLength * PhysicsSystem.METERS_PER_PIXEL;
 
+        Body startBody = null, endBody = null;
+        if (rope.startBody.has(PhysicsBody.class))
+            startBody = rope.startBody.get(PhysicsBody.class).body;
+        if (rope.endBody != null && rope.endBody.has(PhysicsBody.class))
+            endBody = rope.endBody.get(PhysicsBody.class).body;
+
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(w/2, h/2);
 
@@ -53,7 +58,7 @@ public class RopeSystem extends com.toggle.katana2d.System {
         List<Vector2> segmentsPath = Utilities.getPoints(rope.path, rope.segmentLength, true);
         rope.numSegments = segmentsPath.size() - 1;
 
-        Body link = rope.startBody;
+        Body link = startBody;
         float lastY = segmentsPath.get(0).y; float lastX = segmentsPath.get(0).x;
         for (int i=0; i<rope.numSegments; ++i) {
             Vector2 p0 = segmentsPath.get(i);
@@ -71,19 +76,21 @@ public class RopeSystem extends com.toggle.katana2d.System {
 
             rope.segments.add(body);
 
-            jointDef.initialize(link, body, new Vector2(lastX, lastY));
-            mWorld.createJoint(jointDef);
+            if (link != null) {
+                jointDef.initialize(link, body, new Vector2(lastX, lastY));
+                mWorld.createJoint(jointDef);
 
-            djointDef.initialize(link, body, link.getWorldCenter(), body.getWorldCenter());
-            mWorld.createJoint(djointDef);
+                djointDef.initialize(link, body, link.getWorldCenter(), body.getWorldCenter());
+                mWorld.createJoint(djointDef);
+            }
 
             link = body;
             lastY = segmentsPath.get(i + 1).y;
             lastX = segmentsPath.get(i + 1).x;
         }
 
-        if (rope.endBody != null) {
-            jointDef.initialize(link, rope.endBody, link.getWorldCenter());
+        if (endBody != null && link != null) {
+            jointDef.initialize(link, endBody, link.getWorldCenter());
             mWorld.createJoint(jointDef);
         }
     }

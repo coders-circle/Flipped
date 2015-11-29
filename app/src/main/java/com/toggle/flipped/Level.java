@@ -1,7 +1,6 @@
 package com.toggle.flipped;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.toggle.katana2d.Entity;
@@ -16,13 +15,15 @@ import com.toggle.katana2d.physics.PhysicsUtilities;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-public class Level implements CustomLoader {
+public class Level implements CustomLoader, World.WorldEventListener {
 
     public LevelLoader levelLoader;
     protected Game mGame;
     public List<Checkpoint> checkpoints = new ArrayList<>();
+    public HashMap<String, Entity> mirrors = new HashMap<>();
 
     public Level(Game game, int levelFileId) {
         mGame = game;
@@ -60,16 +61,20 @@ public class Level implements CustomLoader {
 
     }*/
 
-    public void changeWorld(int nextWorldId) {
+    public void changeWorld(int nextWorldId, Entity entryMirror) {
         if (mActiveWorld != null)
             mActiveWorld.unload();
 
         setActiveWorld(nextWorldId);
-        mActiveWorld.load();
+        mActiveWorld.load(entryMirror);
     }
 
-    public void changeWorld(String nextWorld) {
-        changeWorld(mWorlds.getId(nextWorld));
+    public void changeWorld(String nextWorld, Entity entryMirror) {
+        changeWorld(mWorlds.getId(nextWorld), entryMirror);
+    }
+
+    public void changeWorld(FlipSystem.Mirror m) {
+        changeWorld(m.nextWorld, mirrors.get(m.exitMirror));
     }
 
     @Override
@@ -95,69 +100,78 @@ public class Level implements CustomLoader {
     }
 
     @Override
-    public Entity loadEntity(Scene scene, com.badlogic.gdx.physics.box2d.World world, String entityName, JSONObject entity) {
+    public boolean loadEntity(Entity entity, com.badlogic.gdx.physics.box2d.World world, String entityName, JSONObject entityJson) {
         try {
-            JSONObject components = entity.getJSONObject("components");
+            JSONObject components = entityJson.getJSONObject("components");
             JSONObject transformation;
+            Scene scene = levelLoader.mCurrentScene;
 
             if (entityName.equals("player")) {
                 transformation = components.getJSONObject("Transformation");
-                Entity player = new BotCreator(scene.getGame(), world).createBot("player",
+                new BotCreator(scene.getGame(), world).createBot(entity, "player",
                         (float) transformation.getDouble("Translate-X"),
                         (float) transformation.getDouble("Translate-Y"), (float) transformation.getDouble("Angle"));
-                player.add(new Player());
-                scene.addEntity(player);
-
-                //standardEntities.add("player", player);
-                return player;
+                entity.add(new Player());
+                return true;
             }
             else if (entityName.startsWith("ground")) {
-                Entity ground = new Entity();
                 Shape shape = Utilities.createChainShape(components.getJSONObject("Path").getString("Points"));
-                ground.add(new Transformation(0, 0, 0));
-                ground.add(new PhysicsBody(world, BodyDef.BodyType.StaticBody, ground, shape, new PhysicsBody.Properties(0)));
-                scene.addEntity(ground);
-                return ground;
+                entity.add(new Transformation(0, 0, 0));
+                entity.add(new PhysicsBody(world, BodyDef.BodyType.StaticBody, entity, shape, new PhysicsBody.Properties(0)));
+                return true;
 
             }
             else if (components.has("Mirror")) {
-                Entity mirror = new Entity();
                 transformation = components.getJSONObject("Transformation");
-                mirror.add(new Transformation((float) transformation.getDouble("Translate-X"),
+                entity.add(new Transformation((float) transformation.getDouble("Translate-X"),
                         (float) transformation.getDouble("Translate-Y"), (float) transformation.getDouble("Angle")));
-                mirror.add(new Sprite(mGame.textureManager.get("mirror"), -1));
-                mirror.add(new PhysicsBody(world, BodyDef.BodyType.StaticBody, mirror, new PhysicsBody.Properties(true)));
-                mirror.add(new FlipSystem.FlipItem(FlipSystem.FlipItem.FlipItemType.MIRROR));
+                entity.add(new Sprite(mGame.textureManager.get("mirror"), -1));
+                entity.add(new PhysicsBody(world, BodyDef.BodyType.StaticBody, entity, new PhysicsBody.Properties(true)));
 
-                FlipSystem.Mirror mrr;
-                mirror.get(FlipSystem.FlipItem.class).data = mrr = new FlipSystem.Mirror();
-                mrr.nextWorld = components.getJSONObject("Mirror").getString("Next world");
+                FlipSystem.Mirror mrr = entity.get(FlipSystem.Mirror.class);
+                JSONObject mirrorJson = components.getJSONObject("Mirror");
+                mrr.nextWorld = mirrorJson.getString("Next world");
+                mrr.exitMirror = mirrorJson.getString("Exit mirror");
 
-                scene.addEntity(mirror);
-                return mirror;
+                mirrors.put(entityName, entity);
+                return true;
             }
             else if (components.has("Rope") && components.has("Path")) {
-                Entity rope = new Entity();
-
                 JSONObject r = components.getJSONObject("Rope");
-                Body startBody = levelLoader.mEntities.get(r.getString("Start Body")).get(PhysicsBody.class).body;
-                Body endBody = null;
+                Entity startBody = levelLoader.mCurrentEntities.get(r.getString("Start Body"));
+                Entity endBody = null;
                 if (r.getString("End Body").trim().length() > 0)
-                    endBody = levelLoader.mEntities.get(r.getString("End Body")).get(PhysicsBody.class).body;
+                    endBody = levelLoader.mCurrentEntities.get(r.getString("End Body"));
 
                 List<Vector2> path = PhysicsUtilities.parsePoints(components.getJSONObject("Path").getString("Points"), false, 0, 0);
-                rope.add(new Rope(path, Rope.STANDARD_SEGMENT_THICKNESS, Rope.STANDARD_SEGMENT_LENGTH,
+                entity.add(new Rope(path, Rope.STANDARD_SEGMENT_THICKNESS, Rope.STANDARD_SEGMENT_LENGTH,
                         startBody, endBody));
 
-                rope.get(Rope.class).segmentSprite = new Sprite(mGame.textureManager.get("rope"), 0);
-                scene.addEntity(rope);
-                return rope;
+                entity.get(Rope.class).segmentSprite = new Sprite(mGame.textureManager.get("rope"), 0);
+                return true;
             }
         }
         catch (Exception e){
             e.printStackTrace();
         }
-        return null;
+        return false;
     }
 
+    @Override
+    public boolean addComponent(com.badlogic.gdx.physics.box2d.World world, Entity entity, String compName, JSONObject component, JSONObject components) {
+        try {
+            if (compName.equals("Explosive")) {
+                entity.add(new ExplosionSystem.Explosive());
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public void onWorldInitialized(World world) {
+
+    }
 }
