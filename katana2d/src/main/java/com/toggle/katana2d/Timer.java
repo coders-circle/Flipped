@@ -32,6 +32,14 @@ public class Timer {
         float deltaTime = currentTime - mLastTime;
         mLastTime = currentTime;
         callback.update(mTarget/ONE_SECOND);
+
+        float dt = mTarget - deltaTime;
+        if (dt > 4000)    // we were too fast, got less delta time than we expected
+            try {
+                Thread.sleep((long)(dt/ONE_SECOND*1000));   // sleep for rest of the time
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         return 1;
 
         /*// second counter is used to keep track whether we have crossed a second
