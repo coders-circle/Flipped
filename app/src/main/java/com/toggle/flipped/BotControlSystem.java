@@ -75,7 +75,7 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             else {
                 b.body.getFixtureList().get(0).setFriction(0.0f);
 
-                // If not hanging already, check if we should
+                /*// If not hanging already, check if we should
                 if (!onTop && bot.wall != null && bot.wall.getBody().getType() == BodyDef.BodyType.StaticBody)
                 if ((onRightSide && bot.direction == Bot.Direction.RIGHT)
                     || (onLeftSide && bot.direction == Bot.Direction.LEFT)) {
@@ -91,16 +91,16 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
                                 b.body.getWorldCenter());
                         b.body.setGravityScale(0);
 
-                        /*RevoluteJointDef jdef = new RevoluteJointDef();
-                        jdef.initialize(bot.wall.getBody(), b.body, bot.wallPoint);*/
+                        *//*RevoluteJointDef jdef = new RevoluteJointDef();
+                        jdef.initialize(bot.wall.getBody(), b.body, bot.wallPoint);*//*
 
                         jdef.collideConnected = true;
                         bot.hangingJoint = b.body.getWorld().createJoint(jdef);
                     }
-                }
+                }*/
             }
 
-            if (!toHang && bot.hangingJoint != null) {
+           /* if (!toHang && bot.hangingJoint != null) {
                 b.body.getWorld().destroyJoint(bot.hangingJoint);
                 bot.hangingJoint = null;
                 b.body.setGravityScale(1);
@@ -111,7 +111,7 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
                 bot.hangingJoint = null;
                 b.body.setGravityScale(1);
                 b.body.applyForce(new Vector2(0, -25f), b.body.getWorldCenter(), false);
-            }
+            }*/
 
             // If we are on ground but we are in JUMP state, revert to NOTHING action state
             if (bot.actionState == Bot.ActionState.JUMP && onGround)
@@ -121,7 +121,8 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             // linear impulse to jump.
             else if (bot.actionState == Bot.ActionState.JUMP_START) {
                 if (onGround) {
-                    b.body.applyLinearImpulse(new Vector2(0, -3.4f * b.body.getMass()), b.body.getWorldCenter(), false);
+                    float force = Math.min(5f, bot.dy);
+                    b.body.applyLinearImpulse(new Vector2(0, -force * b.body.getMass()), b.body.getWorldCenter(), false);
 
                     // Change to jumping state
                     bot.actionState = Bot.ActionState.JUMP;
@@ -133,11 +134,13 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             // set horizontal velocity according to current moving direction.
             Vector2 vel = b.body.getLinearVelocity();
             float speed = 0;
+
+            float targetSpeed = Math.min(bot.dx, 4f);
             if (bot.motionState == Bot.MotionState.MOVE) {
                 if (bot.direction == Bot.Direction.LEFT)
-                    speed = -3f;
+                    speed = -targetSpeed;
                 else
-                    speed = 3f;
+                    speed = targetSpeed;
             }
             float force = b.body.getMass()*(speed-vel.x) / dt;    // f = mv/t ; v = required change in velocity
             b.body.applyForce(new Vector2(force, 0), b.body.getWorldCenter(), false);
@@ -158,6 +161,8 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
 
             if (speed != 0)
                 s.scaleX = speed < 0? -1 : 1;
+
+            bot.ssdWalk.animationSpeed = 3 * targetSpeed;
         }
 
     }

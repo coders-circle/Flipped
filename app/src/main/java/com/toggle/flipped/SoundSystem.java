@@ -24,6 +24,11 @@ public class SoundSystem extends com.toggle.katana2d.System {
                         // where (x, y) is relative coordinate of their screen position
                     }
                 }
+                if(soundSource.type() == Sound.AMBIANCE && !soundSource.isPlaying()){
+                    soundSource.setLooping(true);
+                    soundSource.start();
+
+                }
             }
         }
     }

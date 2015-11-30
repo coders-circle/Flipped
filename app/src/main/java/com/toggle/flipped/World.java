@@ -51,6 +51,7 @@ public class World extends Scene {
         mSystems.add(new WindSystem());
         mSystems.add(new RopeSystem(physicsSystem.getWorld(), mGame.getRenderer()));
         mSystems.add(new ExplosionSystem(physicsSystem.getWorld(), mGame));
+        mSystems.add(new SoundSystem());
 
         // Load the entities from the level editor
         mLevelLoader.loadWorld(mWorldName, this, physicsSystem.getWorld());

@@ -13,7 +13,7 @@ public class PhysicsSystem extends System implements ContactListener {
     public static final float PIXELS_PER_METER = 32f;               // 32 pixels = 1 meter
     public static final float METERS_PER_PIXEL = 1 / PIXELS_PER_METER;
 
-    private World world = new World(new Vector2(0, 10), false);
+    private World world = new World(new Vector2(0, 14), false);
 
     public PhysicsSystem()
     {

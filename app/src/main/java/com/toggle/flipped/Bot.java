@@ -24,6 +24,9 @@ public class Bot implements Component {
     Fixture leftsideFixture, rightsideFixture;
     Fixture topFixture;
 
+    float dy;
+    float dx;
+
     // Contacts
     int groundContacts=0, leftSideContacts=0, rightSideContacts=0, topContacts=0;
     Fixture wall; Vector2 wallPoint;  // left or right side wall that has been most recently collided with

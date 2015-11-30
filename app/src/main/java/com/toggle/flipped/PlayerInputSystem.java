@@ -41,12 +41,12 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
         // motion control =  left side, action = right
         motionControlLimit.left = 0.0f;
         motionControlLimit.right = 2.0f * devWidth / 5.0f;
-        motionControlLimit.top = devHeight / 2.0f;
+        motionControlLimit.top = 0.0f;
         motionControlLimit.bottom = devHeight;
 
         actionControlLimit.left = 3.0f * devWidth / 5.0f;
         actionControlLimit.right = devWidth;
-        actionControlLimit.top = devHeight / 2.0f;
+        actionControlLimit.top = 0.0f;
         actionControlLimit.bottom = devHeight;
 
 
@@ -54,20 +54,24 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
             //Player p = e.get(Player.class);
             Bot b = e.get(Bot.class);
 
+            int dxLimit = 3;
+            int dyLimit = 3;
             for (int i = 0; i < touchData.pointers.size(); i++) {
                 TouchInputData.Pointer touch = touchData.pointers.valueAt(i);
                 if (motionControlLimit.hitTest(touch.x, touch.y)) {
-                    if (touch.dx > 5) {
+                    b.dx = Math.max(b.dx, Math.abs(touch.dx/3));
+                    if (touch.dx > dxLimit) {
                         b.direction = Bot.Direction.RIGHT;
                         b.motionState = Bot.MotionState.MOVE;
-                    } else if (touch.dx < -5) {
+                    } else if (touch.dx < -dxLimit) {
                         b.direction = Bot.Direction.LEFT;
                         b.motionState = Bot.MotionState.MOVE;
                     }
                 } else if (actionControlLimit.hitTest(touch.x, touch.y)) {
                     // if vertical sliding direction is up, and sliding magnitude is big enough
                     // then jump (or move up if we are hanging)
-                    if (touch.dy < -6) {
+                    if (touch.dy < -dyLimit) {
+                        b.dy = -touch.dy;
                         if (b.actionState == Bot.ActionState.HANG)
                             b.actionState = Bot.ActionState.HANG_UP;
                         else
@@ -79,6 +83,7 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
 
             if (touchData.pointers.size() == 0) {
                 b.motionState = Bot.MotionState.IDLE;
+                b.dx = 0;
             }
 
             // We may do this in a different system, but for now
