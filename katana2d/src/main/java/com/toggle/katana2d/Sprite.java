@@ -72,6 +72,8 @@ public class Sprite implements Component{
                 ssd.index++;
 
                 if (ssd.index >= ssd.numImages) {
+                    if (ssd.listener != null)
+                        ssd.listener.onComplete();
                     if (ssd.loop)
                         ssd.index = 0;
                     else
@@ -93,6 +95,12 @@ public class Sprite implements Component{
         public float timePassed = 0;     // time that has elapsed since last frame
 
         public int index = 0;	// the index of image to draw next
+
+        public AnimationListener listener;
+    }
+
+    public interface AnimationListener {
+        void onComplete();
     }
 
     public void changeSprite(Texture sprite, SpriteSheetData newSpriteSheetData) {

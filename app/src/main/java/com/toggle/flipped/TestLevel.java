@@ -29,8 +29,13 @@ public class TestLevel extends Level {
         world.addEntity(bk2);
 
         Entity bk3 = new Entity();
-        bk3.add(new Background(mGame.getRenderer().addTexture(R.drawable.trees, 1955, 640, 2, 1), 50));
+        bk3.add(new Background(mGame.getRenderer().addTexture(R.drawable.trees, 1955, 640, 2, 1), 55));
         world.addEntity(bk3);
+
+        Entity bk3a = new Entity();
+        bk3a.add(new Background(mGame.getRenderer().addTexture(R.drawable.fore2, 1500, 640, 2, 1), 44));
+        world.addEntity(bk3a);
+        bk3a.get(Background.class).mTexture.color = new float[]{0.3f,0.3f,0.3f,1};
 
         Entity bk4 = new Entity();
         bk4.add(new Background(mGame.getRenderer().addTexture(R.drawable.path, 940, 640, 8, 1), 0));

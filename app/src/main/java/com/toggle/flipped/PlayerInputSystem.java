@@ -53,14 +53,24 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
         for (Entity e : mEntities) {
             //Player p = e.get(Player.class);
             Bot b = e.get(Bot.class);
+            boolean hanging = b.actionState == Bot.ActionState.HANG || b.actionState == Bot.ActionState.HANG_UP;
 
             for (int i = 0; i < touchData.pointers.size(); i++) {
-                TouchInputData.Pointer touch = touchData.pointers.valueAt(i);
+                TouchInputData.Pointer touch;
+                try {
+                    touch = touchData.pointers.valueAt(i);
+                }
+                catch (Exception ex) {
+                    ex.printStackTrace();
+                    continue;
+                }
                 if (motionControlLimit.hitTest(touch.x, touch.y)) {
-                    if (touch.dx > 5) {
+                    if (touch.dx > 5
+                            && !(hanging && b.direction == Bot.Direction.RIGHT)) {
                         b.direction = Bot.Direction.RIGHT;
                         b.motionState = Bot.MotionState.MOVE;
-                    } else if (touch.dx < -5) {
+                    } else if (touch.dx < -5
+                            && !(hanging && b.direction == Bot.Direction.LEFT)) {
                         b.direction = Bot.Direction.LEFT;
                         b.motionState = Bot.MotionState.MOVE;
                     }

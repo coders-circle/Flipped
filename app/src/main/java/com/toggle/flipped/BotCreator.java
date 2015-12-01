@@ -102,7 +102,12 @@ public class BotCreator {
             else
                 bot.sprPush = getSprite(json.getJSONObject("walk_sprite"));
 
-            Sprite.SpriteSheetData stand, walk, push, jump;
+            if (json.has("climb_sprite"))
+                bot.sprClimb = getSprite(json.getJSONObject("climb_sprite"));
+            else
+                bot.sprClimb = getSprite(json.getJSONObject("climb_sprite"));
+
+            Sprite.SpriteSheetData stand, walk, push, jump, climb;
 
             walk = getSpriteSheet(json.getJSONObject("walk_sheet"));
 
@@ -124,10 +129,17 @@ public class BotCreator {
             else
                 push = getSpriteSheet(json.getJSONObject("walk_sheet"));
 
+            if (json.has("climb_sheet"))
+                climb = getSpriteSheet(json.getJSONObject("climb_sheet"));
+            else
+                climb = getSpriteSheet(json.getJSONObject("climb_sheet"));
+            climb.loop = false;
+
             bot.ssdIdle = stand;
             bot.ssdWalk = walk;
             bot.ssdJump = jump;
             bot.ssdPush = push;
+            bot.ssdClimb = climb;
 
             entity.get(Sprite.class).spriteSheetData = stand;
 

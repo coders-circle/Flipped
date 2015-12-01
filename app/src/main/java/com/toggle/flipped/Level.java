@@ -2,6 +2,7 @@ package com.toggle.flipped;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Game;
@@ -10,6 +11,7 @@ import com.toggle.katana2d.Scene;
 import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Transformation;
 import com.toggle.katana2d.physics.PhysicsBody;
+import com.toggle.katana2d.physics.PhysicsSystem;
 import com.toggle.katana2d.physics.PhysicsUtilities;
 
 import org.json.JSONObject;
@@ -95,6 +97,12 @@ public class Level implements CustomLoader, World.WorldEventListener {
                             new float[]{0.0f, 0.0f, 0.7f, 1}, 32, 6
                     ));
                 return true;
+            case "hanger":
+                /*if (!game.textureManager.has(spriteName))
+                    game.textureManager.add(spriteName, game.getRenderer().addTexture(
+                            new float[]{0.0f, 0.0f, 0.7f, 1}, 32, 16
+                ));*/
+                return true;
         }
         return false;
     }
@@ -148,6 +156,17 @@ public class Level implements CustomLoader, World.WorldEventListener {
                         startBody, endBody));
 
                 entity.get(Rope.class).segmentSprite = new Sprite(mGame.textureManager.get("rope"), 0);
+                return true;
+            }
+            else if (entityName.startsWith("hanger")) {
+                PolygonShape hangerShape = new PolygonShape();
+                hangerShape.setAsBox(16* PhysicsSystem.METERS_PER_PIXEL, 8*PhysicsSystem.METERS_PER_PIXEL);
+                transformation = components.getJSONObject("Transformation");
+                entity.add(new Transformation((float) transformation.getDouble("Translate-X"),
+                        (float) transformation.getDouble("Translate-Y"), (float) transformation.getDouble("Angle")));
+                entity.add(new PhysicsBody(world, BodyDef.BodyType.StaticBody, entity, hangerShape, new PhysicsBody.Properties(true)));;
+                entity.add(new Hanger());
+                //entity.add(new Sprite(mGame.textureManager.get("hanger"), -1));
                 return true;
             }
         }

@@ -29,6 +29,7 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
         Bot p = e.get(Bot.class);
         PhysicsBody b = e.get(PhysicsBody.class);
         //Vector2 ex = b.body.getFixtureList().get(0).getAABB(0).getExtents();
+        //b.body.getFixtureList().get(0).setFriction(0);
 
         Sprite s = e.get(Sprite.class);
         Vector2 ex = new Vector2(s.texture.width/2 * PhysicsSystem.METERS_PER_PIXEL - 0.01f, s.texture.height/2 * PhysicsSystem.METERS_PER_PIXEL - 0.01f);
@@ -38,7 +39,7 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
         PolygonShape shape = new PolygonShape();
 
         // A sensor at the bottom to sense the ground
-        shape.setAsBox(ex.x*0.93f, sensorSize, new Vector2(0, ex.y), 0);
+        shape.setAsBox(ex.x*0.83f, sensorSize, new Vector2(0, ex.y), 0);
         p.groundFixture = b.createSensor(shape);
 
         // Side sensors
@@ -49,11 +50,6 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
         shape.setAsBox(sensorSize, ex.y/2, new Vector2(ex.x, 0), 0);
         p.rightsideFixture = b.createSensor(shape);
 
-        // Top sensor
-        shape = new PolygonShape();
-        shape.setAsBox(ex.x*1.2f, sensorSize, new Vector2(0, -ex.y - sensorSize*5), 0);
-        p.topFixture = b.createSensor(shape);
-
         b.contactListener = this;
     }
 
@@ -61,56 +57,60 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
     public void update(float dt) {
         for (Entity e : mEntities) {
             //Transformation t = e.get(Transformation.class);
-            PhysicsBody b = e.get(PhysicsBody.class);
-            Sprite s = e.get(Sprite.class);
-            Bot bot = e.get(Bot.class);
+            final PhysicsBody b = e.get(PhysicsBody.class);
+            final Sprite s = e.get(Sprite.class);
+            final Bot bot = e.get(Bot.class);
+
+            float directionFactor = bot.direction== Bot.Direction.RIGHT?1:-1;
 
             boolean onGround = bot.groundContacts>0;
             boolean onLeftSide = bot.leftSideContacts>0, onRightSide = bot.rightSideContacts>0;
-            boolean onTop = bot.topContacts>0;
 
-            boolean toHang = false;
+            boolean toHang = bot.hangingContacts > 0
+                    && !onGround && ((onRightSide && bot.direction == Bot.Direction.RIGHT)
+                    || (onLeftSide && bot.direction == Bot.Direction.LEFT));
             if (onGround)
-                b.body.getFixtureList().get(0).setFriction(0.5f);
-            else {
+                b.body.getFixtureList().get(0).setFriction(0.2f);
+            else
                 b.body.getFixtureList().get(0).setFriction(0.0f);
 
-                // If not hanging already, check if we should
-                if (!onTop && bot.wall != null && bot.wall.getBody().getType() == BodyDef.BodyType.StaticBody)
-                if ((onRightSide && bot.direction == Bot.Direction.RIGHT)
-                    || (onLeftSide && bot.direction == Bot.Direction.LEFT)) {
-                    toHang = true;
+            if (toHang) {
+                if (bot.actionState != Bot.ActionState.HANG && bot.actionState != Bot.ActionState.HANG_UP)
+                    bot.actionState = Bot.ActionState.HANG;
+            }
+            else if (bot.actionState == Bot.ActionState.HANG_UP || bot.actionState == Bot.ActionState.HANG) {
+                b.body.setTransform(b.body.getPosition().add(
+                        32*directionFactor*PhysicsSystem.METERS_PER_PIXEL, 24* PhysicsSystem.METERS_PER_PIXEL), 0);
+                bot.actionState = Bot.ActionState.NOTHING;
+                bot.hangingContacts = bot.leftSideContacts = bot.rightSideContacts = 0;
+            }
 
-                    if (bot.actionState != Bot.ActionState.HANG && bot.actionState != Bot.ActionState.HANG_UP)
-                        bot.actionState = Bot.ActionState.HANG;
+            if (bot.actionState == Bot.ActionState.HANG) {
+                b.body.setType(BodyDef.BodyType.KinematicBody);
+                b.body.setLinearVelocity(new Vector2(0, 0));
+                b.body.setTransform(bot.hanger.getBody().getPosition().sub(
+                        10 * directionFactor * PhysicsSystem.METERS_PER_PIXEL,
+                        3 * PhysicsSystem.METERS_PER_PIXEL), 0);
 
-                    if (bot.hangingJoint == null) {
-                        // create a joint with the wall
-                        DistanceJointDef jdef = new DistanceJointDef();
-                        jdef.initialize(bot.wall.getBody(), b.body, bot.wallPoint,
-                                b.body.getWorldCenter());
-                        b.body.setGravityScale(0);
-
-                        /*RevoluteJointDef jdef = new RevoluteJointDef();
-                        jdef.initialize(bot.wall.getBody(), b.body, bot.wallPoint);*/
-
-                        jdef.collideConnected = true;
-                        bot.hangingJoint = b.body.getWorld().createJoint(jdef);
+                bot.ssdClimb.index = 0;
+                bot.ssdClimb.animationSpeed = 0;
+                s.changeSprite(bot.sprClimb, bot.ssdClimb);
+            }
+            else if (bot.actionState == Bot.ActionState.HANG_UP) {
+                bot.ssdClimb.animationSpeed = 12;
+                bot.ssdClimb.listener = new Sprite.AnimationListener() {
+                    @Override
+                    public void onComplete() {
+                        b.body.setTransform(bot.hanger.getBody().getPosition().sub(
+                                0, (16+24) * PhysicsSystem.METERS_PER_PIXEL), 0);
+                        bot.actionState = Bot.ActionState.NOTHING;
+                        bot.hangingContacts = bot.leftSideContacts = bot.rightSideContacts = 0;
                     }
-                }
+                };
+                s.changeSprite(bot.sprClimb, bot.ssdClimb);
             }
-
-            if (!toHang && bot.hangingJoint != null) {
-                b.body.getWorld().destroyJoint(bot.hangingJoint);
-                bot.hangingJoint = null;
-                b.body.setGravityScale(1);
-            }
-
-            if (bot.actionState == Bot.ActionState.HANG_UP && bot.hangingJoint != null) {
-                b.body.getWorld().destroyJoint(bot.hangingJoint);
-                bot.hangingJoint = null;
-                b.body.setGravityScale(1);
-                b.body.applyForce(new Vector2(0, -25f), b.body.getWorldCenter(), false);
+            else {
+                b.body.setType(BodyDef.BodyType.DynamicBody);
             }
 
             // If we are on ground but we are in JUMP state, revert to NOTHING action state
@@ -121,7 +121,7 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             // linear impulse to jump.
             else if (bot.actionState == Bot.ActionState.JUMP_START) {
                 if (onGround) {
-                    b.body.applyLinearImpulse(new Vector2(0, -3.4f * b.body.getMass()), b.body.getWorldCenter(), false);
+                    b.body.applyLinearImpulse(new Vector2(0, -5f * b.body.getMass()), b.body.getWorldCenter(), false);
 
                     // Change to jumping state
                     bot.actionState = Bot.ActionState.JUMP;
@@ -133,14 +133,22 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             // set horizontal velocity according to current moving direction.
             Vector2 vel = b.body.getLinearVelocity();
             float speed = 0;
-            if (bot.motionState == Bot.MotionState.MOVE) {
-                if (bot.direction == Bot.Direction.LEFT)
-                    speed = -3f;
-                else
-                    speed = 3f;
+            if (bot.motionState == Bot.MotionState.MOVE)
+                speed = 3f * directionFactor;
+
+            if (b.body.getType() == BodyDef.BodyType.DynamicBody) {
+                float force = b.body.getMass() * (speed - vel.x) / dt;    // f = mv/t ; v = required change in velocity
+                b.body.applyForce(new Vector2(force, 0), b.body.getWorldCenter(), false);
             }
-            float force = b.body.getMass()*(speed-vel.x) / dt;    // f = mv/t ; v = required change in velocity
-            b.body.applyForce(new Vector2(force, 0), b.body.getWorldCenter(), false);
+            else
+                b.body.setLinearVelocity(speed, vel.y);
+
+            // limit upward vertical velocity
+            /*float maxVelY = -12;
+            if (vel.y < maxVelY) {
+                float force1 = b.body.getMass() * (maxVelY - vel.y) / dt;
+                b.body.applyForce(new Vector2(0, force1), b.body.getWorldCenter(), false);
+            }*/
 
             // change sprites
             if (onGround) {
@@ -153,7 +161,8 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
                 else
                     s.changeSprite(bot.sprIdle, bot.ssdIdle);
             }
-            else
+            else if (bot.actionState != Bot.ActionState.HANG
+                    && bot.actionState != Bot.ActionState.HANG_UP)
                 s.changeSprite(bot.sprJump, bot.ssdJump);
 
             if (speed != 0)
@@ -164,41 +173,45 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
 
     @Override
     public void beginContact(Contact contact, Fixture me, Fixture other) {
-        if (other.isSensor())
-            return;
-
         Bot bot = ((Entity)me.getUserData()).get(Bot.class);
+
+        if (other.isSensor()) {
+            if ((me == bot.leftsideFixture || me == bot.rightsideFixture)
+                    && ((Entity)other.getUserData()).has(Hanger.class)) {
+                bot.hanger = other;
+                bot.hangingContacts++;
+            }
+            return;
+        }
+
         if (me == bot.groundFixture) {
             if (!((Entity)other.getUserData()).has(PlatformSystem.OneWayPlatform.class)
                     || me.getBody().getLinearVelocity().y >= 0)
                 bot.groundContacts++;
         }
-        else if (me == bot.leftsideFixture) {
+        else if (me == bot.leftsideFixture)
             bot.leftSideContacts++;
-            bot.wall = other; bot.wallPoint = contact.getWorldManifold().getPoints()[0];
-        }
-        else if (me == bot.rightsideFixture) {
+        else if (me == bot.rightsideFixture)
             bot.rightSideContacts++;
-            bot.wall = other; bot.wallPoint = contact.getWorldManifold().getPoints()[0];
-        }
-        else if (me == bot.topFixture)
-            bot.topContacts++;
     }
 
     @Override
     public void endContact(Contact contact, Fixture me, Fixture other) {
-        if (other.isSensor())
-            return;
-
         Bot bot = ((Entity)me.getUserData()).get(Bot.class);
+
+        if (other.isSensor()) {
+            if ((me == bot.leftsideFixture || me == bot.rightsideFixture)
+                    && ((Entity) other.getUserData()).has(Hanger.class)
+                    && bot.hangingContacts > 0)
+                bot.hangingContacts--;
+        }
+
         if (me == bot.groundFixture && bot.groundContacts > 0)
                 bot.groundContacts--;
         else if (me == bot.leftsideFixture && bot.leftSideContacts > 0)
             bot.leftSideContacts--;
         else if (me == bot.rightsideFixture && bot.rightSideContacts > 0)
             bot.rightSideContacts--;
-        else if (me == bot.topFixture)
-            bot.topContacts--;
     }
 
     @Override

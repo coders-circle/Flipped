@@ -5,5 +5,8 @@
   "jump_sheet": { "rows": 2, "cols" : 5, "index": 2 },
 
   "push_sprite" : { "file":"pushin", "width": 24, "height": 48 },
-  "push_sheet": { "rows": 2, "cols" : 5, "images": 7 }
+  "push_sheet": { "rows": 2, "cols" : 5, "images": 7 },
+
+  "climb_sprite" : { "file":"climbbb", "width":80, "height": 80},
+  "climb_sheet" : { "rows":2, "cols":8 }
 }

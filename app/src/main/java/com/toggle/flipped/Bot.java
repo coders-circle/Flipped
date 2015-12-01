@@ -22,14 +22,12 @@ public class Bot implements Component {
     // Sensors required to sense if bot is colliding on ground or on sides
     Fixture groundFixture;
     Fixture leftsideFixture, rightsideFixture;
-    Fixture topFixture;
 
     // Contacts
-    int groundContacts=0, leftSideContacts=0, rightSideContacts=0, topContacts=0;
-    Fixture wall; Vector2 wallPoint;  // left or right side wall that has been most recently collided with
-    Joint hangingJoint;
+    int groundContacts=0, leftSideContacts=0, rightSideContacts=0, hangingContacts=0;
+    Joint hangingJoint; Fixture hanger;
 
     // Sprites and sprite-sheet-data for different states
-    Sprite.SpriteSheetData ssdIdle, ssdWalk, ssdJump, ssdPush;
-    Texture sprIdle, sprWalk, sprJump, sprPush;
+    Sprite.SpriteSheetData ssdIdle, ssdWalk, ssdJump, ssdPush, ssdClimb;
+    Texture sprIdle, sprWalk, sprJump, sprPush, sprClimb;
 }
