@@ -4,9 +4,15 @@
 
   "jump_sheet": { "rows": 2, "cols" : 5, "index": 2 },
 
-  "push_sprite" : { "file":"pushin", "width": 24, "height": 48 },
-  "push_sheet": { "rows": 2, "cols" : 5, "images": 7 },
+  "push_sprite" : { "file":"pushing", "width": 24, "height": 48 },
+  "push_sheet": { "rows": 1, "cols" : 8 },
 
   "climb_sprite" : { "file":"climbbb", "width":80, "height": 80},
-  "climb_sheet" : { "rows":2, "cols":8 }
+  "climb_sheet" : { "rows":2, "cols":8 },
+
+  "pick_sprite" : { "file": "picking", "width":48, "height":48, "origin-x":0.25 },
+  "pick_sheet" : { "rows":2, "cols":8},
+
+  "carry_sprite" : { "file": "carrying", "width":24, "height":48 },
+  "carry_sheet" : { "rows":1, "cols":8}
 }

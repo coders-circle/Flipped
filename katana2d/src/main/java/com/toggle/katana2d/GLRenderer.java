@@ -412,7 +412,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
             SimpleBitmapTexture tt = (SimpleBitmapTexture)t;
             tt.textureId = loadTexture(tt.bitmap);
         }
-        else if (t.getClass() == SimpleTexture.class) {
+        else if (t.getClass() == SimpleTexture.class && t.resourceId >= 0) {
             SimpleTexture tt = (SimpleTexture)t;
             tt.textureId = loadTexture(tt.resourceId);
         }

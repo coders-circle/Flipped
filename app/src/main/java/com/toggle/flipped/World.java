@@ -22,6 +22,7 @@ public class World extends Scene {
     public float mAngle;   // Angle of the world: 180 for flip, 0 for normal
 
     private Entity mPlayer; // Player entity; every world has one
+    public com.badlogic.gdx.physics.box2d.World physicsWorld;
 
     public World(Level parentLevel, LevelLoader levelLoader, String worldName) {
         mLevelLoader = levelLoader;
@@ -35,6 +36,7 @@ public class World extends Scene {
         PhysicsSystem physicsSystem = new PhysicsSystem();
         FlipSystem flipSystem = new FlipSystem(mParentLevel);
         ParticleSystem particleSystem = new ParticleSystem();
+        physicsWorld = physicsSystem.getWorld();
 
         // Add the systems
 
@@ -49,11 +51,14 @@ public class World extends Scene {
         mSystems.add(new PlayerInputSystem(mGame));
         mSystems.add(flipSystem);
         mSystems.add(new WindSystem());
-        mSystems.add(new RopeSystem(physicsSystem.getWorld(), mGame.getRenderer()));
-        mSystems.add(new ExplosionSystem(physicsSystem.getWorld(), mGame));
+        mSystems.add(new RopeSystem(physicsWorld, mGame.getRenderer()));
+        mSystems.add(new ExplosionSystem(physicsWorld, mGame));
+        mSystems.add(new SoundSystem());
+        mSystems.add(new PickCarrySystem());
+        mSystems.add(new BurnSystem());
 
         // Load the entities from the level editor
-        mLevelLoader.loadWorld(mWorldName, this, physicsSystem.getWorld());
+        mLevelLoader.loadWorld(mWorldName, this, physicsWorld);
 
         mPlayer = mParentLevel.levelLoader.mCurrentEntities.get("player");
         flipSystem.setPlayer(mPlayer);

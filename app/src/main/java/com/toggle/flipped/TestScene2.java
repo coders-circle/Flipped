@@ -157,7 +157,7 @@ public class TestScene2 extends Scene {
         addEntity(bk3);
 
         Entity bk4 = new Entity();
-        bk4.add(new Background(mGame.getRenderer().addTexture(R.drawable.pa1th, 640, 480), 0));
+        bk4.add(new Background(mGame.getRenderer().addTexture(R.drawable.path, 640, 480), 0));
         addEntity(bk4);
     }
     //Font font;

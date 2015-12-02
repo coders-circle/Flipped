@@ -120,6 +120,11 @@ public class Level implements CustomLoader, World.WorldEventListener {
                         (float) transformation.getDouble("Translate-X"),
                         (float) transformation.getDouble("Translate-Y"), (float) transformation.getDouble("Angle"));
                 entity.add(new Player());
+
+                /*Sound s = new Sound();
+                entity.add(s);
+
+                s.addSource(mGame.getActivity(), R.raw.bg_music, Sound.AMBIANCE);*/
                 return true;
             }
             else if (entityName.startsWith("ground")) {

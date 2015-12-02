@@ -1,5 +1,7 @@
 package com.toggle.katana2d;
 
+import android.util.Log;
+
 // Sprite component that stores sprite-sheet data and a reference to GLSprite
 public class Sprite implements Component{
     public Texture texture;
@@ -59,30 +61,6 @@ public class Sprite implements Component{
         }
     }
 
-    public void animate(double dt) {
-        SpriteSheetData ssd = spriteSheetData;
-        // animate a sprite sheet by advancing the image index when required time has elapsed
-        if (ssd != null && ssd.animationSpeed > 0) {
-            if (ssd.numImages < 0)
-                ssd.numImages = ssd.numRows * ssd.numCols;
-
-            ssd.timePassed += (float) dt;
-            if (ssd.timePassed >= 1.0/ssd.animationSpeed) {
-                ssd.timePassed = 0;
-                ssd.index++;
-
-                if (ssd.index >= ssd.numImages) {
-                    if (ssd.listener != null)
-                        ssd.listener.onComplete();
-                    if (ssd.loop)
-                        ssd.index = 0;
-                    else
-                        ssd.index--;
-                }
-            }
-        }
-    }
-
     public static class SpriteSheetData {
         // all these are normalized (i.e. in [0, 1] range) with respect to texture size
         public float offsetX = 0, offsetY = 0, imgWidth, imgHeight, hSpacing = 0, vSpacing = 0;
@@ -117,6 +95,29 @@ public class Sprite implements Component{
         spriteSheetData = newSpriteSheetData;
     }
 
+    public void animate(double dt) {
+        SpriteSheetData ssd = spriteSheetData;
+        // animate a sprite sheet by advancing the image index when required time has elapsed
+        if (ssd != null && ssd.animationSpeed > 0) {
+            if (ssd.numImages < 0)
+                ssd.numImages = ssd.numRows * ssd.numCols;
+
+            ssd.timePassed += (float) dt;
+            if (ssd.timePassed >= 1.0/ssd.animationSpeed) {
+                ssd.timePassed = 0;
+                ssd.index++;
+
+                if (ssd.index >= ssd.numImages) {
+                    if (ssd.listener != null)
+                        ssd.listener.onComplete();
+                    if (ssd.loop)
+                        ssd.index = 0;
+                    else
+                        ssd.index--;
+                }
+            }
+        }
+    }
 
     public void draw(GLRenderer renderer, float x, float y, float angle) {
         if (texture == null)

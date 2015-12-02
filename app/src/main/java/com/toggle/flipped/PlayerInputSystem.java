@@ -1,7 +1,5 @@
 package com.toggle.flipped;
 
-import android.util.Log;
-
 import com.toggle.katana2d.Camera;
 import com.toggle.katana2d.Game;
 import com.toggle.katana2d.TouchInputData;
@@ -41,12 +39,12 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
         // motion control =  left side, action = right
         motionControlLimit.left = 0.0f;
         motionControlLimit.right = 2.0f * devWidth / 5.0f;
-        motionControlLimit.top = devHeight / 2.0f;
+        motionControlLimit.top = 0.0f;
         motionControlLimit.bottom = devHeight;
 
         actionControlLimit.left = 3.0f * devWidth / 5.0f;
         actionControlLimit.right = devWidth;
-        actionControlLimit.top = devHeight / 2.0f;
+        actionControlLimit.top = 0.0f;
         actionControlLimit.bottom = devHeight;
 
 
@@ -55,6 +53,8 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
             Bot b = e.get(Bot.class);
             boolean hanging = b.actionState == Bot.ActionState.HANG || b.actionState == Bot.ActionState.HANG_UP;
 
+            int dxLimit = 3;
+            int dyLimit = 3;
             for (int i = 0; i < touchData.pointers.size(); i++) {
                 TouchInputData.Pointer touch;
                 try {
@@ -64,12 +64,14 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
                     ex.printStackTrace();
                     continue;
                 }
-                if (motionControlLimit.hitTest(touch.x, touch.y)) {
-                    if (touch.dx > 5
+                if (motionControlLimit.hitTest(touch.x, touch.y)
+                        && b.actionState != Bot.ActionState.PICK) {
+                    b.touchX = Math.max(b.touchX, Math.abs(touch.dx/3));
+                    if (touch.dx > dxLimit
                             && !(hanging && b.direction == Bot.Direction.RIGHT)) {
                         b.direction = Bot.Direction.RIGHT;
                         b.motionState = Bot.MotionState.MOVE;
-                    } else if (touch.dx < -5
+                    } else if (touch.dx < -dxLimit
                             && !(hanging && b.direction == Bot.Direction.LEFT)) {
                         b.direction = Bot.Direction.LEFT;
                         b.motionState = Bot.MotionState.MOVE;
@@ -77,18 +79,29 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
                 } else if (actionControlLimit.hitTest(touch.x, touch.y)) {
                     // if vertical sliding direction is up, and sliding magnitude is big enough
                     // then jump (or move up if we are hanging)
-                    if (touch.dy < -6) {
+                    if (touch.dy < -dyLimit) {
+                        b.touchY = -touch.dy;
                         if (b.actionState == Bot.ActionState.HANG)
                             b.actionState = Bot.ActionState.HANG_UP;
-                        else
+                        else if (b.actionState == Bot.ActionState.NOTHING)
                             b.actionState = Bot.ActionState.JUMP_START;
                     }
+
+                    // if movement is small, we just tapped for action
+                    else if (!b.actionStart && Math.abs(touch.dx)<4 && Math.abs(touch.dy)<4
+                            && b.actionState != Bot.ActionState.JUMP && b.actionState != Bot.ActionState.JUMP_START) {
+                        b.actionStart = true;
+                        b.touchX = touch.x;
+                        b.touchY = touch.y;
+                    }
+
                 }
 
             }
 
             if (touchData.pointers.size() == 0) {
                 b.motionState = Bot.MotionState.IDLE;
+                b.touchX = 0;
             }
 
             // We may do this in a different system, but for now

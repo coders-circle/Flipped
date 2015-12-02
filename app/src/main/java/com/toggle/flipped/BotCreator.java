@@ -37,6 +37,12 @@ public class BotCreator {
         int spriteTex = Utilities.getResourceId(mGame.getActivity(), "drawable", spriteName);
         Texture glSprite = mGame.getRenderer().addTexture(spriteTex, (float) sprite.getDouble("width"), (float) sprite.getDouble("height"));
         glSprite.color = new float[]{209f/255,209f/255,209f/255,1};
+
+        if (sprite.has("origin-x"))
+            glSprite.originX = (float)sprite.getDouble("origin-x");
+        if (sprite.has("origin-y"))
+            glSprite.originY = (float)sprite.getDouble("origin-y");
+
         mGame.textureManager.add(spriteName, glSprite);
         return glSprite;
     }
@@ -105,9 +111,19 @@ public class BotCreator {
             if (json.has("climb_sprite"))
                 bot.sprClimb = getSprite(json.getJSONObject("climb_sprite"));
             else
-                bot.sprClimb = getSprite(json.getJSONObject("climb_sprite"));
+                bot.sprClimb = getSprite(json.getJSONObject("walk_sprite"));
 
-            Sprite.SpriteSheetData stand, walk, push, jump, climb;
+            if (json.has("pick_sprite"))
+                bot.sprPick = getSprite(json.getJSONObject("pick_sprite"));
+            else
+                bot.sprPick = getSprite(json.getJSONObject("walk_sprite"));
+
+            if (json.has("carry_sprite"))
+                bot.sprCarry = getSprite(json.getJSONObject("carry_sprite"));
+            else
+                bot.sprCarry = getSprite(json.getJSONObject("walk_sprite"));
+
+            Sprite.SpriteSheetData stand, walk, push, jump, climb, pick, carry;
 
             walk = getSpriteSheet(json.getJSONObject("walk_sheet"));
 
@@ -132,14 +148,27 @@ public class BotCreator {
             if (json.has("climb_sheet"))
                 climb = getSpriteSheet(json.getJSONObject("climb_sheet"));
             else
-                climb = getSpriteSheet(json.getJSONObject("climb_sheet"));
+                climb = getSpriteSheet(json.getJSONObject("walk_sheet"));
             climb.loop = false;
+
+            if (json.has("pick_sheet"))
+                pick = getSpriteSheet(json.getJSONObject("pick_sheet"));
+            else
+                pick = getSpriteSheet(json.getJSONObject("walk_sheet"));
+            pick.loop = false;
+
+            if (json.has("carry_sheet"))
+                carry = getSpriteSheet(json.getJSONObject("carry_sheet"));
+            else
+                carry = getSpriteSheet(json.getJSONObject("walk_sheet"));
 
             bot.ssdIdle = stand;
             bot.ssdWalk = walk;
             bot.ssdJump = jump;
             bot.ssdPush = push;
             bot.ssdClimb = climb;
+            bot.ssdPick = pick;
+            bot.ssdCarry = carry;
 
             entity.get(Sprite.class).spriteSheetData = stand;
 
