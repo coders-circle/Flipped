@@ -1,6 +1,8 @@
 package com.toggle.flipped;
 
 
+import android.util.Log;
+
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.toggle.katana2d.*;

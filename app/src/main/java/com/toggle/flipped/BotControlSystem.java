@@ -34,7 +34,7 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
         PolygonShape shape = new PolygonShape();
 
         // A sensor at the bottom to sense the ground
-        shape.setAsBox(ex.x*0.83f, sensorSize*4, new Vector2(0, ex.y+sensorSize), 0);
+        shape.setAsBox(ex.x*0.83f, sensorSize*3, new Vector2(0, ex.y+sensorSize), 0);
         p.groundFixture = b.createSensor(shape);
 
         // Side sensors
@@ -64,10 +64,26 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             final Sprite s = e.get(Sprite.class);
             final Bot bot = e.get(Bot.class);
 
+            boolean resetIdle = true;
+            if (bot.actionState == Bot.ActionState.NOTHING && bot.motionState == Bot.MotionState.IDLE) {
+                bot.idleTime += dt;
+                if (bot.idleTime > 5) {
+                    bot.ssdIdle.animationSpeed = 12;
+                    resetIdle = false;
+                }
+            } else {
+                bot.idleTime = 0;
+            }
+
+            if (resetIdle) {
+                bot.ssdIdle.animationSpeed = 0;
+                bot.ssdIdle.index = 0;
+            }
+
             if (bot.dropTime > 0)
                 bot.dropTime -= dt;
 
-            float directionFactor = bot.direction== Bot.Direction.RIGHT?1:-1;
+            float directionFactor = bot.direction == Bot.Direction.RIGHT?1:-1;
             s.scaleX = directionFactor < 0? -1 : 1;
 
             boolean onGround = bot.groundContacts>0;

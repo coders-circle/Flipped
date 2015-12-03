@@ -1,6 +1,7 @@
 package com.toggle.katana2d;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,5 +35,14 @@ public class Manager<T> {
 
     public int size() {
         return objects.size();
+    }
+
+    public void remove(T object) {
+        int id = objects.indexOf(object);
+        while (id >= 0) {
+            objects.remove(id);
+            map.values().removeAll(Collections.singleton(id));
+            id = objects.indexOf(object);
+        }
     }
 }

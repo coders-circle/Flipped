@@ -32,7 +32,7 @@ public class TestScene2 extends Scene {
         mSystems.add(particleSystem);
 
         mSystems.add(new BotControlSystem());
-        mSystems.add(new PlayerInputSystem(mGame));
+        mSystems.add(new PlayerInputSystem(mGame, 7520, 640));
         //mSystems.add(flipSystem);
         mSystems.add(new WindSystem());
         mSystems.add(new RopeSystem(physicsSystem.getWorld(), mGame.getRenderer()));
@@ -145,19 +145,19 @@ public class TestScene2 extends Scene {
 
 
         Entity bk1 = new Entity();
-        bk1.add(new Background(mGame.getRenderer().addTexture(R.drawable.main_background, 640, 400), 100));
+        bk1.add(new Background(mGame.getRenderer().addTexture(R.drawable.level1_back, 640, 400), 100));
         addEntity(bk1);
 
         Entity bk2 = new Entity();
-        bk2.add(new Background(mGame.getRenderer().addTexture(R.drawable.hills, 640, 480), 50));
+        bk2.add(new Background(mGame.getRenderer().addTexture(R.drawable.level1_hills, 640, 480), 50));
         addEntity(bk2);
 
         Entity bk3 = new Entity();
-        bk3.add(new Background(mGame.getRenderer().addTexture(R.drawable.trees, 640, 480), 30));
+        bk3.add(new Background(mGame.getRenderer().addTexture(R.drawable.level1_trees, 640, 480), 30));
         addEntity(bk3);
 
         Entity bk4 = new Entity();
-        bk4.add(new Background(mGame.getRenderer().addTexture(R.drawable.path, 640, 480), 0));
+        bk4.add(new Background(mGame.getRenderer().addTexture(R.drawable.level1_path, 640, 480), 0));
         addEntity(bk4);
     }
     //Font font;

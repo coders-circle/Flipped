@@ -421,5 +421,29 @@ public class GLRenderer implements GLSurfaceView.Renderer {
             tt.textureIds = loadTexture(tt.resourceId, (int)tt.width, (int)tt.height, tt.numCols, tt.numRows);
         }
     }
+
+    public void deleteTexture(Texture t) {
+        int texids[] = new int[] {0};
+        if (t.getClass() == SimpleBitmapTexture.class) {
+            SimpleBitmapTexture tt = (SimpleBitmapTexture)t;
+            tt.bitmap.recycle();
+            texids[0] = tt.textureId;
+        }
+        else if (t.getClass() == SimpleTexture.class && t.resourceId >= 0) {
+            SimpleTexture tt = (SimpleTexture)t;
+            texids[0] = tt.textureId;
+        }
+        else if (t.getClass() == MultiTexture.class) {
+            MultiTexture tt = (MultiTexture)t;
+            texids = new int[tt.textureIds.size()];
+            for (int i=0; i<tt.textureIds.size(); ++i)
+                texids[i] = tt.textureIds.get(i);
+        }
+
+        GLES20.glDeleteTextures(texids.length, texids, 0);
+
+        mGame.textureManager.remove(t);
+        mTextures.remove(t);
+    }
 }
 

@@ -27,18 +27,28 @@ public class Level implements CustomLoader, World.WorldEventListener {
     public List<Checkpoint> checkpoints = new ArrayList<>();
     public HashMap<String, Entity> mirrors = new HashMap<>();
 
-    public Level(Game game, int levelFileId) {
+    public interface Listener {
+        void onLevelComplete(Level level);
+    }
+    private Listener mListener;
+
+    public Level(Game game, int levelFileId, Listener listener) {
         mGame = game;
+        mListener = listener;
         String level = com.toggle.katana2d.Utilities.getRawFileText(game.getActivity(), levelFileId);
         levelLoader = new LevelLoader(level);
         levelLoader.load(mGame, this);
     }
 
+    public void complete() {
+        mListener.onLevelComplete(this);
+    }
+
     protected Manager<World> mWorlds = new Manager<>();
     protected World mActiveWorld = null;
 
-    public int addWorld(String worldName, float angle) {
-        World newWorld = new World(this, levelLoader, worldName);
+    public int addWorld(String worldName, float angle, float width, float height) {
+        World newWorld = new World(this, levelLoader, worldName, width, height);
         int id = mWorlds.add(worldName, newWorld);
         newWorld.mSceneId = mGame.addScene(newWorld);
         newWorld.mAngle = angle;
@@ -46,8 +56,10 @@ public class Level implements CustomLoader, World.WorldEventListener {
     }
 
     public void setActiveWorld(int index) {
-        if (index < 0 || index >= mWorlds.size())
+        if (index < 0 || index >= mWorlds.size()) {
             mActiveWorld = null;
+            mGame.setActiveScene(-1);
+        }
         else {
             mActiveWorld = mWorlds.get(index);
             mGame.setActiveScene(mActiveWorld.mSceneId);
@@ -56,19 +68,25 @@ public class Level implements CustomLoader, World.WorldEventListener {
 
 /*    public World getActiveWorld() {
         return mActiveWorld;
+    }*/
+
+    // load a level
+    public void load() {
+
     }
 
     // When level exits, we may unload resources specific to that level
-    public void unloadResources() {
+    public void unload() {
 
-    }*/
+    }
 
     public void changeWorld(int nextWorldId, Entity entryMirror) {
         if (mActiveWorld != null)
             mActiveWorld.unload();
 
         setActiveWorld(nextWorldId);
-        mActiveWorld.load(entryMirror);
+        if (mActiveWorld != null)
+            mActiveWorld.load(entryMirror);
     }
 
     public void changeWorld(String nextWorld, Entity entryMirror) {
@@ -76,7 +94,10 @@ public class Level implements CustomLoader, World.WorldEventListener {
     }
 
     public void changeWorld(FlipSystem.Mirror m) {
-        changeWorld(m.nextWorld, mirrors.get(m.exitMirror));
+        if (m.nextWorld.equals("next level"))
+            complete();
+        else if (!m.nextWorld.equals("") && mWorlds.has(m.nextWorld))
+            changeWorld(m.nextWorld, mirrors.get(m.exitMirror));
     }
 
     @Override
@@ -140,6 +161,7 @@ public class Level implements CustomLoader, World.WorldEventListener {
                         (float) transformation.getDouble("Translate-Y"), (float) transformation.getDouble("Angle")));
                 entity.add(new Sprite(mGame.textureManager.get("mirror"), -1));
                 entity.add(new PhysicsBody(world, BodyDef.BodyType.StaticBody, entity, new PhysicsBody.Properties(true)));
+                entity.add(new FlipSystem.Mirror());
 
                 FlipSystem.Mirror mrr = entity.get(FlipSystem.Mirror.class);
                 JSONObject mirrorJson = components.getJSONObject("Mirror");

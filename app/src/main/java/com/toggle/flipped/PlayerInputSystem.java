@@ -20,9 +20,12 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
         }
     }
 
-    public PlayerInputSystem(Game game) {
+    private float mMaxWidth, mMaxHeight;
+
+    public PlayerInputSystem(Game game, float maxWidth, float maxHeight) {
         super(new Class[] { Player.class, Bot.class, Transformation.class});
         mGame = game;
+        mMaxHeight = maxHeight; mMaxWidth = maxWidth;
     }
 
     @Override
@@ -116,9 +119,8 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
             // assuming the world is twice the width of camera view (w*2).
             // This assumption is temporary.
             Camera camera = mGame.getRenderer().getCamera();
-            float maxW = 7520, maxH = 640;
-            camera.x = Math.min(Math.max(w / 2, t.x), maxW - w / 2) - w / 2;
-            camera.y = Math.min(Math.max(h / 2, t.y), maxH - h / 2) - h / 2;
+            camera.x = Math.min(Math.max(w / 2, t.x), mMaxWidth - w / 2) - w / 2;
+            camera.y = Math.min(Math.max(h / 2, t.y), mMaxHeight - h / 2) - h / 2;
         }
     }
 }

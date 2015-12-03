@@ -53,17 +53,19 @@ public class Game implements TimerCallback {
         if (mActiveScene != null)
             mActiveScene.onActiveStateChanged(false);
         mActiveScene = getScene(index);
-        mActiveScene.onActiveStateChanged(true);
+        if (mActiveScene != null)
+            mActiveScene.onActiveStateChanged(true);
     }
 
     // Get a scene from index
     public Scene getScene(int index) {
-        return mScenes.get(index);
+        try {
+            return mScenes.get(index);
+        }
+        catch (Exception ex) {
+            return null;
+        }
     }
-
-
-    private boolean mStop = false;
-    private final Integer drawLock = 1;
 
     // called on surface creation
     public void init() {
@@ -73,29 +75,6 @@ public class Game implements TimerCallback {
                 scene.init(this);
             mInitialized = true;
             mActivity.onGameStart();
-
-            /*// start updating in separate thread
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (!mStop) {
-                        // Update using timer
-                        mDrawInterpolation = mTimer.update(Game.this);
-
-                        // After each update, we need to draw, notify the render thread to wakeup if sleeping
-                        synchronized (drawLock) {
-                            drawLock.notify();
-                        }
-
-                        try {
-                            Thread.sleep(5);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }).start();*/
-
         }
     }
 
@@ -108,22 +87,11 @@ public class Game implements TimerCallback {
 
     // draw method for rendering stuffs
     public void newFrame() {
-        /*// sleep till the update thread wakes us up
-        synchronized (drawLock) {
-            try {
-                drawLock.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }*/
-
-        mDrawInterpolation = mTimer.update(this);
+        float drawInterpolation = mTimer.update(this);
         // draw a frame
         if (mActiveScene != null)
-            mActiveScene.draw(mDrawInterpolation);
+            mActiveScene.draw(drawInterpolation);
     }
-
-    private float mDrawInterpolation;
 
     // pause and resume events
     public void onPause() {

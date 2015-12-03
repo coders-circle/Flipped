@@ -24,11 +24,14 @@ public class World extends Scene {
     private Entity mPlayer; // Player entity; every world has one
     public com.badlogic.gdx.physics.box2d.World physicsWorld;
 
-    public World(Level parentLevel, LevelLoader levelLoader, String worldName) {
+    private float mWidth, mHeight;
+
+    public World(Level parentLevel, LevelLoader levelLoader, String worldName, float width, float height) {
         mLevelLoader = levelLoader;
         mWorldName = worldName;
         mParentLevel = parentLevel;
         mAngle = 0;
+        mWidth = width; mHeight = height;
     }
 
     @Override
@@ -48,7 +51,7 @@ public class World extends Scene {
 
         // Flipped's systems, controlling inputs, player, mirror, wind, rope, explosives etc.
         mSystems.add(new BotControlSystem());
-        mSystems.add(new PlayerInputSystem(mGame));
+        mSystems.add(new PlayerInputSystem(mGame, mWidth, mHeight));
         mSystems.add(flipSystem);
         mSystems.add(new WindSystem());
         mSystems.add(new RopeSystem(physicsWorld, mGame.getRenderer()));
@@ -85,6 +88,7 @@ public class World extends Scene {
         } else {
             x = entryMirror.get(Transformation.class).x;
             y = entryMirror.get(Transformation.class).y - 32;
+            x *= PhysicsSystem.METERS_PER_PIXEL; y *= PhysicsSystem.METERS_PER_PIXEL;
         }
 
         mPlayer.get(PhysicsBody.class).body.setTransform(new Vector2(x, y), 0);

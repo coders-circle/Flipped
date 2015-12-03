@@ -20,6 +20,8 @@ public class Bot implements Component {
     MotionState motionState = MotionState.IDLE;
     ActionState actionState = ActionState.NOTHING;
 
+    float idleTime = 0;
+
     // Sensors required to sense if bot is colliding on ground or on sides
     Fixture groundFixture;
     Fixture leftSideFixture, rightSideFixture;
