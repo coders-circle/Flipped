@@ -9,6 +9,13 @@ public class Burner implements Component {
     Entity emitter;
     boolean reflect = false;
 
+    boolean source = true;
+    float fullLife = -1;
+    float life = 0;
+    boolean isBurning = true;
+
+    float sourceWidth=0, sourceHeight=0;    // meters
+
     public Burner(Entity emitter) {
         this.emitter = emitter;
     }

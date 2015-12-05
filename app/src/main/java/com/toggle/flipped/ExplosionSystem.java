@@ -18,8 +18,8 @@ public class ExplosionSystem extends com.toggle.katana2d.System implements Conta
     public void beginContact(Contact contact, Fixture me, Fixture other) {
         Explosive e = ((Entity)me.getUserData()).get(Explosive.class);
         Entity otherEntity = (Entity)other.getUserData();
-        if (!me.isSensor() && otherEntity.has(Fire.class) && other.isSensor()) {
-            if (!e.destroyed && !e.isExploding) {
+        if (!me.isSensor() && otherEntity.has(Burner.class) && other.isSensor()) {
+            if (!e.destroyed && !e.isExploding && otherEntity.get(Burner.class).isBurning) {
                 e.explosionTime = 2;
                 e.isExploding = true;
             }
@@ -45,7 +45,6 @@ public class ExplosionSystem extends com.toggle.katana2d.System implements Conta
 
     @Override
     public boolean reportFixture(Fixture other) {
-        Log.d("exploding", other.toString());
         Entity otherEntity = (Entity)other.getUserData();
         if (otherEntity.has(Mover.class)) {
             Mover m = otherEntity.get(Mover.class);

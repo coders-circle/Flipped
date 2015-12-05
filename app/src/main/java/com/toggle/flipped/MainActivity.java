@@ -31,7 +31,7 @@ public class MainActivity extends GameActivity implements Level.Listener/* imple
 
         level1 = new Level1(game, this);
         level2 = new Level2(game, this);
-        level2.load();
+        level1.load();
     }
 
     public void loadResources() {

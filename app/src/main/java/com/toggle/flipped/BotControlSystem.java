@@ -269,7 +269,7 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             Vector2 vel = b.body.getLinearVelocity();
             float speed = 0;
             float moveSpeed = Math.min(bot.touchX, 4f);
-            if (bot.motionState == Bot.MotionState.MOVE)
+            if (bot.motionState == Bot.MotionState.MOVE && bot.actionState != Bot.ActionState.PICK)
                 speed = moveSpeed * directionFactor;
 
             if (b.body.getType() == BodyDef.BodyType.DynamicBody) {

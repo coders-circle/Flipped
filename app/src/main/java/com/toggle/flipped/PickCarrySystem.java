@@ -51,6 +51,7 @@ public class PickCarrySystem extends com.toggle.katana2d.System {
                     entity.get(Burner.class).reflect = true;
                 }
             } else  if (entity.has(Burner.class)) {
+                pos.x += 2;
                 entity.get(Burner.class).reflect = false;
             }
 

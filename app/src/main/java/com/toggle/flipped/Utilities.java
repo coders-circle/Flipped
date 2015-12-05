@@ -79,7 +79,7 @@ public class Utilities {
         b.body.getFixtureList().get(0).setFilterData(d);*/
 
         PolygonShape fireShape = new PolygonShape();
-        fireShape.setAsBox(10 * PhysicsSystem.METERS_PER_PIXEL, 10 * PhysicsSystem.METERS_PER_PIXEL, new Vector2(10 * PhysicsSystem.METERS_PER_PIXEL, 0), 0);
+        fireShape.setAsBox(4 * PhysicsSystem.METERS_PER_PIXEL, 4 * PhysicsSystem.METERS_PER_PIXEL, new Vector2(10 * PhysicsSystem.METERS_PER_PIXEL, 0), 0);
         b.createSensor(fireShape);
 
         Carriable c = new Carriable();
@@ -136,9 +136,50 @@ public class Utilities {
         e.var_speed = 5;
         e.accel_x = 20;
         e.additiveBlend = true;
+        e.emissionRate = 0;
         scene.addEntity(emitter);
 
-        stick.add(new Burner(emitter));
-        stick.add(new Fire());
+        Burner burner = new Burner(emitter);
+        stick.add(burner);
+
+        burner.source = false;
+        burner.fullLife = 12;
+    }
+
+
+    public static void createFire(Scene scene, World world, Entity stick, JSONObject components) throws JSONException {
+        Game game = scene.getGame();
+        stick.add(new Sprite(game.getRenderer().addTexture(new float[]{1, 1, 0, 1}, 10, 10), -1.6f));
+        JSONObject transformation = components.getJSONObject("Transformation");
+        stick.add(new Transformation((float) transformation.getDouble("Translate-X"),
+                (float) transformation.getDouble("Translate-Y"), (float) transformation.getDouble("Angle")));
+        PhysicsBody b = new PhysicsBody(world, BodyDef.BodyType.StaticBody, stick, new PhysicsBody.Properties(0, 0, 0));
+        stick.add(b);
+
+        /*PolygonShape fireShape = new PolygonShape();
+        fireShape.setAsBox(24 * PhysicsSystem.METERS_PER_PIXEL, 24 * PhysicsSystem.METERS_PER_PIXEL);
+        b.createSensor(fireShape);*/
+
+        Entity emitter = new Entity();
+        emitter.add(new Transformation(0, 0, -90));
+        emitter.add(new Emitter(game.getRenderer(), 300, game.getRenderer().mFuzzyTextureId, 3, 100, new float[]{180f / 255, 80f / 255, 10f / 255, 1}, new float[]{0, 0, 0, 0}));
+        Emitter e = emitter.get(Emitter.class);
+        e.var_startColor[3] = 0.3f;
+        e.size = 20;
+        e.var_size = 5;
+        e.var_angle = 70;
+        e.speed = 10;
+        e.var_speed = 5;
+        e.accel_x = 20;
+        e.additiveBlend = true;
+        scene.addEntity(emitter);
+
+        Burner burner = new Burner(emitter);
+        stick.add(burner);
+
+        burner.source = true;
+        burner.position = 0;
+        burner.sourceWidth = 24 * PhysicsSystem.METERS_PER_PIXEL;
+        burner.sourceHeight = 24 * PhysicsSystem.METERS_PER_PIXEL;
     }
 }

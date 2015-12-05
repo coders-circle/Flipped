@@ -113,6 +113,7 @@ public class Level implements CustomLoader, World.WorldEventListener {
         switch (spriteName) {
             case "player":
             case "stick":
+            case "fire":
                 return true;
             case "block":
                 if (!game.textureManager.has(spriteName))
@@ -232,6 +233,10 @@ public class Level implements CustomLoader, World.WorldEventListener {
             }
             else if (entityName.startsWith("stick")) {
                 Utilities.createStick(levelLoader.mCurrentScene, world, entity, components);
+                return true;
+            }
+            else if (entityName.startsWith("fire")) {
+                Utilities.createFire(levelLoader.mCurrentScene, world, entity, components);
                 return true;
             }
         }
