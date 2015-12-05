@@ -4,10 +4,10 @@
 
   "jump_sheet": { "rows": 2, "cols" : 5, "index": 2 },
 
-  "push_sprite" : { "file":"pushing", "width": 24, "height": 48 },
+  "push_sprite" : { "file":"pushing", "width": 28, "height": 48 },
   "push_sheet": { "rows": 1, "cols" : 8 },
 
-  "climb_sprite" : { "file":"climbbb", "width":80, "height": 80},
+  "climb_sprite" : { "file":"climbing", "width":60, "height": 48, "origin-x":0.312},
   "climb_sheet" : { "rows":2, "cols":8 },
 
   "pick_sprite" : { "file": "picking", "width":48, "height":48, "origin-x":0.25 },
@@ -17,5 +17,8 @@
   "carry_sheet" : { "rows":1, "cols":8},
 
   "idle_sprite" : {"file":"idle", "width":24, "height":48},
-  "idle_sheet" : {"rows":1, "cols":8}
+  "idle_sheet" : {"rows":2, "cols":8},
+
+  "lever_sprite" : {"file":"lever_push", "width":32, "height":48},
+  "lever_sheet" : {"rows":2, "cols":8}
 }

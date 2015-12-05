@@ -7,13 +7,17 @@ import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Component;
 import com.toggle.katana2d.Texture;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Bot implements Component {
-    enum Direction { LEFT, RIGHT };
+    boolean dead = false;
+    enum Direction { LEFT, RIGHT }
 
     // Note that the following two states are different
     // since one can be moving and jumping at the same time.
     enum MotionState { IDLE, MOVE }
-    enum ActionState { NOTHING, JUMP_START, JUMP, HANG, HANG_UP, PICK, CARRY }
+    enum ActionState { NOTHING, JUMP_START, JUMP, HANG, HANG_UP, PICK, CARRY, LEVER_PUSH }
     boolean actionStart;
 
     Direction direction = Direction.RIGHT;
@@ -24,12 +28,15 @@ public class Bot implements Component {
 
     // Sensors required to sense if bot is colliding on ground or on sides
     Fixture groundFixture;
-    Fixture leftSideFixture, rightSideFixture;
+    Fixture leftSideFixture, rightSideFixture, leftFixtureObject, rightFixtureObject;
     Fixture aheadSensorLeft, aheadSensorRight;
 
     // Carrying object
     Carriable carriable;
     float dropTime = 0;    // disable picking as soon as dropping
+
+    // Lever
+    Trigger lever;
 
     float touchY;
     float touchX;
@@ -41,6 +48,8 @@ public class Bot implements Component {
     Fixture aheadLeft, aheadRight;
 
     // Sprites and sprite-sheet-data for different states
-    Sprite.SpriteSheetData ssdIdle, ssdWalk, ssdJump, ssdPush, ssdClimb, ssdPick, ssdCarry;
-    Texture sprIdle, sprWalk, sprJump, sprPush, sprClimb, sprPick, sprCarry;
+    Sprite.SpriteSheetData ssdIdle, ssdWalk, ssdJump, ssdPush, ssdClimb, ssdPick, ssdCarry, ssdLever;
+    Texture sprIdle, sprWalk, sprJump, sprPush, sprClimb, sprPick, sprCarry, sprLever;
+
+    List<Vector2> climbPositions = new ArrayList<>();
 }

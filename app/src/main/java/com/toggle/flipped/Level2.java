@@ -1,5 +1,7 @@
 package com.toggle.flipped;
 
+import android.util.Log;
+
 import com.toggle.katana2d.Background;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.GLRenderer;
@@ -21,7 +23,7 @@ public class Level2 extends Level {
 
     @Override
     public void load() {
-        int world1 = addWorld("world1", 0, 3910, 640);
+        int world1 = addWorld("world1", 0, 7520, 640);
         ///*int world2 = */addWorld("world2", 180, 7520, 640);    // flipped world
 
         changeWorld(world1, null);
@@ -39,7 +41,6 @@ public class Level2 extends Level {
 
     @Override
     public void onWorldInitialized(World world) {
-
         Texture tex;
 
         Entity bk1 = new Entity();
@@ -59,7 +60,7 @@ public class Level2 extends Level {
         mTextures.add(tex);
 
         Entity bk4 = new Entity();
-        tex = mGame.getRenderer().addTexture(R.drawable.level2_path_glow, 1955, 640, 2, 1);
+        tex = mGame.getRenderer().addTexture(R.drawable.level2_path, 1880, 640, 4, 1);
         bk4.add(new Background(tex, 0));
         world.addEntity(bk4);
         mTextures.add(tex);
@@ -70,5 +71,10 @@ public class Level2 extends Level {
         bk5.add(new Transformation(tex.width/2, tex.height/2, 0));
         world.addEntity(bk5);
         mTextures.add(tex);*/
+
+        /*Entity lever = new Entity();
+        lever.add(new Sprite(mGame.getRenderer().addTexture(new float[]{1,0,0,1,}, 32f, 8f), -1));
+        lever.add(new Transformation())
+        world.addEntity(lever);*/
     }
 }

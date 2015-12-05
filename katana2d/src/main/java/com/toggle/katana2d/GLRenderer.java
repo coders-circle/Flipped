@@ -266,6 +266,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         GLES20.glScissor((int) cx, (int) cy, (int) (width * scale), (int) (height * scale));
 
         mScaling = scale;
+
     }
 
     // Set transform for drawing the rectangle.

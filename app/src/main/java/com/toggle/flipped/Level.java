@@ -70,6 +70,11 @@ public class Level implements CustomLoader, World.WorldEventListener {
         return mActiveWorld;
     }*/
 
+    public void restart() {
+        unload();
+        load();
+    }
+
     // load a level
     public void load() {
 
@@ -123,6 +128,22 @@ public class Level implements CustomLoader, World.WorldEventListener {
                     game.textureManager.add(spriteName, game.getRenderer().addTexture(
                             new float[]{0.0f, 0.0f, 0.7f, 1}, 32, 16
                 ));*/
+                return true;
+            case "lever":
+                if (!game.textureManager.has(spriteName)) {
+                    game.textureManager.add(spriteName, game.getRenderer().addTexture(
+                           R.drawable.lever, 32, 8
+                    ));
+                    game.textureManager.get(spriteName).originX = 1;
+                }
+                return true;
+            case "cross":
+                if (!game.textureManager.has(spriteName)) {
+                    game.textureManager.add(spriteName, game.getRenderer().addTexture(
+                            R.drawable.cross, 247, 275
+                    ));
+                    game.textureManager.get(spriteName).originY = 1;
+                }
                 return true;
         }
         return false;
@@ -208,6 +229,35 @@ public class Level implements CustomLoader, World.WorldEventListener {
         try {
             if (compName.equals("Explosive")) {
                 entity.add(new ExplosionSystem.Explosive());
+            }
+            else if (compName.equals("Mover")) {
+                Mover m = new Mover();
+                m.type = Mover.Type.LINEAR;
+                m.finalX = (float)component.getDouble("Final-X");
+                m.finalY = (float)component.getDouble("Final-Y");
+                entity.add(m);
+            }
+            else if (compName.equals("Rotor")) {
+                Mover m = new Mover();
+                m.type = Mover.Type.ANGULAR;
+                m.finalAngle = (float)component.getDouble("Final-Angle");
+                entity.add(m);
+            }
+            else if (compName.equals("Lever")) {
+                final Trigger trigger = new Trigger();
+                trigger.tag = component.getString("Tag");
+                entity.add(trigger);
+
+                String mentity = trigger.tag.substring(0, trigger.tag.indexOf("_lever"));
+                trigger.object = levelLoader.mCurrentEntities.get(mentity);
+                entity.get(Trigger.class).listeners.add(new Trigger.Listener() {
+                    @Override
+                    public void onTriggered(boolean status) {
+                        Entity moverEntity = (Entity) trigger.object;
+                        Mover m = moverEntity.get(Mover.class);
+                        m.start(moverEntity.get(Transformation.class));
+                    }
+                });
             }
         }
         catch (Exception e){

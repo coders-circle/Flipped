@@ -23,8 +23,6 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
         // Add sensors
         Bot p = e.get(Bot.class);
         PhysicsBody b = e.get(PhysicsBody.class);
-        //Vector2 ex = b.body.getFixtureList().get(0).getAABB(0).getExtents();
-        //b.body.getFixtureList().get(0).setFriction(0);
 
         Sprite s = e.get(Sprite.class);
         Vector2 ex = new Vector2(s.texture.width/2 * PhysicsSystem.METERS_PER_PIXEL - 0.01f, s.texture.height/2 * PhysicsSystem.METERS_PER_PIXEL - 0.01f);
@@ -39,10 +37,10 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
 
         // Side sensors
         shape = new PolygonShape();
-        shape.setAsBox(sensorSize, ex.y/2, new Vector2(-ex.x, 0), 0);
+        shape.setAsBox(sensorSize, sensorSize*4, new Vector2(-ex.x, 0), 0);
         p.leftSideFixture = b.createSensor(shape);
         shape = new PolygonShape();
-        shape.setAsBox(sensorSize, ex.y/2, new Vector2(ex.x, 0), 0);
+        shape.setAsBox(sensorSize, sensorSize*4, new Vector2(ex.x, 0), 0);
         p.rightSideFixture = b.createSensor(shape);
 
         float boxSize = 16 * PhysicsSystem.METERS_PER_PIXEL;
@@ -67,12 +65,17 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             boolean resetIdle = true;
             if (bot.actionState == Bot.ActionState.NOTHING && bot.motionState == Bot.MotionState.IDLE) {
                 bot.idleTime += dt;
-                if (bot.idleTime > 5) {
+                if (bot.idleTime > 15) {
+                    bot.idleTime = 0;
+                    bot.ssdIdle.animationSpeed = 0;
+                }
+                else if (bot.idleTime > 5) {
                     bot.ssdIdle.animationSpeed = 12;
                     resetIdle = false;
                 }
             } else {
                 bot.idleTime = 0;
+                bot.ssdIdle.animationSpeed = 0;
             }
 
             if (resetIdle) {
@@ -87,7 +90,7 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             s.scaleX = directionFactor < 0? -1 : 1;
 
             boolean onGround = bot.groundContacts>0;
-            boolean onLeftSide = bot.leftSideContacts>0, onRightSide = bot.rightSideContacts>0;
+            boolean onLeftSide = bot.leftSideContacts>0 && bot.direction == Bot.Direction.LEFT, onRightSide = bot.rightSideContacts>0 && bot.direction == Bot.Direction.RIGHT;
 
             // Get the fixture that is ahead of us
             Fixture ahead = null;
@@ -97,10 +100,14 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
                 ahead = bot.aheadRight;
 
             // set friction on when we are on ground
-            if (onGround)
-                b.body.getFixtureList().get(0).setFriction(0.2f);
-            else
-                b.body.getFixtureList().get(0).setFriction(0.0f);
+            b.body.getFixtureList().get(0).setFriction(0.0f);
+
+
+            Entity sideEntity = null;
+            if (bot.direction == Bot.Direction.LEFT && onLeftSide)
+                sideEntity = (Entity)bot.leftFixtureObject.getUserData();
+            else if (bot.direction == Bot.Direction.RIGHT && onRightSide)
+                sideEntity = (Entity)bot.rightFixtureObject.getUserData();
 
             /*
             First handle actions
@@ -148,6 +155,19 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
                     bot.carriable.state = Carriable.State.CARRIED;
                 }
             }
+            else if (bot.actionState == Bot.ActionState.LEVER_PUSH) {
+                s.changeSprite(bot.sprLever, bot.ssdLever);
+                bot.lever.leverPosition = bot.ssdLever.index / 15f;
+                bot.ssdLever.listener = new Sprite.AnimationListener() {
+                    @Override
+                    public void onComplete() {
+                        bot.lever.leverPosition = 1;
+                        s.changeSprite(bot.sprIdle, bot.ssdIdle);
+                        bot.lever.trigger();
+                        bot.actionState = Bot.ActionState.NOTHING;
+                    }
+                };
+            }
 
 
             /*
@@ -157,21 +177,18 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             // we can hang when we touch a hanger and our direction is same as that of contact
             // and we are not on ground
             boolean toHang = bot.hangingContacts > 0
-                    && !onGround && ((onRightSide && bot.direction == Bot.Direction.RIGHT)
-                    || (onLeftSide && bot.direction == Bot.Direction.LEFT));
+                    && !onGround && (onRightSide || onLeftSide);
 
             if (toHang) {
                 // if we are to hang but not already in a hanging state, set the state
-                if (bot.actionState != Bot.ActionState.HANG && bot.actionState != Bot.ActionState.HANG_UP)
+                if (bot.actionState != Bot.ActionState.HANG && bot.actionState != Bot.ActionState.HANG_UP) {
                     bot.actionState = Bot.ActionState.HANG;
+                    bot.motionState = Bot.MotionState.IDLE;
+                }
             }
             else if (bot.actionState == Bot.ActionState.HANG_UP || bot.actionState == Bot.ActionState.HANG) {
                 // if we are not to hang but we are in hanging state, reset the state
-                // and the position.
                 // note that this happens when we cancel a hang by trying to move opposite the direction of hanging
-
-                b.body.setTransform(b.body.getPosition().add(
-                        32*directionFactor*PhysicsSystem.METERS_PER_PIXEL, 24* PhysicsSystem.METERS_PER_PIXEL), 0);
                 bot.actionState = Bot.ActionState.NOTHING;
                 bot.hangingContacts = bot.leftSideContacts = bot.rightSideContacts = 0;
             }
@@ -182,10 +199,12 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
                 b.body.setType(BodyDef.BodyType.KinematicBody);
                 b.body.setLinearVelocity(new Vector2(0, 0));
 
-                // position the body so it is properly hanging
-                b.body.setTransform(bot.hanger.getBody().getPosition().sub(
-                        10 * directionFactor * PhysicsSystem.METERS_PER_PIXEL,
-                        3 * PhysicsSystem.METERS_PER_PIXEL), 0);
+                if (bot.direction == Bot.Direction.RIGHT)
+                    b.body.setTransform(bot.hanger.getBody().getPosition().add(bot.climbPositions.get(0)), 0);
+                else if (bot.direction == Bot.Direction.LEFT)
+                    b.body.setTransform(bot.hanger.getBody().getPosition().add(
+                            -bot.climbPositions.get(0).x, bot.climbPositions.get(0).y
+                    ), 0);
 
                 // climbing animation should be disabled
                 bot.ssdClimb.index = 0;
@@ -196,13 +215,20 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
                 // while moving up during hanging, climbing animation should be enabled
                 bot.ssdClimb.animationSpeed = 12;
 
+                if (bot.direction == Bot.Direction.RIGHT)
+                    b.body.setTransform(bot.hanger.getBody().getPosition().add(bot.climbPositions.get(bot.ssdClimb.index)), 0);
+                else if (bot.direction == Bot.Direction.LEFT)
+                    b.body.setTransform(bot.hanger.getBody().getPosition().add(
+                            -bot.climbPositions.get(bot.ssdClimb.index).x, bot.climbPositions.get(bot.ssdClimb.index).y
+                    ), 0);
+
                 // on completion on animation, reset the position and state
                 if (bot.ssdClimb.listener == null)
                 bot.ssdClimb.listener = new Sprite.AnimationListener() {
                     @Override
                     public void onComplete() {
-                        b.body.setTransform(bot.hanger.getBody().getPosition().sub(
-                                0, (16+24) * PhysicsSystem.METERS_PER_PIXEL), 0);
+                        /*b.body.setTransform(bot.hanger.getBody().getPosition().sub(
+                                0, (16+24) * PhysicsSystem.METERS_PER_PIXEL), 0);*/
                         bot.actionState = Bot.ActionState.NOTHING;
                         bot.hangingContacts = bot.leftSideContacts = bot.rightSideContacts = 0;
                         bot.ssdClimb.listener = null;
@@ -255,6 +281,17 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             else
                 b.body.setLinearVelocity(speed, vel.y);
 
+            /*
+            If moving forward with a lever in front, we activate the lever
+             */
+
+            if ((speed < 0 && onLeftSide) || (speed > 0 && onRightSide)) {
+                if (sideEntity != null && sideEntity.has(Trigger.class)) {
+                    bot.lever = sideEntity.get(Trigger.class);
+                    if (!bot.lever.getStatus())
+                        bot.actionState = Bot.ActionState.LEVER_PUSH;
+                }
+            }
 
             /*
             Now change sprites accordingly
@@ -266,8 +303,10 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
                         bot.ssdCarry.animationSpeed = 3*moveSpeed;
                         s.changeSprite(bot.sprCarry, bot.ssdCarry);
                     }
-                    else if ((speed < 0 && onLeftSide) || (speed > 0 && onRightSide))
-                        s.changeSprite(bot.sprPush, bot.ssdPush);
+                    else if (onLeftSide || onRightSide) {
+                        if (bot.actionState != Bot.ActionState.LEVER_PUSH)
+                            s.changeSprite(bot.sprPush, bot.ssdPush);
+                    }
                     else
                         s.changeSprite(bot.sprWalk, bot.ssdWalk);
                 }
@@ -306,10 +345,14 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
                     || me.getBody().getLinearVelocity().y >= 0)*/
                 bot.groundContacts++;
         }
-        else if (me == bot.leftSideFixture)
+        else if (me == bot.leftSideFixture) {
             bot.leftSideContacts++;
-        else if (me == bot.rightSideFixture)
+            bot.leftFixtureObject = other;
+        }
+        else if (me == bot.rightSideFixture) {
             bot.rightSideContacts++;
+            bot.rightFixtureObject = other;
+        }
         else if (me == bot.aheadSensorLeft) {
             bot.aheadLeftContacts++;
             bot.aheadLeft = other;

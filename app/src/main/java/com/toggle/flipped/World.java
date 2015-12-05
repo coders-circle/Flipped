@@ -59,6 +59,8 @@ public class World extends Scene {
         mSystems.add(new SoundSystem());
         mSystems.add(new PickCarrySystem());
         mSystems.add(new BurnSystem());
+        mSystems.add(new TriggerSystem());
+        mSystems.add(new AutoMoverSystem());
 
         // Load the entities from the level editor
         mLevelLoader.loadWorld(mWorldName, this, physicsWorld);
@@ -92,6 +94,13 @@ public class World extends Scene {
         }
 
         mPlayer.get(PhysicsBody.class).body.setTransform(new Vector2(x, y), 0);
+    }
+
+    @Override
+    public void onUpdate(float dt) {
+        if (mPlayer.get(Bot.class).dead)
+            mParentLevel.restart();
+        //Log.d("dead", mPlayer.get(Bot.class).dead+"");
     }
 
     // When world changes from this to another world

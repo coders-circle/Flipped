@@ -1,7 +1,5 @@
 package com.toggle.katana2d;
 
-import android.app.Activity;
-
 public class Engine {
 
     private SurfaceView mSurfaceView;

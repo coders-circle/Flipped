@@ -1,5 +1,7 @@
 package com.toggle.flipped;
 
+import android.util.Log;
+
 import com.toggle.katana2d.Game;
 import com.toggle.katana2d.GameActivity;
 

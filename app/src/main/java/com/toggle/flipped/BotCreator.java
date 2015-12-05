@@ -1,5 +1,6 @@
 package com.toggle.flipped;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Game;
@@ -10,6 +11,7 @@ import com.toggle.katana2d.Utilities;
 import com.toggle.katana2d.physics.PhysicsBody;
 
 import com.badlogic.gdx.physics.box2d.World;
+import com.toggle.katana2d.physics.PhysicsSystem;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -123,7 +125,12 @@ public class BotCreator {
             else
                 bot.sprCarry = getSprite(json.getJSONObject("walk_sprite"));
 
-            Sprite.SpriteSheetData stand, walk, push, jump, climb, pick, carry;
+            if (json.has("lever_sprite"))
+                bot.sprLever = getSprite(json.getJSONObject("lever_sprite"));
+            else
+                bot.sprLever = getSprite(json.getJSONObject("walk_sprite"));
+
+            Sprite.SpriteSheetData stand, walk, push, jump, climb, pick, carry, lever;
 
             walk = getSpriteSheet(json.getJSONObject("walk_sheet"));
 
@@ -162,6 +169,12 @@ public class BotCreator {
             else
                 carry = getSpriteSheet(json.getJSONObject("walk_sheet"));
 
+            if (json.has("lever_sheet"))
+                lever = getSpriteSheet(json.getJSONObject("lever_sheet"));
+            else
+                lever = getSpriteSheet(json.getJSONObject("walk_sheet"));
+            lever.loop = false;
+
             bot.ssdIdle = stand;
             bot.ssdWalk = walk;
             bot.ssdJump = jump;
@@ -169,6 +182,27 @@ public class BotCreator {
             bot.ssdClimb = climb;
             bot.ssdPick = pick;
             bot.ssdCarry = carry;
+            bot.ssdLever = lever;
+
+            bot.climbPositions.add(new Vector2(-26, -5));
+            bot.climbPositions.add(new Vector2(-25, -6));
+            bot.climbPositions.add(new Vector2(-24, -7));
+            bot.climbPositions.add(new Vector2(-23, -8));
+            bot.climbPositions.add(new Vector2(-22, -9));
+            bot.climbPositions.add(new Vector2(-22, -10));
+            bot.climbPositions.add(new Vector2(-20, -12));
+            bot.climbPositions.add(new Vector2(-18, -14));
+            bot.climbPositions.add(new Vector2(-16, -16));
+            bot.climbPositions.add(new Vector2(-14, -18));
+            bot.climbPositions.add(new Vector2(-10, -20));
+            bot.climbPositions.add(new Vector2(-8, -22));
+            bot.climbPositions.add(new Vector2(6, -24));
+            bot.climbPositions.add(new Vector2(4, -27));
+            bot.climbPositions.add(new Vector2(2, -30));
+            bot.climbPositions.add(new Vector2(0, -34));
+
+            for (int i=0; i<16; ++i)
+                bot.climbPositions.get(i).scl(PhysicsSystem.METERS_PER_PIXEL);
 
             entity.get(Sprite.class).spriteSheetData = stand;
 

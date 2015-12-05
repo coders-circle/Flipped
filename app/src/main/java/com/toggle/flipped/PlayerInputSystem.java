@@ -67,8 +67,7 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
                     ex.printStackTrace();
                     continue;
                 }
-                if (motionControlLimit.hitTest(touch.x, touch.y)
-                        && b.actionState != Bot.ActionState.PICK) {
+                if (motionControlLimit.hitTest(touch.x, touch.y) && b.actionState != Bot.ActionState.PICK) {
                     b.touchX = Math.max(b.touchX, Math.abs(touch.dx/3));
                     if (touch.dx > dxLimit
                             && !(hanging && b.direction == Bot.Direction.RIGHT)) {
@@ -113,14 +112,23 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
             float w = mGame.getRenderer().width;
             float h = mGame.getRenderer().height;
 
+            if (t.y > mMaxHeight+48)
+                b.dead = true;
+
 
             // Scroll the camera so that player is at the center of screen.
             // Make sure the camera don't go off the edges of the world,
             // assuming the world is twice the width of camera view (w*2).
             // This assumption is temporary.
+
+            float x = t.x, y = t.y;
+            if (b.actionState == Bot.ActionState.HANG || b.actionState == Bot.ActionState.HANG_UP) {
+                Transformation tt = ((Entity) b.hanger.getUserData()).get(Transformation.class);
+                x = tt.x; y = tt.y;
+            }
             Camera camera = mGame.getRenderer().getCamera();
-            camera.x = Math.min(Math.max(w / 2, t.x), mMaxWidth - w / 2) - w / 2;
-            camera.y = Math.min(Math.max(h / 2, t.y), mMaxHeight - h / 2) - h / 2;
+            camera.x = Math.min(Math.max(w / 2, x), mMaxWidth - w / 2) - w / 2;
+            camera.y = Math.min(Math.max(h / 2, y), mMaxHeight - h / 2) - h / 2;
         }
     }
 }

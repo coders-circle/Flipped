@@ -1,9 +1,9 @@
 package com.toggle.flipped;
 
-import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.ChainShape;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
@@ -148,10 +148,17 @@ public class LevelLoader {
                     // box and circle shapes are easy. polygon is little bit complicated
                     switch (type) {
                         case "box":
+                            Vector2 center;
+                            String spr = components.getJSONObject("Sprite").getString("Sprite");
+                            center = new Vector2(
+                                    -(game.textureManager.get(spr).originX-0.5f)*(float)jsonShape.getDouble("width") * scaleX,
+                                    -(game.textureManager.get(spr).originY-0.5f)*(float)jsonShape.getDouble("height") * scaleY);
+
                             shape = new PolygonShape();
                             ((PolygonShape) shape).setAsBox(
                                     (float) jsonShape.getDouble("width") / 2 * PhysicsSystem.METERS_PER_PIXEL * scaleX,
-                                    (float) jsonShape.getDouble("height") / 2 * PhysicsSystem.METERS_PER_PIXEL * scaleY);
+                                    (float) jsonShape.getDouble("height") / 2 * PhysicsSystem.METERS_PER_PIXEL * scaleY,
+                                    center.scl(PhysicsSystem.METERS_PER_PIXEL), 0);
                             break;
 
                         case "circle":
@@ -160,12 +167,19 @@ public class LevelLoader {
                             break;
 
                         default:
-                            shape = new PolygonShape();
-                            float offsetX = (float) sprite.getDouble("width") / 2;
-                            float offsetY = (float) sprite.getDouble("height") / 2;
+                            shape = new ChainShape();
+                            spr = components.getJSONObject("Sprite").getString("Sprite");
+                            center = new Vector2(
+                                    (game.textureManager.get(spr).originX-0.5f)*(float)sprite.getDouble("width"),
+                                    (game.textureManager.get(spr).originY-0.5f)*(float)sprite.getDouble("height"));
+
+
+                            float offsetX = (float) sprite.getDouble("width") / 2 + center.x;
+                            float offsetY = (float) sprite.getDouble("height") / 2 + center.y;
                             List<Vector2> vertices = PhysicsUtilities.parsePoints(jsonShape.getString("points"), true, offsetX, offsetY);
+                            vertices.add(new Vector2(vertices.get(0)));
                             PhysicsUtilities.scale(vertices, scaleX, scaleY);
-                            ((PolygonShape) shape).set(vertices.toArray(new Vector2[vertices.size()]));
+                            ((ChainShape) shape).createChain(vertices.toArray(new Vector2[vertices.size()]));
 
                             break;
 
