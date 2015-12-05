@@ -7,19 +7,22 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.World;
 import com.toggle.katana2d.*;
 import com.toggle.katana2d.physics.*;
+import com.toggle.katana2d.physics.ContactListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExplosionSystem extends com.toggle.katana2d.System implements com.toggle.katana2d.physics.ContactListener {
+public class ExplosionSystem extends com.toggle.katana2d.System implements ContactListener, QueryCallback {
 
     @Override
     public void beginContact(Contact contact, Fixture me, Fixture other) {
-        //if (me.isSensor())
-        if (((Entity)other.getUserData()).has(Fire.class) && other.isSensor()) {
-            Explosive e = ((Entity)me.getUserData()).get(Explosive.class);
-            e.explosionTime = 2;
-            e.isExploding = true;
+        Explosive e = ((Entity)me.getUserData()).get(Explosive.class);
+        Entity otherEntity = (Entity)other.getUserData();
+        if (!me.isSensor() && otherEntity.has(Fire.class) && other.isSensor()) {
+            if (!e.destroyed && !e.isExploding) {
+                e.explosionTime = 2;
+                e.isExploding = true;
+            }
         }
     }
 
@@ -40,6 +43,19 @@ public class ExplosionSystem extends com.toggle.katana2d.System implements com.t
 
     public final static int NON_EXPLOSIVE_GROUP = -1;
 
+    @Override
+    public boolean reportFixture(Fixture other) {
+        Log.d("exploding", other.toString());
+        Entity otherEntity = (Entity)other.getUserData();
+        if (otherEntity.has(Mover.class)) {
+            Mover m = otherEntity.get(Mover.class);
+            if (m.type == Mover.Type.ANGULAR) {
+                m.start(otherEntity.get(Transformation.class));
+            }
+        }
+        return true;
+    }
+
     public static class Explosive implements Component {
         public List<Body> particles = new ArrayList<>();    // air particles that are "exploded"
         public int numParticles = 32;
@@ -53,12 +69,14 @@ public class ExplosionSystem extends com.toggle.katana2d.System implements com.t
 
         public boolean destroyed = false;
         public float explosionTime = 0;
+
+        public float explosionWidth, explosionHeight;   // in meters
     }
 
     private World mWorld;
     private Game mGame;
     public ExplosionSystem(World world, Game game) {
-        super(new Class[]{Sprite.class, Explosive.class, Transformation.class, PhysicsBody.class});
+        super(new Class[]{Sprite.class, Explosive.class, Transformation.class, PhysicsBody.class, Emitter.class});
         mWorld = world;
         mGame = game;
     }
@@ -72,6 +90,14 @@ public class ExplosionSystem extends com.toggle.katana2d.System implements com.t
             d.groupIndex = NON_EXPLOSIVE_GROUP;
             f.setFilterData(d);
         }
+        Explosive e = entity.get(Explosive.class);
+        /*
+        // add explosion sensor
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(e.sprite.texture.width/2 * PhysicsSystem.METERS_PER_PIXEL, e.sprite.texture.height/2 * PhysicsSystem.METERS_PER_PIXEL);
+        b.createSensor(shape);*/
+        e.explosionWidth = e.sprite.texture.width * PhysicsSystem.METERS_PER_PIXEL;
+        e.explosionHeight = e.sprite.texture.height * PhysicsSystem.METERS_PER_PIXEL;
     }
 
     @Override
@@ -81,17 +107,30 @@ public class ExplosionSystem extends com.toggle.katana2d.System implements com.t
             Transformation t = entity.get(Transformation.class);
             PhysicsBody bd = entity.get(PhysicsBody.class);
             Sprite s = entity.get(Sprite.class);
+            Emitter emitter = entity.get(Emitter.class);
 
             if (e.isExploding && !e.destroyed) {
+                bd.body.setType(BodyDef.BodyType.StaticBody);
+                bd.body.setLinearVelocity(new Vector2(0, 0));
+                bd.body.setTransform(bd.body.getPosition(), (float)Math.toRadians(-90));
+
                 if (e.explosionTime > 0)  {
+                    emitter.emitNext = true;
                     e.explosionTime -= dt;
                 }
                 else {
-                    if (e.sprite != null)
-                        s.changeSprite(e.sprite.texture, e.sprite.spriteSheetData);
+                    emitter.emitNext = false;
+                    s.changeSprite(e.sprite.texture, e.sprite.spriteSheetData);
+
+                    Vector2 pos = bd.body.getPosition();
+                    bd.body.getWorld().QueryAABB(this,
+                            pos.x-e.explosionWidth/2, pos.y-e.explosionHeight/2,
+                            pos.x+e.explosionWidth/2, pos.y+e.explosionHeight/2
+                    );
 
                     for (Fixture f: bd.body.getFixtureList()) {
-                        bd.body.destroyFixture(f);
+                        if (!f.isSensor())
+                            bd.body.destroyFixture(f);
                     }
 
                     e.lifeSpan -= dt;
@@ -100,12 +139,15 @@ public class ExplosionSystem extends com.toggle.katana2d.System implements com.t
                         for (Body b : e.particles)
                             b.getWorld().destroyBody(b);
 
-                   /* // reset the explosive
-                    e.particles.clear();
-                    e.isExploding = false;
-                    e.lifeSpan = 5;*/
-                        //destroy the entity body as well
+                        /* // reset the explosive
+                        e.particles.clear();
+                        e.isExploding = false;
+                        e.lifeSpan = 5;*/
+
+                        // destroy the explosive
                         e.destroyed = true;
+                        e.isExploding = false;
+
                     } else if (e.particles.size() == 0) {
                         // create the particles
                         FixtureDef fixtureDef = new FixtureDef();
@@ -141,20 +183,6 @@ public class ExplosionSystem extends com.toggle.katana2d.System implements com.t
                     }
                 }
             }
-            /*else {  // if not exploding then explode at touch
-                TouchInputData inputData = mGame.getTouchInputData();
-                Camera camera = mGame.getRenderer().getCamera();
-                if (inputData.pointers.size() > 0) {
-                    for (int i=0; i<inputData.pointers.size(); ++i) {
-                        TouchInputData.Pointer p = inputData.pointers.valueAt(i);
-
-                        if (new Vector2(p.x+camera.x-t.x, p.y+camera.y-t.y).len() < 20) {
-                            e.isExploding = true;
-                            break;
-                        }
-                    }
-                }
-            }*/
         }
     }
 

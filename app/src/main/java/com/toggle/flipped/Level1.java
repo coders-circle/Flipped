@@ -31,10 +31,12 @@ public class Level1 extends Level {
 
     @Override
     public void load() {
+        mGame.getActivity().handler.sendEmptyMessage(1);
         addWorld("world1", 0, 7520, 640);
         addWorld("world2", 180, 3500, 640);    // flipped world
 
         changeWorld(0, null);
+        mGame.getActivity().handler.sendEmptyMessage(2);
     }
 
     @Override
@@ -89,7 +91,7 @@ public class Level1 extends Level {
             bk5.add(new Transformation(tex.width/2, tex.height/2, 0));
             world.addEntity(bk5);
             mTextures.add(tex);*/
-
+/*
             // A stick
             Entity stick = new Entity();
             stick.add(new Sprite(mGame.getRenderer().addTexture(new float[]{1, 1, 0, 1}, 16, 4), -1.6f));
@@ -97,12 +99,12 @@ public class Level1 extends Level {
             PhysicsBody b = new PhysicsBody(world.physicsWorld, BodyDef.BodyType.DynamicBody, stick, new PhysicsBody.Properties(1, 0.2f, 0.1f));
             stick.add(b);
 
-            Filter d = b.body.getFixtureList().get(0).getFilterData();
+            *//*Filter d = b.body.getFixtureList().get(0).getFilterData();
             d.groupIndex = ExplosionSystem.NON_EXPLOSIVE_GROUP;
-            b.body.getFixtureList().get(0).setFilterData(d);
+            b.body.getFixtureList().get(0).setFilterData(d);*//*
 
             PolygonShape fireShape = new PolygonShape();
-            fireShape.setAsBox(28 * PhysicsSystem.METERS_PER_PIXEL, 28 * PhysicsSystem.METERS_PER_PIXEL, new Vector2(10 * PhysicsSystem.METERS_PER_PIXEL, 0), 0);
+            fireShape.setAsBox(10 * PhysicsSystem.METERS_PER_PIXEL, 10 * PhysicsSystem.METERS_PER_PIXEL, new Vector2(10 * PhysicsSystem.METERS_PER_PIXEL, 0), 0);
             b.createSensor(fireShape);
 
             Carriable c = new Carriable();
@@ -164,7 +166,7 @@ public class Level1 extends Level {
             stick.add(new Burner(emitter));
             stick.add(new Fire());
 
-            world.addEntity(stick);
+            world.addEntity(stick);*/
         }
         else if (world == mWorlds.get(1)) {
             Entity bk1 = new Entity();

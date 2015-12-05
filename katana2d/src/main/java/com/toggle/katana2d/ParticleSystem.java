@@ -84,44 +84,43 @@ public class ParticleSystem extends System {
                 if (e.emissionTime >= et) {
                     e.emissionTime -= et;
                     emit(e, 1);
+                    if (e.emitOnlyOnce)
+                        e.emitNext = false;
                 }
+            }
 
-                for (int i = 0; i < e.numParticles; ++i) {
-                    Emitter.Particle p = e.particles[i];
+            for (int i = 0; i < e.numParticles; ++i) {
+                Emitter.Particle p = e.particles[i];
 
-                    if (p==null)
-                        continue;
+                if (p==null)
+                    continue;
 
-                    if (p.life >= e.life) {
-                        kill(e, i);
-                        continue;
-                    }
-                    p.life += dt;
-
-                    p.speed_x += p.accel_x * dt;
-                    p.speed_y += p.accel_y * dt;
-
-                    p.x = p.x + p.speed_x * dt;
-                    p.y = p.y + p.speed_y * dt;
-
-
-                    // Fill the point sprites data
-                    int o = i * PointSprites.ELEMENTS_PER_POINT;
-
-                    e.pointSpritesData[o] = p.x;
-                    e.pointSpritesData[o + 1] = p.y;
-
-                    float f = p.life / e.life;
-                    e.pointSpritesData[o + 2] = p.startColor[0] + f * p.rangeColor[0];
-                    e.pointSpritesData[o + 3] = p.startColor[1] + f * p.rangeColor[1];
-                    e.pointSpritesData[o + 4] = p.startColor[2] + f * p.rangeColor[2];
-                    e.pointSpritesData[o + 5] = p.startColor[3] + f * p.rangeColor[3];
-
-                    e.pointSpritesData[o + 6] = p.size;
+                if (p.life >= e.life) {
+                    kill(e, i);
+                    continue;
                 }
+                p.life += dt;
 
-                if (e.emitOnlyOnce)
-                    e.emitNext = false;
+                p.speed_x += p.accel_x * dt;
+                p.speed_y += p.accel_y * dt;
+
+                p.x = p.x + p.speed_x * dt;
+                p.y = p.y + p.speed_y * dt;
+
+
+                // Fill the point sprites data
+                int o = i * PointSprites.ELEMENTS_PER_POINT;
+
+                e.pointSpritesData[o] = p.x;
+                e.pointSpritesData[o + 1] = p.y;
+
+                float f = p.life / e.life;
+                e.pointSpritesData[o + 2] = p.startColor[0] + f * p.rangeColor[0];
+                e.pointSpritesData[o + 3] = p.startColor[1] + f * p.rangeColor[1];
+                e.pointSpritesData[o + 4] = p.startColor[2] + f * p.rangeColor[2];
+                e.pointSpritesData[o + 5] = p.startColor[3] + f * p.rangeColor[3];
+
+                e.pointSpritesData[o + 6] = p.size;
             }
         }
     }

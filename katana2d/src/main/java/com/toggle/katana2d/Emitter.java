@@ -57,7 +57,7 @@ public class Emitter implements Component {
     public int numParticles = 0;             // total number of particles emitted
 
     public boolean emitOnlyOnce = false;    // Emit only once and then set emitNext to false automatically
-    public boolean emitNext = true;         // SSet this to false to stop emitting and true to start emitting
+    public boolean emitNext = true;         // Set this to false to stop emitting and true to start emitting
 
     public float emissionTime = 0;          // total time since last emission
 }

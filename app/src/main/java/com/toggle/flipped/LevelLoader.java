@@ -54,9 +54,11 @@ public class LevelLoader {
                 // if custom loader doesn't handle this sprite, just
                 // load the sprite with the key as filename
                 if (!mCustomLoader.loadSprite(game, key.toLowerCase(), jsonSprite)) {
-                    int spriteTex = Utilities.getResourceId(game.getActivity(), "drawable", key);
-                    Texture sprite = game.getRenderer().addTexture(spriteTex, (float) jsonSprite.getDouble("width"), (float) jsonSprite.getDouble("height"));
-                    game.textureManager.add(key, sprite);
+                    if (!game.textureManager.has(key)) {
+                        int spriteTex = Utilities.getResourceId(game.getActivity(), "drawable", key);
+                        Texture sprite = game.getRenderer().addTexture(spriteTex, (float) jsonSprite.getDouble("width"), (float) jsonSprite.getDouble("height"));
+                        game.textureManager.add(key, sprite);
+                    }
                 }
             }
         } catch (JSONException e) {
@@ -130,7 +132,7 @@ public class LevelLoader {
                     scaleY = (float) components.getJSONObject("Transformation").getDouble("Scale-Y");
                 }
                 Sprite sc = new Sprite(game.textureManager.get(component.getString("Sprite")),
-                        (float)component.optDouble("Z-Order", -1));
+                        (float)component.optDouble("Z", -1));
                 sc.scaleX = scaleX;
                 sc.scaleY = scaleY;
                 entity.add(sc);

@@ -52,7 +52,7 @@ public class FlipSystem extends com.toggle.katana2d.System implements ContactLis
             Body b = entity.get(PhysicsBody.class).body;
 
             if (f.player != null)
-                if (Math.abs(f.player.getPosition().x-b.getPosition().x) < 5* PhysicsSystem.METERS_PER_PIXEL)
+                if (Math.abs(f.player.getPosition().x-b.getPosition().x) < 10* PhysicsSystem.METERS_PER_PIXEL)
                     mLevel.changeWorld(f);
         }
     }

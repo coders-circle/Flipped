@@ -9,6 +9,7 @@ public class Sprite implements Component{
     public float scaleX = 1, scaleY = 1;
     public final float distance; // z-order
     public boolean scroll = false;  // Note that scrolling doesn't work well with Physics System
+    public boolean visible = true;
 
     public Sprite(Texture texture, float z) {
         this.texture = texture;
@@ -120,7 +121,7 @@ public class Sprite implements Component{
     }
 
     public void draw(GLRenderer renderer, float x, float y, float angle) {
-        if (texture == null)
+        if (texture == null || !visible)
             return;
 
         if (scroll) {

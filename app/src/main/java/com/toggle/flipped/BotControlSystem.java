@@ -227,8 +227,6 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
                 bot.ssdClimb.listener = new Sprite.AnimationListener() {
                     @Override
                     public void onComplete() {
-                        /*b.body.setTransform(bot.hanger.getBody().getPosition().sub(
-                                0, (16+24) * PhysicsSystem.METERS_PER_PIXEL), 0);*/
                         bot.actionState = Bot.ActionState.NOTHING;
                         bot.hangingContacts = bot.leftSideContacts = bot.rightSideContacts = 0;
                         bot.ssdClimb.listener = null;

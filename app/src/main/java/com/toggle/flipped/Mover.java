@@ -7,7 +7,7 @@ import com.toggle.katana2d.Transformation;
 public class Mover implements Component {
     public void start(Transformation current) {
         if (type == Type.LINEAR) {
-            lVelocity = new Vector2(finalX, finalY).sub(current.x, current.y).nor().scl(0.5f);
+            lVelocity = new Vector2(finalX, finalY).sub(current.x, current.y).nor().scl(0.8f);
         }
         else if (type == Type.ANGULAR) {
             aVelocity = Math.signum(finalAngle - current.angle) * 0.8f;

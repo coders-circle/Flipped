@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
+import com.toggle.katana2d.Emitter;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Game;
 import com.toggle.katana2d.Manager;
@@ -111,6 +112,7 @@ public class Level implements CustomLoader, World.WorldEventListener {
     public boolean loadSprite(Game game, String spriteName, JSONObject sprite) {
         switch (spriteName) {
             case "player":
+            case "stick":
                 return true;
             case "block":
                 if (!game.textureManager.has(spriteName))
@@ -120,10 +122,15 @@ public class Level implements CustomLoader, World.WorldEventListener {
                     ));
                 return true;
             case "mirror":
-                if (!game.textureManager.has(spriteName))
-                    game.textureManager.add(spriteName, game.getRenderer().addTexture(
+                if (!game.textureManager.has(spriteName)) {
+                    /*game.textureManager.add(spriteName, game.getRenderer().addTexture(
                             new float[]{0.0f, 0.0f, 0.7f, 1}, 32, 6
+                    ));*/
+                    game.textureManager.add(spriteName, game.getRenderer().addTexture(
+                            R.drawable.mirror, 64, 32
                     ));
+                    game.textureManager.get(spriteName).originY = 1;
+                }
                 return true;
             case "hanger":
                 /*if (!game.textureManager.has(spriteName))
@@ -179,17 +186,21 @@ public class Level implements CustomLoader, World.WorldEventListener {
 
             }
             else if (components.has("Mirror")) {
-                transformation = components.getJSONObject("Transformation");
-                entity.add(new Transformation((float) transformation.getDouble("Translate-X"),
-                        (float) transformation.getDouble("Translate-Y"), (float) transformation.getDouble("Angle")));
-                entity.add(new Sprite(mGame.textureManager.get("mirror"), -1));
-                entity.add(new PhysicsBody(world, BodyDef.BodyType.StaticBody, entity, new PhysicsBody.Properties(true)));
-                entity.add(new FlipSystem.Mirror());
-
-                FlipSystem.Mirror mrr = entity.get(FlipSystem.Mirror.class);
                 JSONObject mirrorJson = components.getJSONObject("Mirror");
+
+                entity.add(new FlipSystem.Mirror());
+                FlipSystem.Mirror mrr = entity.get(FlipSystem.Mirror.class);
                 mrr.nextWorld = mirrorJson.getString("Next world");
                 mrr.exitMirror = mirrorJson.getString("Exit mirror");
+
+                entity.add(new Sprite(mGame.textureManager.get("mirror"), -1));
+                if (mrr.nextWorld.equals(""))
+                    entity.get(Sprite.class).visible = false;
+
+                    transformation = components.getJSONObject("Transformation");
+                entity.add(new Transformation((float) transformation.getDouble("Translate-X"),
+                        (float) transformation.getDouble("Translate-Y"), (float) transformation.getDouble("Angle")));
+                entity.add(new PhysicsBody(world, BodyDef.BodyType.StaticBody, entity, new PhysicsBody.Properties(true)));
 
                 mirrors.put(entityName, entity);
                 return true;
@@ -219,6 +230,10 @@ public class Level implements CustomLoader, World.WorldEventListener {
                 //entity.add(new Sprite(mGame.textureManager.get("hanger"), -1));
                 return true;
             }
+            else if (entityName.startsWith("stick")) {
+                Utilities.createStick(levelLoader.mCurrentScene, world, entity, components);
+                return true;
+            }
         }
         catch (Exception e){
             e.printStackTrace();
@@ -231,10 +246,22 @@ public class Level implements CustomLoader, World.WorldEventListener {
         try {
             if (compName.equals("Explosive")) {
                 ExplosionSystem.Explosive e = new ExplosionSystem.Explosive();
-                e.sprite = new Sprite(mGame.getRenderer().addTexture(R.drawable.explosion, 64, 64),-5, 9, 9);
+                e.sprite = new Sprite(mGame.getRenderer().addTexture(R.drawable.explosion, 128, 128),-5, 9, 9);
                 e.sprite.spriteSheetData.loop = false;
                 e.lifeSpan = 81f/12;    // 81 frames running at 12 FPS
                 entity.add(e);
+
+                Emitter emitter = new Emitter(mGame.getRenderer(), 300, mGame.getRenderer().mFuzzyTextureId, 3, 100, new float[]{180f / 255, 80f / 255, 10f / 255, 1}, new float[]{0, 0, 0, 0});
+                emitter.var_startColor[3] = 0.3f;
+                emitter.size = 36;
+                emitter.var_size = 5;
+                emitter.var_angle = 90;
+                emitter.speed = 10;
+                emitter.var_speed = 5;
+                emitter.accel_x = 20;
+                emitter.additiveBlend = true;
+                emitter.emitNext = false;
+                entity.add(emitter);
 
             }
             else if (compName.equals("Mover")) {
