@@ -91,9 +91,22 @@ public class LevelLoader {
                 if (!mCustomLoader.loadEntity(e, boxWorld, key.toLowerCase(), jsonEntity)) {
                     JSONObject jsonComponents = jsonEntity.getJSONObject("components");
 
+                    // First load sprite and transformation if they exist, then load the rest
+
+                    if (jsonComponents.has("Sprite")) {
+                        if (!mCustomLoader.addComponent(boxWorld, e, "Sprite", jsonComponents.getJSONObject("Sprite"), jsonComponents))
+                            addComponent(boxWorld, e, "Sprite", jsonComponents.getJSONObject("Sprite"), jsonComponents);
+                    }
+                    if (jsonComponents.has("Transformation")) {
+                        if (!mCustomLoader.addComponent(boxWorld, e, "Transformation", jsonComponents.getJSONObject("Transformation"), jsonComponents))
+                            addComponent(boxWorld, e, "Transformation", jsonComponents.getJSONObject("Transformation"), jsonComponents);
+                    }
+
                     Iterator<String> ckeys = jsonComponents.keys();
                     while (ckeys.hasNext()) {
                         String ckey = ckeys.next();
+                        if (ckey.equals("Sprite") || ckey.equals("Transformation"))
+                            continue;
 
                         // again if custom loader doesn't handle this type of component, then we add it ourself
                         if (!mCustomLoader.addComponent(boxWorld, e, ckey, jsonComponents.getJSONObject(ckey), jsonComponents))
@@ -187,16 +200,20 @@ public class LevelLoader {
 
                     // Finally create the rigid body
                     BodyDef.BodyType bodyType;
-                    if (component.getString("Type").equals("Static"))
+                    String btype = component.getString("Type");
+                    if (btype.equals("Static") || btype.equals("Sensor"))
                         bodyType = BodyDef.BodyType.StaticBody;
-                    else if (component.getString("Type").equals("Dynamic"))
+                    else if (btype.equals("Dynamic"))
                         bodyType = BodyDef.BodyType.DynamicBody;
                     else
                         bodyType = BodyDef.BodyType.KinematicBody;
 
-                    entity.add(new PhysicsBody(world, bodyType, entity, shape, new PhysicsBody.Properties(
-                            (float) component.getDouble("Density"), (float) component.getDouble("Friction"), (float) component.getDouble("Restitution")
-                    )));
+                    if (btype.equals("Sensor"))
+                        entity.add(new PhysicsBody(world, bodyType, entity, shape, new PhysicsBody.Properties(true)));
+                    else
+                        entity.add(new PhysicsBody(world, bodyType, entity, shape, new PhysicsBody.Properties(
+                                (float) component.getDouble("Density"), (float) component.getDouble("Friction"), (float) component.getDouble("Restitution")
+                        )));
                 }
             }
             break;

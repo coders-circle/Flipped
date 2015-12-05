@@ -2,6 +2,7 @@ package com.toggle.flipped;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -114,9 +115,6 @@ public class RopeSystem extends com.toggle.katana2d.System {
                     // If enough time has passed, burn a segment
                     if (bd.timePassed > bd.timeToBurn) {
                         // first remove the segment
-                        /*Body body = rope.segments.get(rope.segments.size()-1);
-                        mWorld.destroyBody(body);
-                        rope.segments.remove(body);*/
                         rope.removeSegment(rope.segments.size()-1);
 
                         bd.timePassed = 0; // -= bd.timeToBurn;

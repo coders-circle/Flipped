@@ -4,6 +4,9 @@ import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.Shape;
 import com.toggle.katana2d.Background;
 import com.toggle.katana2d.Emitter;
 import com.toggle.katana2d.Entity;
@@ -13,6 +16,7 @@ import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Texture;
 import com.toggle.katana2d.Transformation;
 import com.toggle.katana2d.physics.PhysicsBody;
+import com.toggle.katana2d.physics.PhysicsSystem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,7 +94,16 @@ public class Level1 extends Level {
             Entity stick = new Entity();
             stick.add(new Sprite(mGame.getRenderer().addTexture(new float[]{1, 1, 0, 1}, 16, 4), -1.6f));
             stick.add(new Transformation(500, 500, 0));
-            stick.add(new PhysicsBody(world.physicsWorld, BodyDef.BodyType.DynamicBody, stick, new PhysicsBody.Properties(1, 0.2f, 0.1f)));
+            PhysicsBody b = new PhysicsBody(world.physicsWorld, BodyDef.BodyType.DynamicBody, stick, new PhysicsBody.Properties(1, 0.2f, 0.1f));
+            stick.add(b);
+
+            Filter d = b.body.getFixtureList().get(0).getFilterData();
+            d.groupIndex = ExplosionSystem.NON_EXPLOSIVE_GROUP;
+            b.body.getFixtureList().get(0).setFilterData(d);
+
+            PolygonShape fireShape = new PolygonShape();
+            fireShape.setAsBox(28 * PhysicsSystem.METERS_PER_PIXEL, 28 * PhysicsSystem.METERS_PER_PIXEL, new Vector2(10 * PhysicsSystem.METERS_PER_PIXEL, 0), 0);
+            b.createSensor(fireShape);
 
             Carriable c = new Carriable();
             c.position = new Vector2(156, 136);
@@ -149,6 +162,7 @@ public class Level1 extends Level {
             world.addEntity(emitter);
 
             stick.add(new Burner(emitter));
+            stick.add(new Fire());
 
             world.addEntity(stick);
         }

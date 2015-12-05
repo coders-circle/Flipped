@@ -127,7 +127,7 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
                 }
                 else if (ahead != null) {
                     Entity other = (Entity)ahead.getUserData();
-                    if (other.has(Carriable.class) && bot.dropTime <= 0) {
+                    if (other != null && other.has(Carriable.class) && bot.dropTime <= 0) {
                         // pickup
                         bot.actionState = Bot.ActionState.PICK;
                         bot.carriable = other.get(Carriable.class);

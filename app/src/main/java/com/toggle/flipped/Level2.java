@@ -1,5 +1,6 @@
 package com.toggle.flipped;
 
+import android.app.Dialog;
 import android.util.Log;
 
 import com.toggle.katana2d.Background;
@@ -23,10 +24,15 @@ public class Level2 extends Level {
 
     @Override
     public void load() {
+        mGame.getActivity().handler.sendEmptyMessage(1);
+
         int world1 = addWorld("world1", 0, 7520, 640);
         ///*int world2 = */addWorld("world2", 180, 7520, 640);    // flipped world
 
         changeWorld(world1, null);
+
+        //loader_dialog.dismiss();
+        mGame.getActivity().handler.sendEmptyMessage(2);
     }
 
     @Override

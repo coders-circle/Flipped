@@ -1,5 +1,7 @@
 package com.toggle.flipped;
 
+import android.util.Log;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -228,7 +230,12 @@ public class Level implements CustomLoader, World.WorldEventListener {
     public boolean addComponent(com.badlogic.gdx.physics.box2d.World world, Entity entity, String compName, JSONObject component, JSONObject components) {
         try {
             if (compName.equals("Explosive")) {
-                entity.add(new ExplosionSystem.Explosive());
+                ExplosionSystem.Explosive e = new ExplosionSystem.Explosive();
+                e.sprite = new Sprite(mGame.getRenderer().addTexture(R.drawable.explosion, 64, 64),-5, 9, 9);
+                e.sprite.spriteSheetData.loop = false;
+                e.lifeSpan = 81f/12;    // 81 frames running at 12 FPS
+                entity.add(e);
+
             }
             else if (compName.equals("Mover")) {
                 Mover m = new Mover();

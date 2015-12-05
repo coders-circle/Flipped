@@ -3,11 +3,13 @@ package com.toggle.flipped;
 
 import android.util.Log;
 
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.toggle.katana2d.*;
 import com.toggle.katana2d.physics.ContactListener;
 import com.toggle.katana2d.physics.PhysicsBody;
+import com.toggle.katana2d.physics.PhysicsSystem;
 
 public class FlipSystem extends com.toggle.katana2d.System implements ContactListener {
 
@@ -20,6 +22,8 @@ public class FlipSystem extends com.toggle.katana2d.System implements ContactLis
 
         public String nextWorld;
         public String exitMirror;
+
+        public Body player;
     }
 
     private Bot mBotComponent;   // Bot component of player, consists the ground fixture to test collision with
@@ -42,16 +46,30 @@ public class FlipSystem extends com.toggle.katana2d.System implements ContactLis
     }
 
     @Override
+    public void update(float dt) {
+        for (Entity entity: mEntities) {
+            Mirror f = entity.get(Mirror.class);
+            Body b = entity.get(PhysicsBody.class).body;
+
+            if (f.player != null)
+                if (Math.abs(f.player.getPosition().x-b.getPosition().x) < 5* PhysicsSystem.METERS_PER_PIXEL)
+                    mLevel.changeWorld(f);
+        }
+    }
+
+    @Override
     public void beginContact(Contact contact, Fixture me, Fixture other) {
         Mirror f = ((Entity)me.getUserData()).get(Mirror.class);
         if (other == mBotComponent.groundFixture) {
-            mLevel.changeWorld(f);
+            f.player = other.getBody();
         }
     }
 
     @Override
     public void endContact(Contact contact, Fixture me, Fixture other) {
-
+        Mirror f = ((Entity)me.getUserData()).get(Mirror.class);
+        if (f.player == other.getBody())
+            f.player = null;
     }
 
     @Override

@@ -114,7 +114,6 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         GLES20.glEnable(GLES20.GL_BLEND);
         setAlphaBlending();
 
-
         // Enable z buffer
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         GLES20.glDepthFunc(GLES20.GL_LEQUAL);
@@ -349,6 +348,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     private List<Integer> loadTexture(int resourceId, int width, int height, int numCols, int numRows) {
         List<Integer> ids = new ArrayList<>();
         try {
+
             InputStream is = mContext.getResources().openRawResource(resourceId);
             BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(new BufferedInputStream(is), true);
 

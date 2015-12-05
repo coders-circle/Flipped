@@ -26,12 +26,12 @@ public class MainActivity extends GameActivity implements Level.Listener/* imple
         // add menu-screen scene
         game.addScene(menuScreen);*/
 
-        //loadResources();
+        loadResources();
         //game.setActiveScene(game.addScene(new TestScene2()));
 
         level1 = new Level1(game, this);
         level2 = new Level2(game, this);
-        level1.load();
+        level2.load();
     }
 
     public void loadResources() {

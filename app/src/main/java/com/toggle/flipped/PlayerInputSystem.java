@@ -122,10 +122,10 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
             // This assumption is temporary.
 
             float x = t.x, y = t.y;
-            if (b.actionState == Bot.ActionState.HANG || b.actionState == Bot.ActionState.HANG_UP) {
+            /*if (b.actionState == Bot.ActionState.HANG || b.actionState == Bot.ActionState.HANG_UP) {
                 Transformation tt = ((Entity) b.hanger.getUserData()).get(Transformation.class);
                 x = tt.x; y = tt.y;
-            }
+            }*/
             Camera camera = mGame.getRenderer().getCamera();
             camera.x = Math.min(Math.max(w / 2, x), mMaxWidth - w / 2) - w / 2;
             camera.y = Math.min(Math.max(h / 2, y), mMaxHeight - h / 2) - h / 2;

@@ -38,7 +38,7 @@ public class Utilities {
             float dy = p1.y - p0.y;
 
             float d = (float)Math.sqrt(dx * dx + dy * dy);
-            float np = (float)Math.ceil(d / length);
+            int np = (int)Math.floor(d / length);
 
             float stepX = dx / np;
             float stepY = dy / np;
