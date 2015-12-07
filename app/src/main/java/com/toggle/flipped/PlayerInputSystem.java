@@ -1,5 +1,7 @@
 package com.toggle.flipped;
 
+import android.util.Log;
+
 import com.badlogic.gdx.math.Vector2;
 import com.toggle.katana2d.Camera;
 import com.toggle.katana2d.Game;
@@ -71,7 +73,7 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
                     continue;
                 }
                 if (motionControlLimit.hitTest(touch.x, touch.y) && !idleState) {
-                    b.touchX = Math.max(b.touchX, Math.abs(touch.dx/3));
+                    b.touchX = Math.max(b.touchX, Math.abs(touch.vx/30.0f));
                     if (touch.dx > dxLimit
                             && !(hanging && b.direction == Bot.Direction.RIGHT)) {
                         b.direction = Bot.Direction.RIGHT;
@@ -84,8 +86,10 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
                 } else if (actionControlLimit.hitTest(touch.x, touch.y)) {
                     // if vertical sliding direction is up, and sliding magnitude is big enough
                     // then jump (or move up if we are hanging)
-                    if (touch.dy < -dyLimit) {
-                        b.touchY = -touch.dy;
+                    if (touch.vy/10.0f < -dyLimit) {
+                        //Log.v("vy", touch.vy+"");
+                        //Log.v("dy", touch.dy + "");
+                        b.touchY = -touch.vy/10.0f;
                         if (b.actionState == Bot.ActionState.HANG)
                             b.actionState = Bot.ActionState.HANG_UP;
                         else if (b.actionState == Bot.ActionState.NOTHING)

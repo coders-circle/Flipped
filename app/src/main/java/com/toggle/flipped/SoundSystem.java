@@ -16,8 +16,13 @@ public class SoundSystem extends com.toggle.katana2d.System {
             Sound sound = entity.get(Sound.class);
             for(SoundSource soundSource: sound.soundSources){
                 if((soundSource.type() & sound.state) != 0){
-                    if(!soundSource.isFinished() && !soundSource.isPlaying()){
+                    if(!soundSource.isFinished() && !soundSource.isStarted()){
                         soundSource.start();
+                    }
+
+                    if(soundSource.isFinished()){
+                        sound.state = sound.state & (~soundSource.type());
+                        soundSource.reset();
                     }
 
                     if(soundSource.isPlaying()){
@@ -26,8 +31,26 @@ public class SoundSystem extends com.toggle.katana2d.System {
                         // where (x, y) is relative coordinate of their screen position
                     }
                 }
-                if(soundSource.type() == Sound.AMBIANCE && !soundSource.isPlaying()){
-                    soundSource.setLooping(true);
+            }
+        }
+    }
+
+    public void onPause(){
+        for(Entity entity: mEntities) {
+            Sound sound = entity.get(Sound.class);
+            for (SoundSource soundSource : sound.soundSources) {
+                if(soundSource.isStarted()){
+                    soundSource.pause();
+                }
+            }
+        }
+    }
+
+    public void onResume(){
+        for(Entity entity: mEntities) {
+            Sound sound = entity.get(Sound.class);
+            for (SoundSource soundSource : sound.soundSources) {
+                if(soundSource.isStarted() && !soundSource.isFinished()){
                     soundSource.start();
                 }
             }

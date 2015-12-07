@@ -12,6 +12,7 @@ public class SoundSource {
     private float mListenerX, mListenerY;
     private float mStereoConst;
     private boolean mFinished;
+    private boolean mStarted;
 
     private int mType;
 
@@ -22,6 +23,7 @@ public class SoundSource {
         mListenerY = 0.0f;
         mStereoConst = 0.2f;
         mFinished = false;
+        mStarted = false;
     }
 
     public int type(){return mType;}
@@ -36,6 +38,12 @@ public class SoundSource {
             }
         });
     }
+
+    public void reset(){
+        mStarted = false;
+        mFinished = false;
+    }
+
     public void setPosition(float x, float y){
         mX = x;
         mY = y;
@@ -51,11 +59,13 @@ public class SoundSource {
         if(!mSrc.isPlaying()) {
             mFinished = false;
             mSrc.start();
+            mStarted = true;
         }
     }
     public boolean isFinished(){
         return mFinished;
     }
+    public boolean isStarted(){ return mStarted; }
     public void restart(){
         this.stop();
         this.start();

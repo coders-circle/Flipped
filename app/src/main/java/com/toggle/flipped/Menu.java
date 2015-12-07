@@ -37,7 +37,7 @@ public class Menu implements Component {
             this.boundary = font.calculateBoundary(this.text, x, y, 0, 1, 1);
         }
         public void draw(){
-            font.draw(this.text, boundary.left, boundary.top, 0, 1, 1);
+            font.draw(this.text, boundary.left, boundary.top, 0, 1.0f, 1.0f);
         }
     }
 
