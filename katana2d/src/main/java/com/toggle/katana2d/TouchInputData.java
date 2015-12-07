@@ -4,6 +4,7 @@ import android.util.SparseArray;
 
 public class TouchInputData {
 
+    public Pointer tap = new Pointer();
     public SparseArray<Pointer> pointers = new SparseArray<>();
     public static class Pointer {
         // public boolean isTouchDown = false;

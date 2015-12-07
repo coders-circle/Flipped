@@ -5,7 +5,7 @@ import android.util.Log;
 import com.toggle.katana2d.Game;
 import com.toggle.katana2d.GameActivity;
 
-public class MainActivity extends GameActivity implements Level.Listener/* implements SplashScreen.SplashScreenListener*/ {
+public class MainActivity extends GameActivity implements Level.Listener, MenuScreen.Listener/* implements SplashScreen.SplashScreenListener*/ {
     //private List<Level> levels = new ArrayList<>();
 
     /*private SplashScreen splashScreen = new SplashScreen(this);
@@ -17,6 +17,11 @@ public class MainActivity extends GameActivity implements Level.Listener/* imple
     public void onGameStart() {
         Game game = mEngine.getGame();
 
+        level1 = new Level1(game, this);
+        level2 = new Level2(game, this);
+
+        game.setActiveScene(game.addScene(new MenuScreen(this)));
+
         /*// add splash-screen scene
         game.setActiveScene(game.addScene(splashScreen));
 
@@ -26,12 +31,9 @@ public class MainActivity extends GameActivity implements Level.Listener/* imple
         // add menu-screen scene
         game.addScene(menuScreen);*/
 
-        loadResources();
+       // loadResources();
         //game.setActiveScene(game.addScene(new TestScene2()));
-
-        level1 = new Level1(game, this);
-        level2 = new Level2(game, this);
-        level1.load();
+        // level1.load();
     }
 
     public void loadResources() {
@@ -48,6 +50,11 @@ public class MainActivity extends GameActivity implements Level.Listener/* imple
         if (level == level1)
             level2.load();
 
+    }
+
+    @Override
+    public void onPlay() {
+        level1.load();
     }
 
     /*@Override

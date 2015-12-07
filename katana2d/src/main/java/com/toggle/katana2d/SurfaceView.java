@@ -43,6 +43,9 @@ public class SurfaceView extends GLSurfaceView {
                 pointer.dx = 0;
                 pointer.dy = 0;
                 mTouchInputData.pointers.put(pointerId, pointer);
+
+                mTouchInputData.tap.x = pointer.x;
+                mTouchInputData.tap.y = pointer.y;
                 break;
             }
             case MotionEvent.ACTION_MOVE: {
