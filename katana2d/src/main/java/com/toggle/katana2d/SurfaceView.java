@@ -7,6 +7,9 @@ import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import java.lang.*;
+import java.lang.System;
+
 public class SurfaceView extends GLSurfaceView {
     private TouchInputData mTouchInputData = new TouchInputData();
     private GLRenderer mRenderer;
@@ -40,8 +43,9 @@ public class SurfaceView extends GLSurfaceView {
                 TouchInputData.Pointer pointer = new TouchInputData.Pointer();
                 pointer.x = (e.getX(pointerIndex) - mRenderer.getViewportX()) / mRenderer.getViewportScale();
                 pointer.y = (e.getY(pointerIndex) - mRenderer.getViewportY()) / mRenderer.getViewportScale();
-                pointer.dx = 0;
-                pointer.dy = 0;
+                pointer.dx = pointer.vx = 0;
+                pointer.dy = pointer.vy = 0;
+                pointer.downTime = java.lang.System.nanoTime();
                 mTouchInputData.pointers.put(pointerId, pointer);
 
                 mTouchInputData.tap.x = pointer.x;
@@ -59,6 +63,10 @@ public class SurfaceView extends GLSurfaceView {
                         pointer.y = (e.getY(i) - mRenderer.getViewportY()) / mRenderer.getViewportScale();
                         pointer.dx = pointer.x - lastX;
                         pointer.dy = pointer.y - lastY;
+                        float newtime = System.nanoTime();
+                        float dt = (newtime - pointer.downTime) / Timer.ONE_SECOND;
+                        pointer.vx = pointer.dx / dt;
+                        pointer.vy = pointer.dy / dt;
                     }
                 }
                 break;

@@ -7,10 +7,11 @@ public class TouchInputData {
     public Pointer tap = new Pointer();
     public SparseArray<Pointer> pointers = new SparseArray<>();
     public static class Pointer {
-        // public boolean isTouchDown = false;
         public float x;
         public float y;
-        public float dx;
-        public float dy;
+        public float dx, vx;
+        public float dy, vy;
+
+        public float downTime = 0;
     }
 }

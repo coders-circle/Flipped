@@ -88,6 +88,12 @@ public class BotCreator {
             entity.add(new Sprite(getSprite(json.getJSONObject("walk_sprite")), -0.1f));
             entity.add(new PhysicsBody(mWorld, BodyDef.BodyType.DynamicBody, entity, new PhysicsBody.Properties(0.4f, 0f, 0f, true, true)));
             entity.add(new Bot());
+            entity.add(new Sound());
+
+            Sound s = entity.get(Sound.class);
+            // TODO: add sources
+            //s.addSource(mGame.getActivity(), R.raw.mysound, Sound.JUMP_DROP);
+
 
             Bot bot = entity.get(Bot.class);
 

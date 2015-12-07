@@ -17,7 +17,7 @@ import com.toggle.katana2d.physics.PhysicsSystem;
 public class BotControlSystem extends com.toggle.katana2d.System implements ContactListener {
 
     public BotControlSystem() {
-        super(new Class[] { Bot.class, Transformation.class, PhysicsBody.class, Sprite.class });
+        super(new Class[] { Bot.class, Transformation.class, PhysicsBody.class, Sprite.class, Sound.class });
     }
 
     @Override
@@ -63,6 +63,7 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             final PhysicsBody b = e.get(PhysicsBody.class);
             final Sprite s = e.get(Sprite.class);
             final Bot bot = e.get(Bot.class);
+            final Sound sound = e.get(Sound.class);
 
             if (bot.actionState == Bot.ActionState.FADE_OUT) {
                 s.mixColor[3] -= dt;
@@ -271,6 +272,9 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             // linear impulse to jump.
             else if (bot.actionState == Bot.ActionState.JUMP_START) {
                 if (onGround) {
+                    //TODO: Change state to jump_take_off
+                    //sound.state = Sound.JUMP_TAKEOFF;
+
                     float force = Math.min(6f, bot.touchY);
                     b.body.applyLinearImpulse(new Vector2(0, -force * b.body.getMass()), b.body.getWorldCenter(), false);
 

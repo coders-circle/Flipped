@@ -3,7 +3,7 @@ package com.toggle.katana2d;
 import static java.lang.System.nanoTime;
 
 public class Timer {
-    private static final int ONE_SECOND = 1000000000;
+    public static final int ONE_SECOND = 1000000000;
 
     public Timer(float targetFPS) {
         reset(targetFPS);
