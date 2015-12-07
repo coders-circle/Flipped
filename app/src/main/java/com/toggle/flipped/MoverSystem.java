@@ -28,7 +28,7 @@ public class MoverSystem extends com.toggle.katana2d.System {
                 if (m.type == Mover.Type.LINEAR) {
                     if (Math.abs(t.x - fx) < 8 && Math.abs(t.y - fy) < 8) {
                         Bot bot = m.player.get(Bot.class);
-                        if (bot.cameraPos.x == fx && bot.cameraPos.y == fy)
+                        if (bot.cameraPos != null && bot.cameraPos.x == fx && bot.cameraPos.y == fy)
                             bot.cameraPos = null;
                         b.body.setLinearVelocity(new Vector2(0, 0));
                         m.moving = false;
@@ -40,7 +40,7 @@ public class MoverSystem extends com.toggle.katana2d.System {
                 } else if (m.type == Mover.Type.ANGULAR) {
                     if (Math.abs(t.angle - fangle) < 3) {
                         Bot bot = m.player.get(Bot.class);
-                        if (bot.cameraPos.x == t.x && bot.cameraPos.y == t.y)
+                        if (bot.cameraPos != null && bot.cameraPos.x == t.x && bot.cameraPos.y == t.y)
                             bot.cameraPos = null;
                         b.body.setAngularVelocity(0);
                         m.moving = false;

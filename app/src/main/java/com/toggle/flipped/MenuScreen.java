@@ -3,6 +3,7 @@ package com.toggle.flipped;
 import android.graphics.Typeface;
 import android.util.Log;
 
+import com.toggle.katana2d.Camera;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Font;
 import com.toggle.katana2d.RenderSystem;
@@ -15,7 +16,7 @@ public class MenuScreen extends Scene {
 
     private Listener mListener;
 
-    public static interface Listener {
+    public interface Listener {
         void onPlay();
     }
 
@@ -51,6 +52,8 @@ public class MenuScreen extends Scene {
 
     @Override
     public void onDraw(){
+        Camera c = mGame.getRenderer().getCamera();
+        c.x = c.y = 0;
         systemMenu.draw();
     }
 

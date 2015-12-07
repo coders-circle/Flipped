@@ -22,6 +22,7 @@ public abstract class GameActivity  extends Activity {
         public void handleMessage(Message msg) {
             if (msg.what == 1) {
                 dialog = new Dialog(mContext, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+                dialog.setCancelable(false);
                 dialog.setContentView(R.layout.basic_dialog);
                 dialog.show();
             } else if (msg.what == 2) {

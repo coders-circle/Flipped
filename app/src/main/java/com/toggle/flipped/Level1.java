@@ -4,7 +4,9 @@ import com.toggle.katana2d.Background;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.GLRenderer;
 import com.toggle.katana2d.Game;
+import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Texture;
+import com.toggle.katana2d.Transformation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,7 @@ public class Level1 extends Level {
     @Override
     public void load() {
         mGame.getActivity().handler.sendEmptyMessage(1);
-        addWorld("world1", 0, 7520, 640);
+        addWorld("world1", 0, 7300, 640);
         addWorld("world2", 180, 3500, 640);    // flipped world
 
         changeWorld(0, null);
@@ -79,9 +81,15 @@ public class Level1 extends Level {
             world.addEntity(bk3a);
             mTextures.add(tex);
 
-            Entity bk4 = new Entity();
-            tex = mGame.getRenderer().addTexture(R.drawable.level1_path, 940, 640, 8, 1);
+            /*Entity bk4 = new Entity();
+            tex = mGame.getRenderer().addTexture(R.drawable.level1_path, 1825, 640, 4, 1);
             bk4.add(new Background(tex, 0));
+            world.addEntity(bk4);
+            mTextures.add(tex);*/
+            Entity bk4 = new Entity();
+            tex = mGame.getRenderer().addTexture(R.drawable.level1_path, 1825, 640, 4, 1);
+            bk4.add(new Sprite(tex, 0));
+            bk4.add(new Transformation(tex.width/2, tex.height/2, 0));
             world.addEntity(bk4);
             mTextures.add(tex);
 

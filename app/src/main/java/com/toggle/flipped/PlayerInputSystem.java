@@ -141,6 +141,14 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
             else {
                 x = b.cameraPos.x;
                 y = b.cameraPos.y;
+                if (b.cameraFocusLimit) {
+                    if (b.cameraFocusTime > 0)
+                        b.cameraFocusTime -= dt;
+                    else {
+                        b.cameraPos = null;
+                        b.cameraFocusLimit = false;
+                    }
+                }
             }
             Camera camera = mGame.getRenderer().getCamera();
             camera.x = Math.min(Math.max(w / 2, x), mMaxWidth - w / 2) - w / 2;

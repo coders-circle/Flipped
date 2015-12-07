@@ -114,4 +114,9 @@ public class World extends Scene {
     public interface WorldEventListener {
         void onWorldInitialized(World world);
     }
+
+    @Override
+    public void onPause() {
+        mParentLevel.pauseLevel();
+    }
 }

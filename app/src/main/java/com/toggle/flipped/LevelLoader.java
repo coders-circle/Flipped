@@ -137,6 +137,7 @@ public class LevelLoader {
                         (float)component.optDouble("Z", -1));
                 sc.scaleX = scaleX;
                 sc.scaleY = scaleY;
+                sc.visible = component.optString("Visible", "true").equals("true");
                 entity.add(sc);
             }
                 break;
@@ -218,6 +219,8 @@ public class LevelLoader {
                         entity.add(new PhysicsBody(world, bodyType, entity, shape, new PhysicsBody.Properties(
                                 (float) component.getDouble("Density"), (float) component.getDouble("Friction"), (float) component.getDouble("Restitution")
                         )));
+
+                    entity.get(PhysicsBody.class).body.setGravityScale((float)component.optDouble("Gravity scale", 1));
                 }
             }
             break;

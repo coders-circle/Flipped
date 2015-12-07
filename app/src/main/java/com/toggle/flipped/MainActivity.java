@@ -1,6 +1,7 @@
 package com.toggle.flipped;
 
 import android.util.Log;
+import android.view.KeyEvent;
 
 import com.toggle.katana2d.Game;
 import com.toggle.katana2d.GameActivity;
@@ -11,7 +12,8 @@ public class MainActivity extends GameActivity implements Level.Listener, MenuSc
     /*private SplashScreen splashScreen = new SplashScreen(this);
     private MenuScreen menuScreen = new MenuScreen(levels);*/
 
-    Level level1, level2;
+    Level level1, level2, mActiveLevel;
+    MenuScreen menu;
 
     @Override
     public void onGameStart() {
@@ -20,7 +22,8 @@ public class MainActivity extends GameActivity implements Level.Listener, MenuSc
         level1 = new Level1(game, this);
         level2 = new Level2(game, this);
 
-        game.setActiveScene(game.addScene(new MenuScreen(this)));
+        menu = new MenuScreen(this);
+        game.setActiveScene(game.addScene(menu));
 
         /*// add splash-screen scene
         game.setActiveScene(game.addScene(splashScreen));
@@ -31,7 +34,7 @@ public class MainActivity extends GameActivity implements Level.Listener, MenuSc
         // add menu-screen scene
         game.addScene(menuScreen);*/
 
-       // loadResources();
+        loadResources();
         //game.setActiveScene(game.addScene(new TestScene2()));
         // level1.load();
     }
@@ -47,14 +50,47 @@ public class MainActivity extends GameActivity implements Level.Listener, MenuSc
     @Override
     public void onLevelComplete(Level level) {
         level.unload();
-        if (level == level1)
+        if (level == level1) {
             level2.load();
+            mActiveLevel = level2;
+        }
 
     }
 
     @Override
+    public void onLevelPaused(Level level) {
+        mPause = true;
+        mPausedLevel = level;
+        Game game = mEngine.getGame();
+        game.setActiveScene(menu.sceneId);
+        mActiveLevel = null;
+    }
+
+    private boolean mPause = false;
+    private Level mPausedLevel = null;
+
+    @Override
     public void onPlay() {
-        level1.load();
+        if (mPause && mPausedLevel != null) {
+            mPausedLevel.resumeLevel();
+            mActiveLevel = mPausedLevel;
+        } else {
+            level1.load();
+            mActiveLevel = level1;
+        }
+    }
+
+    @Override
+    public boolean onKeyDown(int keycode, KeyEvent e) {
+        switch(keycode) {
+            case KeyEvent.KEYCODE_MENU:
+            case KeyEvent.KEYCODE_BACK:
+                if (mActiveLevel != null) {
+                    mActiveLevel.pauseLevel();
+                    return true;
+                }
+        }
+        return super.onKeyDown(keycode, e);
     }
 
     /*@Override

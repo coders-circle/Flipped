@@ -1,7 +1,5 @@
 package com.toggle.flipped;
 
-import android.util.Log;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -32,6 +30,7 @@ public class Level implements CustomLoader, World.WorldEventListener {
 
     public interface Listener {
         void onLevelComplete(Level level);
+        void onLevelPaused(Level level);
     }
     private Listener mListener;
 
@@ -67,6 +66,16 @@ public class Level implements CustomLoader, World.WorldEventListener {
             mActiveWorld = mWorlds.get(index);
             mGame.setActiveScene(mActiveWorld.mSceneId);
         }
+    }
+
+    public void pauseLevel() {
+        mListener.onLevelPaused(this);
+    }
+
+    public void resumeLevel() {
+        //setActiveWorld(mActiveWorld);
+        if (mActiveWorld != null)
+            mGame.setActiveScene(mActiveWorld.mSceneId);
     }
 
 /*    public World getActiveWorld() {
@@ -158,7 +167,7 @@ public class Level implements CustomLoader, World.WorldEventListener {
             case "lever":
                 if (!game.textureManager.has(spriteName)) {
                     game.textureManager.add(spriteName, game.getRenderer().addTexture(
-                           R.drawable.lever, 20, 4
+                           R.drawable.lever, 32, 8
                     ));
                     game.textureManager.get(spriteName).originX = 1;
                 }
@@ -316,6 +325,7 @@ public class Level implements CustomLoader, World.WorldEventListener {
             }
             else if (compName.equals("Lever")) {
                 final Trigger trigger = new Trigger();
+                final Entity player = levelLoader.mCurrentEntities.get("player");
                 trigger.tag = component.getString("Tag");
                 trigger.type = Trigger.Type.LEVER;
                 entity.add(trigger);
@@ -325,9 +335,18 @@ public class Level implements CustomLoader, World.WorldEventListener {
                 entity.get(Trigger.class).listeners.add(new Trigger.Listener() {
                     @Override
                     public void onTriggered(boolean status) {
-                        Entity moverEntity = (Entity) trigger.object;
-                        Mover m = moverEntity.get(Mover.class);
-                        m.start(moverEntity.get(Transformation.class), false);
+                        Entity triggeredEntity = (Entity) trigger.object;
+                        if (triggeredEntity.has(Mover.class)) {
+                            Mover m = triggeredEntity.get(Mover.class);
+                            m.start(triggeredEntity.get(Transformation.class), false);
+                        } else if (triggeredEntity.has(PhysicsBody.class)) {
+                            PhysicsBody pb = triggeredEntity.get(PhysicsBody.class);
+                            pb.body.setGravityScale(-pb.body.getGravityScale());
+                            Bot bot = player.get(Bot.class);
+                            bot.cameraPos = triggeredEntity.get(Transformation.class).getPos();
+                            bot.cameraFocusLimit = true;
+                            bot.cameraFocusTime = 2;
+                        }
                     }
                 });
             }

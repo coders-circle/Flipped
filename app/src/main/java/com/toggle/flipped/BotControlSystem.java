@@ -354,17 +354,18 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
     @Override
     public void beginContact(Contact contact, Fixture me, Fixture other) {
         Bot bot = ((Entity)me.getUserData()).get(Bot.class);
+        Entity otherEntity = (Entity)other.getUserData();
 
         if (other.isSensor()) {
             if ((me == bot.leftSideFixture || me == bot.rightSideFixture)
-                    && ((Entity)other.getUserData()).has(Hanger.class)) {
+                    && otherEntity.has(Hanger.class)) {
                 bot.hanger = other;
                 bot.hangingContacts++;
             }
             return;
         }
 
-        if (!((Entity)other.getUserData()).has(Carriable.class)) {
+        if (!otherEntity.has(Carriable.class)) {
             if (me == bot.groundFixture) {
             /*if (!((Entity)other.getUserData()).has(PlatformSystem.OneWayPlatform.class)
                     || me.getBody().getLinearVelocity().y >= 0)*/
@@ -391,15 +392,16 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
     public void endContact(Contact contact, Fixture me, Fixture other) {
         Bot bot = ((Entity)me.getUserData()).get(Bot.class);
 
+        Entity otherEntity = (Entity)other.getUserData();
         if (other.isSensor()) {
             if ((me == bot.leftSideFixture || me == bot.rightSideFixture)
-                    && ((Entity) other.getUserData()).has(Hanger.class)
+                    && otherEntity.has(Hanger.class)
                     && bot.hangingContacts > 0)
                 bot.hangingContacts--;
             return;
         }
 
-        if (!((Entity)other.getUserData()).has(Carriable.class)) {
+        if (!otherEntity.has(Carriable.class)) {
             if (me == bot.groundFixture && bot.groundContacts > 0)
                 bot.groundContacts--;
             else if (me == bot.leftSideFixture && bot.leftSideContacts > 0)

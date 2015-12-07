@@ -53,5 +53,5 @@ public class Bot implements Component {
 
     List<Vector2> climbPositions = new ArrayList<>();
 
-    Vector2 cameraPos = null;
+    Vector2 cameraPos = null; float cameraFocusTime = -1; boolean cameraFocusLimit = false;
 }
