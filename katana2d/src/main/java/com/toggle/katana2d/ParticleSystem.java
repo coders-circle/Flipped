@@ -132,20 +132,20 @@ public class ParticleSystem extends System {
             Transformation t = entity.get(Transformation.class);
             if (e.additiveBlend) {
                 e.pointSprites.getRenderer().setAdditiveBlending();
-                e.pointSprites.getRenderer().disableDepth();
             }
+            e.pointSprites.getRenderer().disableDepth();
 
             float minus = 1-interpolation;
             float x = t.x * interpolation + t.lastX * minus;
             float y = t.y * interpolation + t.lastY * minus;
-            float angle = t.angle * interpolation + t.lastAngle * minus;
+            float angle = t.angle * interpolation + t.lastAngle * minus + e.offsetAngle;
 
             e.pointSprites.draw(e.pointSpritesData, x, y, angle, e.numParticles);
 
             if (e.additiveBlend) {
                 e.pointSprites.getRenderer().setAlphaBlending();
-                e.pointSprites.getRenderer().enableDepth();
             }
+            e.pointSprites.getRenderer().enableDepth();
         }
     }
 }

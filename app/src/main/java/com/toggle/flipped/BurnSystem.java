@@ -1,11 +1,9 @@
 package com.toggle.flipped;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.QueryCallback;
 import com.toggle.katana2d.*;
-import com.toggle.katana2d.physics.ContactListener;
 import com.toggle.katana2d.physics.PhysicsBody;
 
 public class BurnSystem extends com.toggle.katana2d.System implements QueryCallback {
@@ -30,7 +28,7 @@ public class BurnSystem extends com.toggle.katana2d.System implements QueryCallb
                     b.isBurning = false;
 
                 Emitter e = b.emitter.get(Emitter.class);
-                e.emissionRate = Math.max(b.life * 20, 0);
+                e.emissionRate = Math.max(b.life*5, 0);
             } else {
                 // We are source, check if there is burnable in our area
                 Vector2 pos = pb.body.getPosition();

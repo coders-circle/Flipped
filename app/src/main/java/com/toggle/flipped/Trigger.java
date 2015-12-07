@@ -7,6 +7,11 @@ import java.util.List;
 
 public class Trigger implements Component {
 
+    public float load = 0;
+    public boolean isPressed = false;
+
+    public enum Type {LEVER, BUTTON}
+    public Type type = Type.LEVER;
     public boolean getStatus() {
         return status;
     }

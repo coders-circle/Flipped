@@ -1,22 +1,10 @@
 package com.toggle.flipped;
 
-import android.util.Log;
-
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Filter;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.Shape;
 import com.toggle.katana2d.Background;
-import com.toggle.katana2d.Emitter;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.GLRenderer;
 import com.toggle.katana2d.Game;
-import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Texture;
-import com.toggle.katana2d.Transformation;
-import com.toggle.katana2d.physics.PhysicsBody;
-import com.toggle.katana2d.physics.PhysicsSystem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,10 +54,22 @@ public class Level1 extends Level {
             world.addEntity(bk2);
             mTextures.add(tex);
 
+            Entity fg1 = new Entity();
+            tex = mGame.getRenderer().addTexture(R.drawable.hills_fog, 1034, 640, 2, 1);
+            fg1.add(new Background(tex, 74));
+            world.addEntity(fg1);
+            mTextures.add(tex);
+
             Entity bk3 = new Entity();
             tex = mGame.getRenderer().addTexture(R.drawable.level1_trees, 1955, 640, 2, 1);
             bk3.add(new Background(tex, 55));
             world.addEntity(bk3);
+            mTextures.add(tex);
+
+            Entity fg2 = new Entity();
+            tex = mGame.getRenderer().addTexture(R.drawable.tree_fog, 1955, 640, 2, 1);
+            fg2.add(new Background(tex, 54));
+            world.addEntity(fg2);
             mTextures.add(tex);
 
             Entity bk3a = new Entity();

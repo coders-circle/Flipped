@@ -1,10 +1,12 @@
 package com.toggle.flipped;
 
+import com.badlogic.gdx.math.Vector2;
 import com.toggle.katana2d.Camera;
 import com.toggle.katana2d.Game;
 import com.toggle.katana2d.TouchInputData;
 import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.Transformation;
+import com.toggle.katana2d.physics.PhysicsSystem;
 
 public class PlayerInputSystem extends com.toggle.katana2d.System {
 
@@ -55,6 +57,7 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
             //Player p = e.get(Player.class);
             Bot b = e.get(Bot.class);
             boolean hanging = b.actionState == Bot.ActionState.HANG || b.actionState == Bot.ActionState.HANG_UP;
+            boolean idleState = b.actionState == Bot.ActionState.PICK || b.actionState == Bot.ActionState.FADE_IN || b.actionState == Bot.ActionState.FADE_OUT || b.actionState == Bot.ActionState.FADE_COMPLETE;
 
             int dxLimit = 3;
             int dyLimit = 3;
@@ -67,7 +70,7 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
                     ex.printStackTrace();
                     continue;
                 }
-                if (motionControlLimit.hitTest(touch.x, touch.y) && b.actionState != Bot.ActionState.PICK) {
+                if (motionControlLimit.hitTest(touch.x, touch.y) && !idleState) {
                     b.touchX = Math.max(b.touchX, Math.abs(touch.dx/3));
                     if (touch.dx > dxLimit
                             && !(hanging && b.direction == Bot.Direction.RIGHT)) {
@@ -101,7 +104,7 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
 
             }
 
-            if (touchData.pointers.size() == 0) {
+            if (touchData.pointers.size() == 0 || idleState) {
                 b.motionState = Bot.MotionState.IDLE;
                 b.touchX = 0;
             }
@@ -122,10 +125,23 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
             // This assumption is temporary.
 
             float x = t.x, y = t.y;
-            /*if (b.actionState == Bot.ActionState.HANG || b.actionState == Bot.ActionState.HANG_UP) {
-                Transformation tt = ((Entity) b.hanger.getUserData()).get(Transformation.class);
-                x = tt.x; y = tt.y;
-            }*/
+            if (b.cameraPos == null) {
+                if (b.actionState == Bot.ActionState.HANG || b.actionState == Bot.ActionState.HANG_UP) {
+                    Vector2 vv = new Vector2(b.climbPositions.get(b.climbPositions.size() - 1)).scl(PhysicsSystem.PIXELS_PER_METER);
+                    Transformation tt = ((Entity) b.hanger.getUserData()).get(Transformation.class);
+                    if (b.direction == Bot.Direction.LEFT) {
+                        x = tt.x + vv.x;
+                        y = tt.y + vv.y;
+                    } else if (b.direction == Bot.Direction.RIGHT) {
+                        x = tt.x - vv.x;
+                        y = tt.y + vv.y;
+                    }
+                }
+            }
+            else {
+                x = b.cameraPos.x;
+                y = b.cameraPos.y;
+            }
             Camera camera = mGame.getRenderer().getCamera();
             camera.x = Math.min(Math.max(w / 2, x), mMaxWidth - w / 2) - w / 2;
             camera.y = Math.min(Math.max(h / 2, y), mMaxHeight - h / 2) - h / 2;

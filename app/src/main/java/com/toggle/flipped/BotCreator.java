@@ -85,8 +85,8 @@ public class BotCreator {
 
             // First create the bot entity with required components
             entity.add(new Transformation(x, y, angle));
-            entity.add(new Sprite(getSprite(json.getJSONObject("walk_sprite")), -1.5f));
-            entity.add(new PhysicsBody(mWorld, BodyDef.BodyType.DynamicBody, entity, new PhysicsBody.Properties(0.4f, 0f, 0f, false, true)));
+            entity.add(new Sprite(getSprite(json.getJSONObject("walk_sprite")), -0.1f));
+            entity.add(new PhysicsBody(mWorld, BodyDef.BodyType.DynamicBody, entity, new PhysicsBody.Properties(0.4f, 0f, 0f, true, true)));
             entity.add(new Bot());
 
             Bot bot = entity.get(Bot.class);
@@ -189,17 +189,17 @@ public class BotCreator {
             bot.climbPositions.add(new Vector2(-24, -7));
             bot.climbPositions.add(new Vector2(-23, -8));
             bot.climbPositions.add(new Vector2(-22, -9));
-            bot.climbPositions.add(new Vector2(-22, -10));
+            bot.climbPositions.add(new Vector2(-21, -10));
             bot.climbPositions.add(new Vector2(-20, -12));
             bot.climbPositions.add(new Vector2(-18, -14));
             bot.climbPositions.add(new Vector2(-16, -16));
             bot.climbPositions.add(new Vector2(-14, -18));
-            bot.climbPositions.add(new Vector2(-10, -20));
-            bot.climbPositions.add(new Vector2(-8, -22));
-            bot.climbPositions.add(new Vector2(6, -24));
-            bot.climbPositions.add(new Vector2(4, -27));
-            bot.climbPositions.add(new Vector2(2, -30));
-            bot.climbPositions.add(new Vector2(0, -34));
+            bot.climbPositions.add(new Vector2(-12, -20));
+            bot.climbPositions.add(new Vector2(-10, -22));
+            bot.climbPositions.add(new Vector2(8, -24));
+            bot.climbPositions.add(new Vector2(6, -26));
+            bot.climbPositions.add(new Vector2(4, -30));
+            bot.climbPositions.add(new Vector2(0, -32));
 
             for (int i=0; i<16; ++i)
                 bot.climbPositions.get(i).scl(PhysicsSystem.METERS_PER_PIXEL);

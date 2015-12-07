@@ -67,11 +67,12 @@ public class Utilities {
 
     public static void createStick(Scene scene, World world, Entity stick, JSONObject components) throws JSONException {
         Game game = scene.getGame();
-        stick.add(new Sprite(game.getRenderer().addTexture(new float[]{1, 1, 0, 1}, 16, 4), -1.6f));
+        stick.add(new Sprite(/*game.getRenderer().addTexture(new float[]{1, 1, 0, 1}, 16, 3)*/game.textureManager.get("stick"), -0.05f));
         JSONObject transformation = components.getJSONObject("Transformation");
         stick.add(new Transformation((float) transformation.getDouble("Translate-X"),
                 (float) transformation.getDouble("Translate-Y"), (float) transformation.getDouble("Angle")));
-        PhysicsBody b = new PhysicsBody(world, BodyDef.BodyType.DynamicBody, stick, new PhysicsBody.Properties(1, 0.2f, 0.1f));
+
+        PhysicsBody b = new PhysicsBody(world, BodyDef.BodyType.DynamicBody, stick, new PhysicsBody.Properties(0.2f, 0.2f, 0.1f));
         stick.add(b);
 
         /*Filter d = b.body.getFixtureList().get(0).getFilterData();
@@ -126,7 +127,7 @@ public class Utilities {
 
         Entity emitter = new Entity();
         emitter.add(new Transformation(0, 0, -90));
-        emitter.add(new Emitter(game.getRenderer(), 300, game.getRenderer().mFuzzyTextureId, 3, 100, new float[]{180f / 255, 80f / 255, 10f / 255, 1}, new float[]{0, 0, 0, 0}));
+        emitter.add(new Emitter(game.getRenderer(), 100, game.getRenderer().mFuzzyTextureId, 3, 100, new float[]{180f / 255, 80f / 255, 10f / 255, 1}, new float[]{0, 0, 0, 0}));
         Emitter e = emitter.get(Emitter.class);
         e.var_startColor[3] = 0.3f;
         e.size = 16;
@@ -143,18 +144,22 @@ public class Utilities {
         stick.add(burner);
 
         burner.source = false;
-        burner.fullLife = 12;
+        burner.fullLife = 6;
     }
 
 
-    public static void createFire(Scene scene, World world, Entity stick, JSONObject components) throws JSONException {
+    public static void createFire(Scene scene, World world, Entity fire, JSONObject components) throws JSONException {
         Game game = scene.getGame();
-        stick.add(new Sprite(game.getRenderer().addTexture(new float[]{1, 1, 0, 1}, 10, 10), -1.6f));
+        fire.add(new Sprite(/*game.getRenderer().addTexture(new float[]{1, 1, 0, 1}, 10, 10)*/game.textureManager.get("fire"), -1.6f));
         JSONObject transformation = components.getJSONObject("Transformation");
-        stick.add(new Transformation((float) transformation.getDouble("Translate-X"),
+        fire.add(new Transformation((float) transformation.getDouble("Translate-X"),
                 (float) transformation.getDouble("Translate-Y"), (float) transformation.getDouble("Angle")));
-        PhysicsBody b = new PhysicsBody(world, BodyDef.BodyType.StaticBody, stick, new PhysicsBody.Properties(0, 0, 0));
-        stick.add(b);
+
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(69 / 2 * PhysicsSystem.METERS_PER_PIXEL, 26 / 2 * PhysicsSystem.METERS_PER_PIXEL,
+                new Vector2(0, 26 / 2 * PhysicsSystem.METERS_PER_PIXEL), 0);
+        PhysicsBody b = new PhysicsBody(world, BodyDef.BodyType.StaticBody, fire, shape, new PhysicsBody.Properties(0, 0, 0));
+        fire.add(b);
 
         /*PolygonShape fireShape = new PolygonShape();
         fireShape.setAsBox(24 * PhysicsSystem.METERS_PER_PIXEL, 24 * PhysicsSystem.METERS_PER_PIXEL);
@@ -165,7 +170,7 @@ public class Utilities {
         emitter.add(new Emitter(game.getRenderer(), 300, game.getRenderer().mFuzzyTextureId, 3, 100, new float[]{180f / 255, 80f / 255, 10f / 255, 1}, new float[]{0, 0, 0, 0}));
         Emitter e = emitter.get(Emitter.class);
         e.var_startColor[3] = 0.3f;
-        e.size = 20;
+        e.size = 28;
         e.var_size = 5;
         e.var_angle = 70;
         e.speed = 10;
@@ -175,7 +180,7 @@ public class Utilities {
         scene.addEntity(emitter);
 
         Burner burner = new Burner(emitter);
-        stick.add(burner);
+        fire.add(burner);
 
         burner.source = true;
         burner.position = 0;

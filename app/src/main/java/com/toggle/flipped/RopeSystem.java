@@ -43,8 +43,8 @@ public class RopeSystem extends com.toggle.katana2d.System {
         shape.setAsBox(w/2, h/2);
 
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.density = 2;
-        fixtureDef.friction = 0.5f;
+        fixtureDef.density = 6f;
+        fixtureDef.friction = 0.1f;
         fixtureDef.restitution = 0.2f;
         fixtureDef.shape = shape;
         //fixtureDef.userData = entity;
@@ -53,8 +53,10 @@ public class RopeSystem extends com.toggle.katana2d.System {
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         //bodyDef.userData = entity;
 
-        RevoluteJointDef jointDef = new RevoluteJointDef();
+        RevoluteJointDef rjointDef = new RevoluteJointDef();
         DistanceJointDef djointDef = new DistanceJointDef();
+        rjointDef.collideConnected = true;
+        djointDef.collideConnected = true;
 
         List<Vector2> segmentsPath = Utilities.getPoints(rope.path, rope.segmentLength, true);
         rope.numSegments = segmentsPath.size() - 1;
@@ -74,12 +76,13 @@ public class RopeSystem extends com.toggle.katana2d.System {
             Fixture f = body.createFixture(fixtureDef);
             f.setUserData(entity);
             body.setUserData(entity);
+            body.setGravityScale(0.2f); // less gravity action
 
             rope.segments.add(body);
 
             if (link != null) {
-                jointDef.initialize(link, body, new Vector2(lastX, lastY));
-                mWorld.createJoint(jointDef);
+                rjointDef.initialize(link, body, new Vector2(lastX, lastY));
+                mWorld.createJoint(rjointDef);
 
                 djointDef.initialize(link, body, link.getWorldCenter(), body.getWorldCenter());
                 mWorld.createJoint(djointDef);
@@ -91,8 +94,11 @@ public class RopeSystem extends com.toggle.katana2d.System {
         }
 
         if (endBody != null && link != null) {
-            jointDef.initialize(link, endBody, link.getWorldCenter());
-            mWorld.createJoint(jointDef);
+            rjointDef.initialize(link, endBody, link.getWorldCenter());
+            mWorld.createJoint(rjointDef);
+
+            djointDef.initialize(link, endBody, link.getWorldCenter(), endBody.getWorldCenter());
+            mWorld.createJoint(djointDef);
         }
     }
 
@@ -102,11 +108,10 @@ public class RopeSystem extends com.toggle.katana2d.System {
             Rope rope = entity.get(Rope.class);
 
             // if burning, we need to animate the burning segment
-            if (rope.isBurning)
+            if (rope.isBurning) {
                 rope.burnData.burningSegmentSprite.animate(dt);
 
-            if (rope.segments.size() > 0) {
-                if (rope.isBurning) {
+                if (rope.segments.size() > 0) {
                     Rope.BurnData bd = rope.burnData;
 
                     // Increase time passed
@@ -115,7 +120,7 @@ public class RopeSystem extends com.toggle.katana2d.System {
                     // If enough time has passed, burn a segment
                     if (bd.timePassed > bd.timeToBurn) {
                         // first remove the segment
-                        rope.removeSegment(rope.segments.size()-1);
+                        rope.removeSegment(rope.segments.size() - 1);
 
                         bd.timePassed = 0; // -= bd.timeToBurn;
 

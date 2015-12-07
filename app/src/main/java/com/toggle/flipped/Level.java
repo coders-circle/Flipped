@@ -104,7 +104,7 @@ public class Level implements CustomLoader, World.WorldEventListener {
     public void changeWorld(FlipSystem.Mirror m) {
         if (m.nextWorld.equals("next level"))
             complete();
-        else if (!m.nextWorld.equals("") && mWorlds.has(m.nextWorld))
+        else if (mWorlds.has(m.nextWorld))
             changeWorld(m.nextWorld, mirrors.get(m.exitMirror));
     }
 
@@ -112,8 +112,15 @@ public class Level implements CustomLoader, World.WorldEventListener {
     public boolean loadSprite(Game game, String spriteName, JSONObject sprite) {
         switch (spriteName) {
             case "player":
-            case "stick":
+                return true;
             case "fire":
+                if (!game.textureManager.has(spriteName)) {
+                    game.textureManager.add(spriteName, game.getRenderer().addTexture(
+                            R.drawable.aago,
+                            69, 26
+                    ));
+                    game.textureManager.get(spriteName).originY = 0f;
+                }
                 return true;
             case "block":
                 if (!game.textureManager.has(spriteName))
@@ -122,15 +129,24 @@ public class Level implements CustomLoader, World.WorldEventListener {
                             (float)sprite.optDouble("width", 32), (float)sprite.optDouble("height", 32)
                     ));
                 return true;
+
+            case "stick":
+                if (!game.textureManager.has(spriteName))
+                    game.textureManager.add(spriteName, game.getRenderer().addTexture(
+                            R.drawable.stick,
+                            32, 8
+                    ));
+                return true;
             case "mirror":
                 if (!game.textureManager.has(spriteName)) {
                     /*game.textureManager.add(spriteName, game.getRenderer().addTexture(
-                            new float[]{0.0f, 0.0f, 0.7f, 1}, 32, 6
-                    ));*/
-                    game.textureManager.add(spriteName, game.getRenderer().addTexture(
                             R.drawable.mirror, 64, 32
                     ));
-                    game.textureManager.get(spriteName).originY = 1;
+                    game.textureManager.get(spriteName).originY = 0.85f;*/
+                    game.textureManager.add(spriteName, game.getRenderer().addTexture(
+                            R.drawable.mirror5, 587, 517
+                    ));
+                    game.textureManager.get(spriteName).originY = 0.5f;
                 }
                 return true;
             case "hanger":
@@ -142,7 +158,7 @@ public class Level implements CustomLoader, World.WorldEventListener {
             case "lever":
                 if (!game.textureManager.has(spriteName)) {
                     game.textureManager.add(spriteName, game.getRenderer().addTexture(
-                           R.drawable.lever, 32, 8
+                           R.drawable.lever, 20, 4
                     ));
                     game.textureManager.get(spriteName).originX = 1;
                 }
@@ -195,10 +211,21 @@ public class Level implements CustomLoader, World.WorldEventListener {
                 mrr.exitMirror = mirrorJson.getString("Exit mirror");
 
                 entity.add(new Sprite(mGame.textureManager.get("mirror"), -1));
-                if (mrr.nextWorld.equals(""))
+                if (mrr.nextWorld.equals("")) {
                     entity.get(Sprite.class).visible = false;
+                } else {
+                    /*Emitter emitter = new Emitter(mGame.getRenderer(), 20, mGame.getRenderer().mFuzzyTextureId,
+                            12, 1.2f, new float[]{1,1,1,0.7f}, new float[]{1,1,1,0});
+                    emitter.size = 5; emitter.var_size = 4;
+                    emitter.var_y = entity.get(Sprite.class).texture.width-32;
+                    emitter.var_angle = 90f;
+                    emitter.offsetAngle = -90f;
+                    emitter.additiveBlend = false;
+                    emitter.speed = 2;
+                    entity.add(emitter);*/
+                }
 
-                    transformation = components.getJSONObject("Transformation");
+                transformation = components.getJSONObject("Transformation");
                 entity.add(new Transformation((float) transformation.getDouble("Translate-X"),
                         (float) transformation.getDouble("Translate-Y"), (float) transformation.getDouble("Angle")));
                 entity.add(new PhysicsBody(world, BodyDef.BodyType.StaticBody, entity, new PhysicsBody.Properties(true)));
@@ -217,7 +244,7 @@ public class Level implements CustomLoader, World.WorldEventListener {
                 entity.add(new Rope(path, Rope.STANDARD_SEGMENT_THICKNESS, Rope.STANDARD_SEGMENT_LENGTH,
                         startBody, endBody));
 
-                entity.get(Rope.class).segmentSprite = new Sprite(mGame.textureManager.get("rope"), 0);
+                entity.get(Rope.class).segmentSprite = new Sprite(mGame.textureManager.get("rope"), -0.1f);
                 return true;
             }
             else if (entityName.startsWith("hanger")) {
@@ -274,17 +301,28 @@ public class Level implements CustomLoader, World.WorldEventListener {
                 m.type = Mover.Type.LINEAR;
                 m.finalX = (float)component.getDouble("Final-X");
                 m.finalY = (float)component.getDouble("Final-Y");
+                JSONObject transformation = components.getJSONObject("Transformation");
+                m.initialX = (float)transformation.getDouble("Translate-X");
+                m.initialY = (float)transformation.getDouble("Translate-Y");
+                m.initialAngle = (float)transformation.getDouble("Angle");
                 entity.add(m);
+                m.player = levelLoader.mCurrentEntities.get("player");
             }
             else if (compName.equals("Rotor")) {
                 Mover m = new Mover();
                 m.type = Mover.Type.ANGULAR;
                 m.finalAngle = (float)component.getDouble("Final-Angle");
+                JSONObject transformation = components.getJSONObject("Transformation");
+                m.initialX = (float)transformation.getDouble("Translate-X");
+                m.initialY = (float)transformation.getDouble("Translate-Y");
+                m.initialAngle = (float)transformation.getDouble("Angle");
                 entity.add(m);
+                m.player = levelLoader.mCurrentEntities.get("player");
             }
             else if (compName.equals("Lever")) {
                 final Trigger trigger = new Trigger();
                 trigger.tag = component.getString("Tag");
+                trigger.type = Trigger.Type.LEVER;
                 entity.add(trigger);
 
                 String mentity = trigger.tag.substring(0, trigger.tag.indexOf("_lever"));
@@ -294,7 +332,24 @@ public class Level implements CustomLoader, World.WorldEventListener {
                     public void onTriggered(boolean status) {
                         Entity moverEntity = (Entity) trigger.object;
                         Mover m = moverEntity.get(Mover.class);
-                        m.start(moverEntity.get(Transformation.class));
+                        m.start(moverEntity.get(Transformation.class), false);
+                    }
+                });
+            }
+            else if (compName.equals("Button")) {
+                final Trigger trigger = new Trigger();
+                trigger.tag = component.getString("Tag");
+                trigger.type = Trigger.Type.BUTTON;
+                entity.add(trigger);
+
+                String mentity = trigger.tag.substring(0, trigger.tag.indexOf("_button"));
+                trigger.object = levelLoader.mCurrentEntities.get(mentity);
+                entity.get(Trigger.class).listeners.add(new Trigger.Listener() {
+                    @Override
+                    public void onTriggered(boolean status) {
+                        Entity moverEntity = (Entity) trigger.object;
+                        Mover m = moverEntity.get(Mover.class);
+                        m.start(moverEntity.get(Transformation.class), true);
                     }
                 });
             }

@@ -5,6 +5,7 @@ import android.util.Log;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.toggle.katana2d.Entity;
+import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
 
@@ -50,9 +51,11 @@ public class PickCarrySystem extends com.toggle.katana2d.System {
                 if (entity.has(Burner.class)) {
                     entity.get(Burner.class).reflect = true;
                 }
+                entity.get(Sprite.class).scaleX = -1;
             } else  if (entity.has(Burner.class)) {
                 pos.x += 2;
                 entity.get(Burner.class).reflect = false;
+                entity.get(Sprite.class).scaleX = 1;
             }
 
             b.body.setTransform(

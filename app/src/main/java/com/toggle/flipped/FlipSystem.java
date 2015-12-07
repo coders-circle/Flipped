@@ -45,6 +45,9 @@ public class FlipSystem extends com.toggle.katana2d.System implements ContactLis
         entity.get(PhysicsBody.class).contactListener = this;
     }
 
+    Mirror nextWorldMirror = null;
+    public boolean incoming = false;
+
     @Override
     public void update(float dt) {
         for (Entity entity: mEntities) {
@@ -52,8 +55,27 @@ public class FlipSystem extends com.toggle.katana2d.System implements ContactLis
             Body b = entity.get(PhysicsBody.class).body;
 
             if (f.player != null)
-                if (Math.abs(f.player.getPosition().x-b.getPosition().x) < 10* PhysicsSystem.METERS_PER_PIXEL)
-                    mLevel.changeWorld(f);
+                if (Math.abs(f.player.getPosition().x-b.getPosition().x) < 16* PhysicsSystem.METERS_PER_PIXEL)
+                    if (!f.nextWorld.equals(""))
+                        nextWorldMirror = f;
+        }
+
+        if (nextWorldMirror != null) {
+            if (mBotComponent.actionState == Bot.ActionState.FADE_COMPLETE) {
+                mBotComponent.actionState = Bot.ActionState.NOTHING;
+                mLevel.changeWorld(nextWorldMirror);
+                nextWorldMirror = null;
+            }
+            else
+                mBotComponent.actionState = Bot.ActionState.FADE_OUT;
+        }
+        else if (incoming) {
+            if (mBotComponent.actionState == Bot.ActionState.FADE_COMPLETE) {
+                mBotComponent.actionState = Bot.ActionState.NOTHING;
+                incoming = false;
+            }
+            else
+                mBotComponent.actionState = Bot.ActionState.FADE_IN;
         }
     }
 

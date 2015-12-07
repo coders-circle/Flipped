@@ -1,7 +1,5 @@
 package com.toggle.flipped;
 
-import android.util.Log;
-
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.World;
@@ -49,7 +47,7 @@ public class ExplosionSystem extends com.toggle.katana2d.System implements Conta
         if (otherEntity.has(Mover.class)) {
             Mover m = otherEntity.get(Mover.class);
             if (m.type == Mover.Type.ANGULAR) {
-                m.start(otherEntity.get(Transformation.class));
+                m.start(otherEntity.get(Transformation.class), false);
             }
         }
         return true;

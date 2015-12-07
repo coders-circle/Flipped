@@ -5,6 +5,7 @@ import android.util.Log;
 // Sprite component that stores sprite-sheet data and a reference to GLSprite
 public class Sprite implements Component{
     public Texture texture;
+    public float[] mixColor = new float[] {1,1,1,1};
     public SpriteSheetData spriteSheetData;
     public float scaleX = 1, scaleY = 1;
     public final float distance; // z-order
@@ -131,6 +132,8 @@ public class Sprite implements Component{
             y += yOffset;
         }
 
+        float[] color = texture.color;
+        texture.color = new float[] {texture.color[0]*mixColor[0],texture.color[1]*mixColor[1],texture.color[2]*mixColor[2],texture.color[3]*mixColor[3]};
         if (spriteSheetData == null)
             texture.draw(renderer, x, y, -distance, angle, scaleX, scaleY);
         else {
@@ -144,5 +147,6 @@ public class Sprite implements Component{
 
             texture.draw(renderer, x, y, -distance, angle, scaleX, scaleY, clipX, clipY, ssd.imgWidth, ssd.imgHeight);
         }
+        texture.color = color;
     }
 }

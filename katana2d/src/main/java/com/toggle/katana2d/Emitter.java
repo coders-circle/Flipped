@@ -40,6 +40,8 @@ public class Emitter implements Component {
     public float emissionRate;      // rate to emit particles
     public float life = 1;          // total time each particle can live up to
 
+    public float offsetAngle = 0;
+
     public float[] startColor = new float[] {1, 0, 0, 1};   // start and end colors of the particle
     public float[] endColor = new float[] {1, 0, 0, 1};
     public float[] var_startColor = new float[] {0, 0, 0, 0};   // vary start and end colors of each particle

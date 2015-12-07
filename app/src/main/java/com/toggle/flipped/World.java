@@ -17,6 +17,7 @@ public class World extends Scene {
     private LevelLoader mLevelLoader;
     private String mWorldName;
     private Level mParentLevel;
+    private FlipSystem mFlipSystem;
 
     public int mSceneId;    // Id corresponding to Game's scenes list
     public float mAngle;   // Angle of the world: 180 for flip, 0 for normal
@@ -37,7 +38,7 @@ public class World extends Scene {
     @Override
     public void onInit() {
         PhysicsSystem physicsSystem = new PhysicsSystem();
-        FlipSystem flipSystem = new FlipSystem(mParentLevel);
+        mFlipSystem = new FlipSystem(mParentLevel);
         ParticleSystem particleSystem = new ParticleSystem();
         physicsWorld = physicsSystem.getWorld();
 
@@ -52,7 +53,7 @@ public class World extends Scene {
         // Flipped's systems, controlling inputs, player, mirror, wind, rope, explosives etc.
         mSystems.add(new BotControlSystem());
         mSystems.add(new PlayerInputSystem(mGame, mWidth, mHeight));
-        mSystems.add(flipSystem);
+        mSystems.add(mFlipSystem);
         mSystems.add(new WindSystem());
         mSystems.add(new RopeSystem(physicsWorld, mGame.getRenderer()));
         mSystems.add(new ExplosionSystem(physicsWorld, mGame));
@@ -60,13 +61,13 @@ public class World extends Scene {
         mSystems.add(new PickCarrySystem());
         mSystems.add(new BurnSystem());
         mSystems.add(new TriggerSystem());
-        mSystems.add(new AutoMoverSystem());
+        mSystems.add(new MoverSystem());
 
         // Load the entities from the level editor
         mLevelLoader.loadWorld(mWorldName, this, physicsWorld);
 
         mPlayer = mParentLevel.levelLoader.mCurrentEntities.get("player");
-        flipSystem.setPlayer(mPlayer);
+        mFlipSystem.setPlayer(mPlayer);
 
         startX = mPlayer.get(PhysicsBody.class).body.getPosition().x;
         startY = mPlayer.get(PhysicsBody.class).body.getPosition().y;
@@ -83,6 +84,8 @@ public class World extends Scene {
     public void load(Entity entryMirror) {
         Camera camera = mGame.getRenderer().getCamera();
         camera.angle = mAngle;
+
+        mFlipSystem.incoming = true;
 
         float x, y;
         if (entryMirror == null) {

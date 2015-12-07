@@ -1,5 +1,7 @@
 package com.toggle.flipped;
 
+import android.util.Log;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -61,6 +63,21 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             final PhysicsBody b = e.get(PhysicsBody.class);
             final Sprite s = e.get(Sprite.class);
             final Bot bot = e.get(Bot.class);
+
+            if (bot.actionState == Bot.ActionState.FADE_OUT) {
+                s.mixColor[3] -= dt;
+                if (s.mixColor[3] <= 0) {
+                    s.mixColor[3] = 0;
+                    bot.actionState = Bot.ActionState.FADE_COMPLETE;
+                }
+            }
+            else if (bot.actionState == Bot.ActionState.FADE_IN) {
+                s.mixColor[3] += dt;
+                if (s.mixColor[3] >= 1) {
+                    s.mixColor[3] = 1;
+                    bot.actionState = Bot.ActionState.FADE_COMPLETE;
+                }
+            }
 
             boolean resetIdle = true;
             if (bot.actionState == Bot.ActionState.NOTHING && bot.motionState == Bot.MotionState.IDLE) {
@@ -133,6 +150,9 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
                         bot.carriable = other.get(Carriable.class);
                         bot.carriable.state = Carriable.State.PICKED;
                         bot.carriable.carrier = e;
+                        bot.leftFixtureObject = null;
+                        bot.rightFixtureObject = null;
+                        bot.aheadLeftContacts = 0; bot.aheadRightContacts = 0;
                     }
                 }
                 bot.actionStart = false;
@@ -269,7 +289,7 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             Vector2 vel = b.body.getLinearVelocity();
             float speed = 0;
             float moveSpeed = Math.min(bot.touchX, 4f);
-            if (bot.motionState == Bot.MotionState.MOVE && bot.actionState != Bot.ActionState.PICK)
+            if (bot.motionState == Bot.MotionState.MOVE)
                 speed = moveSpeed * directionFactor;
 
             if (b.body.getType() == BodyDef.BodyType.DynamicBody) {
@@ -286,8 +306,10 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             if ((speed < 0 && onLeftSide) || (speed > 0 && onRightSide)) {
                 if (sideEntity != null && sideEntity.has(Trigger.class)) {
                     bot.lever = sideEntity.get(Trigger.class);
-                    if (!bot.lever.getStatus())
+                    if (bot.lever.type == Trigger.Type.LEVER && !bot.lever.getStatus())
                         bot.actionState = Bot.ActionState.LEVER_PUSH;
+                    else
+                        bot.lever = null;
                 }
             }
 
@@ -338,18 +360,18 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             return;
         }
 
-        if (me == bot.groundFixture) {
+        if (!((Entity)other.getUserData()).has(Carriable.class)) {
+            if (me == bot.groundFixture) {
             /*if (!((Entity)other.getUserData()).has(PlatformSystem.OneWayPlatform.class)
                     || me.getBody().getLinearVelocity().y >= 0)*/
                 bot.groundContacts++;
-        }
-        else if (me == bot.leftSideFixture) {
-            bot.leftSideContacts++;
-            bot.leftFixtureObject = other;
-        }
-        else if (me == bot.rightSideFixture) {
-            bot.rightSideContacts++;
-            bot.rightFixtureObject = other;
+            } else if (me == bot.leftSideFixture) {
+                bot.leftSideContacts++;
+                bot.leftFixtureObject = other;
+            } else if (me == bot.rightSideFixture) {
+                bot.rightSideContacts++;
+                bot.rightFixtureObject = other;
+            }
         }
         else if (me == bot.aheadSensorLeft) {
             bot.aheadLeftContacts++;
@@ -373,12 +395,14 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             return;
         }
 
-        if (me == bot.groundFixture && bot.groundContacts > 0)
+        if (!((Entity)other.getUserData()).has(Carriable.class)) {
+            if (me == bot.groundFixture && bot.groundContacts > 0)
                 bot.groundContacts--;
-        else if (me == bot.leftSideFixture && bot.leftSideContacts > 0)
-            bot.leftSideContacts--;
-        else if (me == bot.rightSideFixture && bot.rightSideContacts > 0)
-            bot.rightSideContacts--;
+            else if (me == bot.leftSideFixture && bot.leftSideContacts > 0)
+                bot.leftSideContacts--;
+            else if (me == bot.rightSideFixture && bot.rightSideContacts > 0)
+                bot.rightSideContacts--;
+        }
         else if (me == bot.aheadSensorLeft)
             bot.aheadLeftContacts--;
         else if (me == bot.aheadSensorRight)

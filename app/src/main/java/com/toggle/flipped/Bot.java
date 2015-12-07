@@ -17,7 +17,7 @@ public class Bot implements Component {
     // Note that the following two states are different
     // since one can be moving and jumping at the same time.
     enum MotionState { IDLE, MOVE }
-    enum ActionState { NOTHING, JUMP_START, JUMP, HANG, HANG_UP, PICK, CARRY, LEVER_PUSH }
+    enum ActionState { NOTHING, JUMP_START, JUMP, HANG, HANG_UP, PICK, CARRY, LEVER_PUSH, FADE_IN, FADE_OUT, FADE_COMPLETE }
     boolean actionStart;
 
     Direction direction = Direction.RIGHT;
@@ -52,4 +52,6 @@ public class Bot implements Component {
     Texture sprIdle, sprWalk, sprJump, sprPush, sprClimb, sprPick, sprCarry, sprLever;
 
     List<Vector2> climbPositions = new ArrayList<>();
+
+    Vector2 cameraPos = null;
 }
