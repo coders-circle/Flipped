@@ -122,7 +122,7 @@ public class TestScene2 extends Scene {
         e.additiveBlend = true;
 
         // Create some few random objects to blow with the wind
-        // TODO
+        // TODO: clean
 
         // Create a wind source
         /*Entity windSource = new Entity();

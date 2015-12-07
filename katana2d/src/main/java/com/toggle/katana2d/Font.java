@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.util.Log;
 
 public class Font {
     private final float fontHeight, fontAscent, fontDescent;
@@ -19,6 +20,28 @@ public class Font {
     private final static int NUM_CHARS = 128;
 
     private final Char[] mChars = new Char[NUM_CHARS];
+
+    public Boundary calculateBoundary(String text, float x, float y, float angle, float scaleX, float scaleY) {
+        float dx = x, dy = y + fontHeight;
+        float maxX = 0;
+        for (int i=0; i<text.length(); ++i) {
+            char j = text.charAt(i);
+            if (j == '\n') {
+                dx = x;
+                dy += fontHeight;
+                maxX = dx > maxX? dx: maxX;
+            }
+            else {
+                Char c = mChars[(int) j];
+                //texture.draw(renderer, dx, dy, 0, angle, scaleX, scaleY, c.u, c.v, c.w, c.h);
+                dx += c.width + spacing;
+            }
+        }
+        maxX = dx > maxX? dx: maxX;
+        return new Boundary(x, y, maxX, dy + 5);
+    }
+
+    public GLRenderer getRenderer(){ return this.renderer; }
 
     public Font(GLRenderer renderer, Typeface typeface, float textSize) {
         Paint paint = new Paint();

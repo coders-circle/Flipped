@@ -1,5 +1,7 @@
 package com.toggle.flipped;
 
+import android.util.Log;
+
 import com.toggle.katana2d.*;
 
 public class SoundSystem extends com.toggle.katana2d.System {
@@ -27,7 +29,6 @@ public class SoundSystem extends com.toggle.katana2d.System {
                 if(soundSource.type() == Sound.AMBIANCE && !soundSource.isPlaying()){
                     soundSource.setLooping(true);
                     soundSource.start();
-
                 }
             }
         }
