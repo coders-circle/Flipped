@@ -273,7 +273,7 @@ public class BotControlSystem extends com.toggle.katana2d.System implements Cont
             else if (bot.actionState == Bot.ActionState.JUMP_START) {
                 if (onGround) {
                     //TODO: Change state to jump_take_off
-                    //sound.state = Sound.JUMP_TAKEOFF;
+                    sound.state = Sound.JUMP_START;
 
                     float force = Math.min(6f, bot.touchY);
                     b.body.applyLinearImpulse(new Vector2(0, -force * b.body.getMass()), b.body.getWorldCenter(), false);

@@ -18,7 +18,6 @@ public class SplashScreen extends Scene {
     @Override
     public void onInit() {
         mSystems.add(new RenderSystem(mGame.getRenderer()));
-
         mListener.onFinish();
     }
 }

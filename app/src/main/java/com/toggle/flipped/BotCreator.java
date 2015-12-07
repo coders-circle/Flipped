@@ -91,8 +91,7 @@ public class BotCreator {
             entity.add(new Sound());
 
             Sound s = entity.get(Sound.class);
-            // TODO: add sources
-            //s.addSource(mGame.getActivity(), R.raw.mysound, Sound.JUMP_DROP);
+            s.addSource(mGame.getActivity(), R.raw.sound_jump_start, Sound.JUMP_START);
 
 
             Bot bot = entity.get(Bot.class);
