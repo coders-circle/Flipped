@@ -21,7 +21,7 @@ public class Mover implements Component {
         }
 
         if (type == Type.LINEAR) {
-            lVelocity = new Vector2(fx, fy).sub(current.x, current.y).nor().scl(0.8f);
+            lVelocity = new Vector2(fx, fy).sub(current.x, current.y).nor();//.scl(1f);
         } else if (type == Type.ANGULAR) {
             aVelocity = Math.signum(fangle - current.angle) * 0.8f;
         }

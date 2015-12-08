@@ -35,7 +35,7 @@ public class MenuScreen extends Scene {
     public void onInit() {
         mSystems.add(new RenderSystem(mGame.getRenderer()));
         mSystems.add(new SoundSystem());
-        font = new Font(mGame.getRenderer(), Typeface.createFromAsset(mGame.getActivity().getAssets(), "IndieFlower.ttf"), 20.0f);
+        font = new Font(mGame.getRenderer(), Typeface.create(Typeface.createFromAsset(mGame.getActivity().getAssets(), "IndieFlower.ttf"), Typeface.BOLD), 20.0f);
         systemMenu = new Menu();
         systemMenu.setup(font);
 
@@ -46,8 +46,8 @@ public class MenuScreen extends Scene {
         Entity backgroundMusic = new Entity();
         Sound s = new Sound();
         s.addSource(mGame.getActivity(), R.raw.sound_menubg, Sound.AMBIANCE);
-        //s.soundSources.get(s.soundSources.size()-1).setLooping(true);
-        //s.state = Sound.AMBIANCE;
+        s.soundSources.get(s.soundSources.size()-1).setLooping(true);
+        s.state = Sound.AMBIANCE;
         backgroundMusic.add(s);
 
         addEntity(backgroundMusic);

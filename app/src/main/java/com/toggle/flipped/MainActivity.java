@@ -75,8 +75,8 @@ public class MainActivity extends GameActivity implements Level.Listener, MenuSc
             mPausedLevel.resumeLevel();
             mActiveLevel = mPausedLevel;
         } else {
-            level1.load();
-            mActiveLevel = level1;
+            level2.load();
+            mActiveLevel = level2;
         }
     }
 

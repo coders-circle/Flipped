@@ -1,5 +1,7 @@
 package com.toggle.flipped;
 
+import android.util.Log;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -336,6 +338,12 @@ public class Level implements CustomLoader, World.WorldEventListener {
                     @Override
                     public void onTriggered(boolean status) {
                         Entity triggeredEntity = (Entity) trigger.object;
+
+                        if (triggeredEntity.has(Sound.class)) {
+                            Sound s = triggeredEntity.get(Sound.class);
+                            s.addState(Sound.TOMBSTONE_RISE);
+                        }
+
                         if (triggeredEntity.has(Mover.class)) {
                             Mover m = triggeredEntity.get(Mover.class);
                             m.start(triggeredEntity.get(Transformation.class), false);
@@ -366,6 +374,12 @@ public class Level implements CustomLoader, World.WorldEventListener {
                         m.start(moverEntity.get(Transformation.class), true);
                     }
                 });
+            }
+            else if (compName.equals("Sound")) {
+                Sound s = new Sound();
+                s.addSource(mGame.getActivity(), com.toggle.katana2d.Utilities.getResourceId(
+                        mGame.getActivity(), "raw", component.getString("file")), Sound.TOMBSTONE_RISE);
+                entity.add(s);
             }
         }
         catch (Exception e){

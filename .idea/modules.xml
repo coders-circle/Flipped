@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Flipped.iml" filepath="$PROJECT_DIR$/Flipped.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/flipped.iml" filepath="$PROJECT_DIR$/flipped.iml" />
+      <module fileurl="file://$PROJECT_DIR$/flipped.iml" filepath="$PROJECT_DIR$/flipped.iml" />
       <module fileurl="file://$PROJECT_DIR$/katana2d/katana2d.iml" filepath="$PROJECT_DIR$/katana2d/katana2d.iml" />
     </modules>
   </component>
