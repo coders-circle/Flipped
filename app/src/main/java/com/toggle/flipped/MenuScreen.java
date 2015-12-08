@@ -1,9 +1,6 @@
 package com.toggle.flipped;
 
-import android.content.res.AssetManager;
 import android.graphics.Typeface;
-import android.os.Environment;
-import android.util.Log;
 
 import com.toggle.katana2d.Camera;
 import com.toggle.katana2d.Entity;
@@ -12,7 +9,6 @@ import com.toggle.katana2d.RenderSystem;
 import com.toggle.katana2d.Scene;
 import com.toggle.katana2d.TouchInputData;
 
-import java.io.InputStream;
 import java.util.List;
 
 public class MenuScreen extends Scene {
@@ -21,6 +17,7 @@ public class MenuScreen extends Scene {
 
     public interface Listener {
         void onPlay();
+        void onExit();
     }
 
     private List<Level> mLevels;
@@ -46,8 +43,8 @@ public class MenuScreen extends Scene {
         Entity backgroundMusic = new Entity();
         Sound s = new Sound();
         s.addSource(mGame.getActivity(), R.raw.sound_menubg, Sound.AMBIANCE);
-        //s.soundSources.get(s.soundSources.size()-1).setLooping(true);
-        //s.state = Sound.AMBIANCE;
+        s.soundSources.get(s.soundSources.size()-1).setLooping(true);
+        s.state = Sound.AMBIANCE;
         backgroundMusic.add(s);
 
         addEntity(backgroundMusic);
@@ -64,23 +61,18 @@ public class MenuScreen extends Scene {
     public void onUpdate(float dt){
         TouchInputData input = mGame.getTouchInputData();
         TouchInputData.Pointer p = input.tap;
-        //for (int i=0; i<input.pointers.size(); ++i) {
-            //TouchInputData.Pointer p = input.pointers.valueAt(i);
-            //if (input.pointers.size() > 0) {
-                switch (systemMenu.hitTest(p.x, p.y)) {
-                    case 0:
-                        mListener.onPlay();
-                        break;
-                    case 1:
-                        // Settings
-                        break;
-                    case 2:
-                        // exit
-                        break;
-                }
-
-            //}
-        //}
+        switch (systemMenu.hitTest(p.x, p.y)) {
+            case 0:
+                mListener.onPlay();
+                break;
+            case 1:
+                // Settings
+                break;
+            case 2:
+                mListener.onExit();
+                // exit
+                break;
+        }
         input.tap.x = -1;
         input.tap.y = -1;
     }

@@ -86,10 +86,18 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
                 } else if (actionControlLimit.hitTest(touch.x, touch.y)) {
                     // if vertical sliding direction is up, and sliding magnitude is big enough
                     // then jump (or move up if we are hanging)
-                    if (touch.vy/10.0f < -dyLimit) {
-                        //Log.v("vy", touch.vy+"");
-                        //Log.v("dy", touch.dy + "");
-                        b.touchY = -touch.vy/10.0f;
+
+                    boolean flipped = false;//mGame.getRenderer().getCamera().angle == 180;
+                    float dy = touch.vy/10.0f;
+                    boolean slideUp = false;
+                    if (/*!flipped &&*/ dy < -dyLimit) {
+                        slideUp = true;
+                        dy = -dy;
+                    }/* else if (flipped && dy > dyLimit) {
+                        slideUp = true;
+                    }*/
+                    if (slideUp) {
+                        b.touchY = dy;
                         if (b.actionState == Bot.ActionState.HANG)
                             b.actionState = Bot.ActionState.HANG_UP;
                         else if (b.actionState == Bot.ActionState.NOTHING)
@@ -116,8 +124,8 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
             // We may do this in a different system, but for now
             // set the camera position according to the player position.
             Transformation t = e.get(Transformation.class);
-            float w = mGame.getRenderer().width;
-            float h = mGame.getRenderer().height;
+            /*float w = mGame.getRenderer().width;
+            float h = mGame.getRenderer().height;*/
 
             if (t.y > mMaxHeight+48)
                 b.dead = true;
@@ -154,9 +162,10 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
                     }
                 }
             }
-            Camera camera = mGame.getRenderer().getCamera();
+            /*Camera camera = mGame.getRenderer().getCamera();
             camera.x = Math.min(Math.max(w / 2, x), mMaxWidth - w / 2) - w / 2;
-            camera.y = Math.min(Math.max(h / 2, y), mMaxHeight - h / 2) - h / 2;
+            camera.y = Math.min(Math.max(h / 2, y), mMaxHeight - h / 2) - h / 2;*/
+            mGame.getRenderer().centerCamera(x, y, mMaxWidth, mMaxHeight);
         }
     }
 }

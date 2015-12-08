@@ -64,8 +64,15 @@ public class Scene {
     protected void onDraw() {
     }
 
-    public void onPause() {}
-    public void onResume() {}
+    public void onPause() {
+        for (System s: mSystems) {
+            s.onPause();
+        }
+    }
+    public void onResume() {
+        for (System s: mSystems) {
+            s.onResume();
+        }}
 
     public Game getGame() {
         return mGame;

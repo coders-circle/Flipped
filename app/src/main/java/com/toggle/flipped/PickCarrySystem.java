@@ -46,14 +46,14 @@ public class PickCarrySystem extends com.toggle.katana2d.System {
 
             if (c.carrier.get(Bot.class).direction == Bot.Direction.LEFT) {
                 pos.x *= -1;
-                pos.x -= 2;
+                pos.x -= 3;
                 angle *= -1;
                 if (entity.has(Burner.class)) {
                     entity.get(Burner.class).reflect = true;
                 }
                 entity.get(Sprite.class).scaleX = -1;
             } else  if (entity.has(Burner.class)) {
-                pos.x += 2;
+                pos.x += 3;
                 entity.get(Burner.class).reflect = false;
                 entity.get(Sprite.class).scaleX = 1;
             }

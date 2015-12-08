@@ -35,6 +35,7 @@ public class SoundSystem extends com.toggle.katana2d.System {
         }
     }
 
+    @Override
     public void onPause(){
         for(Entity entity: mEntities) {
             Sound sound = entity.get(Sound.class);
@@ -46,6 +47,7 @@ public class SoundSystem extends com.toggle.katana2d.System {
         }
     }
 
+    @Override
     public void onResume(){
         for(Entity entity: mEntities) {
             Sound sound = entity.get(Sound.class);

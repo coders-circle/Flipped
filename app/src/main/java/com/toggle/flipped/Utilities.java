@@ -156,8 +156,8 @@ public class Utilities {
                 (float) transformation.getDouble("Translate-Y"), (float) transformation.getDouble("Angle")));
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(69 / 2 * PhysicsSystem.METERS_PER_PIXEL, 26 / 2 * PhysicsSystem.METERS_PER_PIXEL,
-                new Vector2(0, 26 / 2 * PhysicsSystem.METERS_PER_PIXEL), 0);
+        shape.setAsBox(60 / 2 * PhysicsSystem.METERS_PER_PIXEL, 20 / 2 * PhysicsSystem.METERS_PER_PIXEL,
+                new Vector2(0, (20 / 2+2) * PhysicsSystem.METERS_PER_PIXEL), 0);
         PhysicsBody b = new PhysicsBody(world, BodyDef.BodyType.StaticBody, fire, shape, new PhysicsBody.Properties(0, 0, 0));
         fire.add(b);
 

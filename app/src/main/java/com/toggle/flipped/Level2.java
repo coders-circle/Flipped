@@ -55,19 +55,34 @@ public class Level2 extends Level {
         world.addEntity(bk1);
         mTextures.add(tex);
 
-       /* Entity bk2 = new Entity();
-        bk2.add(new Background(mGame.getRenderer().addTexture(R.drawable.level1_hills, 1034, 640, 2, 1), 75));
-        world.addEntity(bk2);*/
+        Entity bk2 = new Entity();
+        tex = mGame.getRenderer().addTexture(R.drawable.level2_hills, 1336, 640, 2, 1);
+        bk2.add(new Background(tex, 75));
+        world.addEntity(bk2);
+        mTextures.add(tex);
+
+        /*Entity bk2aa = new Entity();
+        tex = mGame.getRenderer().addTexture(R.drawable.level2_hills_fog, 1342, 640, 2, 1);
+        bk2aa.add(new Background(tex, 74));
+        world.addEntity(bk2aa);
+        mTextures.add(tex);*/
+
+        Entity bk2a = new Entity();
+        tex = mGame.getRenderer().addTexture(R.drawable.level2_fences, 1094, 640, 4, 1);
+        bk2a.add(new Background(tex, 55));
+        world.addEntity(bk2a);
+        mTextures.add(tex);
 
         Entity bk3 = new Entity();
-        tex = mGame.getRenderer().addTexture(R.drawable.level2_gravestones, 1955, 640, 2, 1);
-        bk3.add(new Background(tex, 55));
+        tex = mGame.getRenderer().addTexture(R.drawable.level2_gravestones, 1554, 640, 4, 1);
+        bk3.add(new Background(tex, 20));
         world.addEntity(bk3);
         mTextures.add(tex);
 
         Entity bk4 = new Entity();
         tex = mGame.getRenderer().addTexture(R.drawable.level2_path, 1880, 640, 4, 1);
-        bk4.add(new Background(tex, 0));
+        bk4.add(new Sprite(tex, 0));
+        bk4.add(new Transformation(tex.width/2, tex.height/2, 0));
         world.addEntity(bk4);
         mTextures.add(tex);
 

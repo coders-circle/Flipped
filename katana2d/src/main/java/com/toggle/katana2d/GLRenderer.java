@@ -446,5 +446,10 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         mGame.textureManager.remove(t);
         mTextures.remove(t);
     }
+
+    public void centerCamera(float x, float y, float maxWidth, float maxHeight) {
+        mCamera.x = Math.min(Math.max(width / 2, x), maxWidth - width / 2) - width / 2;
+        mCamera.y = Math.min(Math.max(height / 2, y), maxHeight - height / 2) - height / 2;
+    }
 }
 

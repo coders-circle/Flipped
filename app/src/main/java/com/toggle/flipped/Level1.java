@@ -55,12 +55,12 @@ public class Level1 extends Level {
             bk2.add(new Background(tex, 75));
             world.addEntity(bk2);
             mTextures.add(tex);
-
+/*
             Entity fg1 = new Entity();
             tex = mGame.getRenderer().addTexture(R.drawable.hills_fog, 1034, 640, 2, 1);
             fg1.add(new Background(tex, 74));
             world.addEntity(fg1);
-            mTextures.add(tex);
+            mTextures.add(tex);*/
 
             Entity bk3 = new Entity();
             tex = mGame.getRenderer().addTexture(R.drawable.level1_trees, 1955, 640, 2, 1);
@@ -68,11 +68,11 @@ public class Level1 extends Level {
             world.addEntity(bk3);
             mTextures.add(tex);
 
-            Entity fg2 = new Entity();
+            /*Entity fg2 = new Entity();
             tex = mGame.getRenderer().addTexture(R.drawable.tree_fog, 1955, 640, 2, 1);
             fg2.add(new Background(tex, 54));
             world.addEntity(fg2);
-            mTextures.add(tex);
+            mTextures.add(tex);*/
 
             Entity bk3a = new Entity();
             tex = mGame.getRenderer().addTexture(R.drawable.level1_forest, 1500, 640, 2, 1);

@@ -126,9 +126,9 @@ public class Level implements CustomLoader, World.WorldEventListener {
                 if (!game.textureManager.has(spriteName)) {
                     game.textureManager.add(spriteName, game.getRenderer().addTexture(
                             R.drawable.aago,
-                            69, 26
+                            60, 20
                     ));
-                    game.textureManager.get(spriteName).originY = 0f;
+                    game.textureManager.get(spriteName).originY = -0.035f;
                 }
                 return true;
             case "block":
@@ -153,9 +153,13 @@ public class Level implements CustomLoader, World.WorldEventListener {
                     ));
                     game.textureManager.get(spriteName).originY = 0.85f;*/
                     game.textureManager.add(spriteName, game.getRenderer().addTexture(
-                            R.drawable.mirror5, 587, 517
+                            R.drawable.mirror51, 587, 517
                     ));
                     game.textureManager.get(spriteName).originY = 0.5f;
+                    /*game.textureManager.add(spriteName, game.getRenderer().addTexture(
+                            R.drawable.mirror_white, 126, 79
+                    ));
+                    game.textureManager.get(spriteName).originY = 0.8f;*/
                 }
                 return true;
             case "hanger":
@@ -170,6 +174,11 @@ public class Level implements CustomLoader, World.WorldEventListener {
                            R.drawable.lever, 32, 8
                     ));
                     game.textureManager.get(spriteName).originX = 1;
+                }
+                if (!game.textureManager.has("lever_base")) {
+                    game.textureManager.add("lever_base", game.getRenderer().addTexture(
+                            R.drawable.base, 17, 3
+                    ));
                 }
                 return true;
             case "cross":
@@ -330,6 +339,14 @@ public class Level implements CustomLoader, World.WorldEventListener {
                 trigger.type = Trigger.Type.LEVER;
                 entity.add(trigger);
 
+                // create base of lever
+                JSONObject transformation = components.getJSONObject("Transformation");
+                Entity base = new Entity();
+                base.add(new Sprite(mGame.textureManager.get("lever_base"), -0.4f));
+                base.add(new Transformation((float)transformation.getDouble("Translate-X"), (float)transformation.getDouble("Translate-Y"), 0));
+                // base.add(new PhysicsBody(world, BodyDef.BodyType.StaticBody, base, new PhysicsBody.Properties(0, 0.2f, 0.2f)));
+                levelLoader.mCurrentScene.addEntity(base);
+
                 String mentity = trigger.tag.substring(0, trigger.tag.indexOf("_lever"));
                 trigger.object = levelLoader.mCurrentEntities.get(mentity);
                 entity.get(Trigger.class).listeners.add(new Trigger.Listener() {
@@ -339,6 +356,7 @@ public class Level implements CustomLoader, World.WorldEventListener {
                         if (triggeredEntity.has(Mover.class)) {
                             Mover m = triggeredEntity.get(Mover.class);
                             m.start(triggeredEntity.get(Transformation.class), false);
+
                         } else if (triggeredEntity.has(PhysicsBody.class)) {
                             PhysicsBody pb = triggeredEntity.get(PhysicsBody.class);
                             pb.body.setGravityScale(-pb.body.getGravityScale());

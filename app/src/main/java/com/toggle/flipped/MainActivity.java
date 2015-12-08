@@ -1,6 +1,5 @@
 package com.toggle.flipped;
 
-import android.util.Log;
 import android.view.KeyEvent;
 
 import com.toggle.katana2d.Game;
@@ -78,6 +77,11 @@ public class MainActivity extends GameActivity implements Level.Listener, MenuSc
             level1.load();
             mActiveLevel = level1;
         }
+    }
+
+    @Override
+    public void onExit() {
+        finish();
     }
 
     @Override

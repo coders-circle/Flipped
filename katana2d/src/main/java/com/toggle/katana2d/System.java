@@ -36,4 +36,11 @@ public class System {
     public void init() {}
     public void update(float dt) {}
     public void draw(float interpolation) {}
+
+    public void onPause() {
+
+    }
+    public void onResume() {
+
+    }
 }

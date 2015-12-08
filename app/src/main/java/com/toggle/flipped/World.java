@@ -14,6 +14,10 @@ import com.toggle.katana2d.physics.PhysicsSystem;
 // On world is one scene, one level contains multiple worlds
 public class World extends Scene {
 
+    public interface WorldEventListener {
+        void onWorldInitialized(World world);
+    }
+
     private LevelLoader mLevelLoader;
     private String mWorldName;
     private Level mParentLevel;
@@ -97,6 +101,7 @@ public class World extends Scene {
         }
 
         mPlayer.get(PhysicsBody.class).body.setTransform(new Vector2(x, y), 0);
+        mGame.getRenderer().centerCamera(x, y, mWidth, mHeight);
     }
 
     @Override
@@ -109,10 +114,6 @@ public class World extends Scene {
     // When world changes from this to another world
     public void unload() {
 
-    }
-
-    public interface WorldEventListener {
-        void onWorldInitialized(World world);
     }
 
     @Override
