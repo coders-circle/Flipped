@@ -144,6 +144,7 @@ public class ExplosionSystem extends com.toggle.katana2d.System implements Conta
                         // destroy the explosive
                         e.destroyed = true;
                         e.isExploding = false;
+                        e.sprite.visible = false;
 
                     } else if (e.particles.size() == 0) {
                         // create the particles

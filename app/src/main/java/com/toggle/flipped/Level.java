@@ -1,5 +1,7 @@
 package com.toggle.flipped;
 
+import android.util.Log;
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -291,9 +293,10 @@ public class Level implements CustomLoader, World.WorldEventListener {
         try {
             if (compName.equals("Explosive")) {
                 ExplosionSystem.Explosive e = new ExplosionSystem.Explosive();
-                e.sprite = new Sprite(mGame.getRenderer().addTexture(R.drawable.explosion, 128, 128),-5, 9, 9);
+                //e.sprite = new Sprite(mGame.getRenderer().addTexture(R.drawable.explosion, 128, 128),-5, 9, 9);
+                e.sprite = new Sprite(mGame.getRenderer().addTexture(R.drawable.ep, 300, 300),-5, 8, 8);
                 e.sprite.spriteSheetData.loop = false;
-                e.lifeSpan = 81f/12;    // 81 frames running at 12 FPS
+                e.lifeSpan = 4*5/12; //81f/12;    // 81 frames running at 12 FPS
                 entity.add(e);
 
                 Emitter emitter = new Emitter(mGame.getRenderer(), 300, mGame.getRenderer().mFuzzyTextureId, 3, 100, new float[]{180f / 255, 80f / 255, 10f / 255, 1}, new float[]{0, 0, 0, 0});
@@ -353,6 +356,12 @@ public class Level implements CustomLoader, World.WorldEventListener {
                     @Override
                     public void onTriggered(boolean status) {
                         Entity triggeredEntity = (Entity) trigger.object;
+
+                        if (triggeredEntity.has(Sound.class)) {
+                            Sound s = triggeredEntity.get(Sound.class);
+                            s.addState(Sound.TOMBSTONE_RISE);
+                        }
+
                         if (triggeredEntity.has(Mover.class)) {
                             Mover m = triggeredEntity.get(Mover.class);
                             m.start(triggeredEntity.get(Transformation.class), false);
@@ -384,6 +393,12 @@ public class Level implements CustomLoader, World.WorldEventListener {
                         m.start(moverEntity.get(Transformation.class), true);
                     }
                 });
+            }
+            else if (compName.equals("Sound")) {
+                Sound s = new Sound();
+                s.addSource(mGame.getActivity(), com.toggle.katana2d.Utilities.getResourceId(
+                        mGame.getActivity(), "raw", component.getString("file")), Sound.TOMBSTONE_RISE);
+                entity.add(s);
             }
         }
         catch (Exception e){

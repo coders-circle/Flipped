@@ -18,6 +18,9 @@ public class SoundSystem extends com.toggle.katana2d.System {
                 if((soundSource.type() & sound.state) != 0){
                     if(!soundSource.isFinished() && !soundSource.isStarted()){
                         soundSource.start();
+                        if((sound.state&Sound.TOMBSTONE_RISE) != 0){
+                            Log.v("sound", "tomb");
+                        }
                     }
 
                     if(soundSource.isFinished()){

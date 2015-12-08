@@ -42,7 +42,7 @@ public class MainActivity extends GameActivity implements Level.Listener, MenuSc
         Game game = mEngine.getGame();
 
         // Rope sprite
-        game.textureManager.add("rope", game.getRenderer().addTexture(new float[]{1, 0.5f, 0, 1},
+        game.textureManager.add("rope", game.getRenderer().addTexture(/*new float[]{1, 0.5f, 0, 1}*/R.drawable.rope_segment,
                 Rope.STANDARD_SEGMENT_LENGTH, Rope.STANDARD_SEGMENT_THICKNESS));
     }
 
@@ -74,8 +74,8 @@ public class MainActivity extends GameActivity implements Level.Listener, MenuSc
             mPausedLevel.resumeLevel();
             mActiveLevel = mPausedLevel;
         } else {
-            level1.load();
-            mActiveLevel = level1;
+            level2.load();
+            mActiveLevel = level2;
         }
     }
 

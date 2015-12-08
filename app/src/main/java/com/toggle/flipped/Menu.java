@@ -27,6 +27,7 @@ public class Menu implements Component {
             this.text = text;
             state = HIDDEN;
             this.font = font;
+            setPosition(0, 0);  // for boundary size, set position to 0,0 and calculate the boundary
         }
         public void hide(){ state = HIDDEN; }
         public void show(){ state = VISIBLE; }
@@ -47,15 +48,15 @@ public class Menu implements Component {
             items.add(new MenuItem(itemName, font));
         }
         public void setup(){
-            float x = 20;
+            //float x = 20;
             float verticalSpace = 20.0f;
-            float y = items.get(0).font.getRenderer().devHeight/2;
-            //y -= verticalSpace;
+            float y = items.get(0).font.getRenderer().devHeight/2 - 70;
+            float w2 = items.get(0).font.getRenderer().devWidth/2;
 
             for(int i = 0; i < items.size(); i++){
+                float x = w2 - (items.get(i).boundary.right-items.get(i).boundary.left)/2;
                 items.get(i).setPosition(x, y);
                 y = items.get(i).boundary.bottom + verticalSpace;
-                //Log.d(items.get(i).text, items.get(i).boundary.top+"");
             }
         }
     }

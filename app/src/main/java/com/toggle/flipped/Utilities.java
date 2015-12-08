@@ -188,8 +188,8 @@ public class Utilities {
         burner.sourceHeight = 24 * PhysicsSystem.METERS_PER_PIXEL;
 
 
-        Sound sound = new Sound();
-        fire.add(sound);
+        //Sound sound = new Sound();
+        //fire.add(sound);
         // TODO: Add sound source for fire
         // sound.addSource(scene.getGame().getActivity(), R.raw.firesound, Sound.FIRE|Sound.AMBIANCE);
     }
