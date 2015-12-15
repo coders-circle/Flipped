@@ -26,6 +26,8 @@ public class Game implements TimerCallback {
 
     public GLRenderer getRenderer() { return mRenderer; }
 
+    public Timer getTimer() { return mTimer; }
+
     public TouchInputData getTouchInputData() { return mRenderer.touchInputData; }
 
     // List of all scenes

@@ -23,7 +23,7 @@ public class Timer {
         return mFps;
     }
     // Get total time elapsed since reset
-    public float getTotalTime() { return mTotalTime; }
+    public float getTotalTime() { return mTotalTime/ONE_SECOND; }
 
     public float update(TimerCallback callback) {
 
@@ -31,6 +31,7 @@ public class Timer {
         float currentTime = nanoTime();
         float deltaTime = currentTime - mLastTime;
         mLastTime = currentTime;
+        mTotalTime += mTarget;
         callback.update(mTarget/ONE_SECOND);
 
         float dt = mTarget - deltaTime;

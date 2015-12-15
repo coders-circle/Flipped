@@ -3,9 +3,11 @@ package com.toggle.katana2d;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.widget.TextView;
 
 public abstract class GameActivity  extends Activity {
     protected Engine mEngine = new Engine();
@@ -25,6 +27,8 @@ public abstract class GameActivity  extends Activity {
                 dialog.setCancelable(false);
                 dialog.setContentView(R.layout.basic_dialog);
                 dialog.show();
+                TextView tv = (TextView)dialog.findViewById(R.id.dialog_textview);
+                tv.setTypeface(Typeface.create(Typeface.createFromAsset(mContext.getAssets(), "IndieFlower.ttf"), Typeface.BOLD));
             } else if (msg.what == 2) {
                 if (dialog != null)
                     dialog.dismiss();

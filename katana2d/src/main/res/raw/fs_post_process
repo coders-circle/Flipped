@@ -1,0 +1,14 @@
+precision mediump float;
+
+uniform sampler2D uTexture;
+uniform vec4 uColor;
+uniform float uTime;
+
+varying vec2 vTexCoord;
+
+void main() {
+    // A simple sine wave
+    vec2 texcoord = vTexCoord;
+    texcoord.x += sin(texcoord.y + 3.14 * uTime) / 100.0;
+    gl_FragColor = texture2D(uTexture, texcoord) * uColor;
+}

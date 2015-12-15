@@ -31,14 +31,19 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     private Context mContext;
     // Game object
     private Game mGame;
+
     GLRenderer(Context context, Game game) { mContext = context; mGame = game;}
 
     // Touch input data;
     public TouchInputData touchInputData;
 
+    // FBO
+    public int mFbo, mRboTexture, mRboDepth;
+
     // GLSL program objects
     public int mSpriteProgram;
     public int mPointSpriteProgram;
+    public int mPostProcessProgram;
 
     // Uniform handles
     public int mSpriteColorHandle;
@@ -47,6 +52,10 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
     public int mPointSpriteMVPMatrixHandle;
     public int mPointSpriteScaleHandle;
+
+    public int mPostProcessMVPMatrixHandle;
+    public int mPostProcessColorHandle;
+    public int mPostProcessTimeHandle;
 
     // vertex buffer data
     private static float mSquareCoords[] = {
@@ -70,6 +79,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     public int mPointSpritePositionHandle;
     public int mPointSpriteColorHandle;
     public int mPointSpriteSizeHandle;
+    public int mPostProcessPositionHandle;
 
     // Transformation matrices
     public final float[] mMVPMatrix = new float[16];
@@ -125,6 +135,25 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         GLES20.glClearColor(100.0f / 255, 149.0f / 255, 237.0f / 255, 1.0f);
         GLES20.glClearDepthf(1.0f);
 
+        prepareSpriteProgram();
+        preparePointsSpriteProgram();
+        preparePostProcessProgram();
+
+        createFBO();
+
+        // Load the standard textures
+        mWhiteTextureId = loadTexture(R.drawable.white);
+        mFuzzyTextureId = loadTexture(R.drawable.fuzzy_circle);
+
+        // Reload the user created textures if any
+        for (Texture t: mTextures)
+            reloadTexture(t);
+
+        // Initialize the Engine
+        mGame.init();
+    }
+
+    private void prepareSpriteProgram() {
         // Compile the sprite shaders
         int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, Utilities.getRawFileText(mContext, R.raw.vs_sprite));
         int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, Utilities.getRawFileText(mContext, R.raw.fs_sprite));
@@ -164,7 +193,9 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         // get the texture uniform handle and set it to use the sample-0
         int texHandle = GLES20.glGetUniformLocation(mSpriteProgram, "uTexture");
         GLES20.glUniform1i(texHandle, 0);
+    }
 
+    private void preparePointsSpriteProgram() {
         // Shaders for point sprites
         int pVertexShader = loadShader(GLES20.GL_VERTEX_SHADER, Utilities.getRawFileText(mContext, R.raw.vs_point_sprite));
         int pFragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, Utilities.getRawFileText(mContext, R.raw.fs_point_sprite));
@@ -189,28 +220,75 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         // get the texture uniform handle and set it to use the sample-0
         int pTexHandle = GLES20.glGetUniformLocation(mPointSpriteProgram, "uTexture");
         GLES20.glUniform1i(pTexHandle, 0);
+    }
 
-        // Load the standard textures
-        mWhiteTextureId = loadTexture(R.drawable.white);
-        mFuzzyTextureId = loadTexture(R.drawable.fuzzy_circle);
+    private void preparePostProcessProgram() {
+        // Compile the sprite shaders
+        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, Utilities.getRawFileText(mContext, R.raw.vs_post_process));
+        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, Utilities.getRawFileText(mContext, R.raw.fs_post_process));
 
-        // Reload the user created textures if any
-        for (Texture t: mTextures)
-            reloadTexture(t);
+        // Link the shaders to a program
+        mPostProcessProgram = GLES20.glCreateProgram();
+        GLES20.glAttachShader(mPostProcessProgram, vertexShader);
+        GLES20.glAttachShader(mPostProcessProgram, fragmentShader);
+        GLES20.glLinkProgram(mPostProcessProgram);
+        GLES20.glUseProgram(mPostProcessProgram);
 
-        // Initialize the Engine
-        mGame.init();
+        // Get the attribute and uniform handles
+        mPostProcessPositionHandle = GLES20.glGetAttribLocation(mPostProcessProgram, "vPosition");
+        GLES20.glEnableVertexAttribArray(mPostProcessPositionHandle);
+        mPostProcessColorHandle = GLES20.glGetUniformLocation(mPostProcessProgram, "uColor");
+        mPostProcessMVPMatrixHandle = GLES20.glGetUniformLocation(mPostProcessProgram, "uMVPMatrix");
+        mPostProcessTimeHandle = GLES20.glGetUniformLocation(mPostProcessProgram, "uTime");
+
+        // get the texture uniform handle and set it to use the sample-0
+        int texHandle = GLES20.glGetUniformLocation(mPostProcessProgram, "uTexture");
+        GLES20.glUniform1i(texHandle, 0);
+    }
+
+    private void createFBO() {
+        /* Create back-buffer, used for post-processing */
+
+        /* Texture */
+        int t[] = new int[1];
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+        GLES20.glGenTextures(1, t, 0);
+        mRboTexture = t[0];
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mRboTexture);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, devWidth, devHeight, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+
+        /* Depth buffer */
+        int d[] = new int[1];
+        GLES20.glGenRenderbuffers(1, d, 0);
+        mRboDepth = d[0];
+        GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, mRboDepth);
+        GLES20.glRenderbufferStorage(GLES20.GL_RENDERBUFFER, GLES20.GL_DEPTH_COMPONENT16, devWidth, devHeight);
+        GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, 0);
+
+        /* Framebuffer to link everything together */
+        int f[] = new int[1];
+        GLES20.glGenFramebuffers(1, f, 0);
+        mFbo = f[0];
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFbo);
+        GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, mRboTexture, 0);
+        GLES20.glFramebufferRenderbuffer(GLES20.GL_FRAMEBUFFER, GLES20.GL_DEPTH_ATTACHMENT, GLES20.GL_RENDERBUFFER, mRboDepth);
+
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
     }
 
     public final float[] mViewMatrix = new float[16];
 
+    //private float mFboScale = 2f;
     @Override
     public void onDrawFrame(GL10 unused) {
 
         GLES20.glDisable(GLES20.GL_SCISSOR_TEST);
-        GLES20.glClearColor(0, 0, 0, 1.0f);
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-        GLES20.glEnable(GLES20.GL_SCISSOR_TEST);
+        GLES20.glViewport(0, 0, devWidth, devHeight);
 
         // View transformations
         Matrix.setIdentityM(mViewMatrix, 0);
@@ -219,9 +297,36 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         Matrix.translateM(mViewMatrix, 0, -width / 2, -height / 2, 0);
         Matrix.translateM(mViewMatrix, 0, -mCamera.x, -mCamera.y, 0);
 
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFbo);
         GLES20.glClearColor(mBackR, mBackG, mBackB, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         mGame.newFrame();
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+
+        // Set the viewport
+        GLES20.glViewport((int) cx, (int) cy, (int) (width * scale), (int) (height * scale));
+        GLES20.glClearColor(0, 0, 0, 1.0f);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glEnable(GLES20.GL_SCISSOR_TEST);
+
+        // View transformations
+        Matrix.setIdentityM(mViewMatrix, 0);
+
+        // draw framebuffer
+        GLES20.glClearColor(0, 0, 0, 1.0f);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+        GLES20.glUseProgram(mPostProcessProgram);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mSpriteBO[0]);
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, mSpriteBO[1]);
+        GLES20.glVertexAttribPointer(mPostProcessPositionHandle, 2, GLES20.GL_FLOAT, false, 2 * 4, 0);
+        setPostProcessTransform();
+        GLES20.glUniform4fv(mPostProcessColorHandle, 1, new float[]{1, 1, 1, 1}, 0);
+        GLES20.glUniform1f(mPostProcessTimeHandle, mGame.getTimer().getTotalTime());
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mRboTexture);
+        GLES20.glDrawElements(GLES20.GL_TRIANGLES, 6, GLES20.GL_UNSIGNED_SHORT, 0);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
     public final int width = 580, height = 320;
@@ -266,6 +371,14 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
         mScaling = scale;
 
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mRboTexture);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, devWidth, devHeight, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
+
+        GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, mRboDepth);
+        GLES20.glRenderbufferStorage(GLES20.GL_RENDERBUFFER, GLES20.GL_DEPTH_COMPONENT16, devWidth, devHeight);
+        GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, 0);
+
     }
 
     // Set transform for drawing the rectangle.
@@ -299,6 +412,18 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         // finally set the value of mvpMatrix uniform to the mMVPMatrix
         GLES20.glUniformMatrix4fv(mPointSpriteMVPMatrixHandle, 1, false, mMVPMatrix, 0);
         GLES20.glUniform1f(mPointSpriteScaleHandle, mScaling);
+    }
+
+    public void setPostProcessTransform() {
+        Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.scaleM(mModelMatrix, 0, width, height, 1);
+
+        // mMVPMatrix = mProjectionMatrix * mViewMatrix * mModelMatrix
+        Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
+
+        // finally set the value of mvpMatrix uniform to the mMVPMatrix
+        GLES20.glUniformMatrix4fv(mPostProcessMVPMatrixHandle, 1, false, mMVPMatrix, 0);
     }
 
     // Create shader object from shader program
