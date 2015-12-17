@@ -34,20 +34,16 @@ public class BackgroundSystem extends System {
         for (Entity entity: mEntities) {
             Background b = entity.get(Background.class);
 
-            b.lastX = b.x; b.lastY = b.y;
             b.x = mRenderer.getCamera().x * b.distance;
             b.y = mRenderer.getCamera().y * b.distance;
         }
     }
 
     @Override
-    public void draw(float interpolation) {
+    public void draw() {
         for (Entity entity: mEntities) {
             Background b = entity.get(Background.class);
-
-            float x = b.x * interpolation + b.lastX * (1-interpolation);
-            float y = b.y * interpolation + b.lastY * (1-interpolation);
-            b.mTexture.draw(mRenderer, x, y, -b.distance, 0, 1, 1);
+            b.mTexture.draw(mRenderer, b.x, b.y, -b.distance, 0, 1, 1);
         }
     }
 }

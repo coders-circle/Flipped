@@ -1,6 +1,8 @@
 package com.toggle.katana2d;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 // Uses sprite and transformation components of entities to render them
 public class RenderSystem extends System {
@@ -36,19 +38,27 @@ public class RenderSystem extends System {
         }
     }
 
+    private List<Entity> postDrawingList = new ArrayList<>();
     @Override
-    public void draw(float interpolation) {
+    public void draw() {
+        postDrawingList.clear();
         for (Entity entity : mEntities) {
             Sprite s = entity.get(Sprite.class);
             Transformation t = entity.get(Transformation.class);
 
-            // Interpolation to fix temporal aliasing
-            float minus = 1-interpolation;
-            float x = t.x * interpolation + t.lastX * minus;
-            float y = t.y * interpolation + t.lastY * minus;
-            float angle = t.angle * interpolation + t.lastAngle * minus;
+            if (s.postDrawn)
+                postDrawingList.add(entity);
+            else
+                s.draw(mRenderer, t.x, t.y, t.angle);
+        }
+    }
 
-            s.draw(mRenderer, x, y, angle);
+    @Override
+    public void postDraw() {
+        for (Entity entity: postDrawingList) {
+            Sprite s = entity.get(Sprite.class);
+            Transformation t = entity.get(Transformation.class);
+            s.draw(mRenderer, t.x, t.y, t.angle);
         }
     }
 }

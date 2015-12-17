@@ -62,8 +62,6 @@ public class ExplosionSystem extends com.toggle.katana2d.System implements Conta
         public float densityPerParticle = 80/numParticles;
         public int numRays = 32;
 
-        public Sprite sprite;
-
         public boolean destroyed = false;
         public float explosionTime = 0;
 
@@ -71,11 +69,9 @@ public class ExplosionSystem extends com.toggle.katana2d.System implements Conta
     }
 
     private World mWorld;
-    private Game mGame;
-    public ExplosionSystem(World world, Game game) {
+    public ExplosionSystem(World world) {
         super(new Class[]{Sprite.class, Explosive.class, Transformation.class, PhysicsBody.class, Emitter.class});
         mWorld = world;
-        mGame = game;
     }
 
     @Override
@@ -88,13 +84,8 @@ public class ExplosionSystem extends com.toggle.katana2d.System implements Conta
             f.setFilterData(d);
         }
         Explosive e = entity.get(Explosive.class);
-        /*
-        // add explosion sensor
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(e.sprite.texture.width/2 * PhysicsSystem.METERS_PER_PIXEL, e.sprite.texture.height/2 * PhysicsSystem.METERS_PER_PIXEL);
-        b.createSensor(shape);*/
-        e.explosionWidth = e.sprite.texture.width * PhysicsSystem.METERS_PER_PIXEL;
-        e.explosionHeight = e.sprite.texture.height * PhysicsSystem.METERS_PER_PIXEL;
+        e.explosionWidth = 300 * PhysicsSystem.METERS_PER_PIXEL;
+        e.explosionHeight = 300 * PhysicsSystem.METERS_PER_PIXEL;
     }
 
     @Override
@@ -116,8 +107,15 @@ public class ExplosionSystem extends com.toggle.katana2d.System implements Conta
                     e.explosionTime -= dt;
                 }
                 else {
-                    emitter.emitNext = false;
-                    s.changeSprite(e.sprite.texture, e.sprite.spriteSheetData);
+                    s.visible = false;
+                    emitter.var_angle = 360;
+                    emitter.emissionRate = 30;
+                    emitter.life = 5;
+                    emitter.size = 90;
+                    emitter.var_size = 40;
+                    emitter.speed = 70;
+                    emitter.var_speed = 20;
+                    emitter.accel_x = emitter.accel_y = 0;
 
                     Vector2 pos = bd.body.getPosition();
                     bd.body.getWorld().QueryAABB(this,
@@ -136,15 +134,10 @@ public class ExplosionSystem extends com.toggle.katana2d.System implements Conta
                         for (Body b : e.particles)
                             b.getWorld().destroyBody(b);
 
-                        /* // reset the explosive
-                        e.particles.clear();
-                        e.isExploding = false;
-                        e.lifeSpan = 5;*/
-
                         // destroy the explosive
                         e.destroyed = true;
                         e.isExploding = false;
-                        e.sprite.visible = false;
+                        emitter.emitNext = false;
 
                     } else if (e.particles.size() == 0) {
                         // create the particles

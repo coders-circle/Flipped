@@ -5,6 +5,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.World;
 import com.toggle.katana2d.Emitter;
 import com.toggle.katana2d.Entity;
+import com.toggle.katana2d.GLRenderer;
 import com.toggle.katana2d.Game;
 import com.toggle.katana2d.Scene;
 import com.toggle.katana2d.Sprite;
@@ -68,6 +69,7 @@ public class Utilities {
     public static void createStick(Scene scene, World world, Entity stick, JSONObject components) throws JSONException {
         Game game = scene.getGame();
         stick.add(new Sprite(/*game.getRenderer().addTexture(new float[]{1, 1, 0, 1}, 16, 3)*/game.textureManager.get("stick"), -0.05f));
+        stick.get(Sprite.class).postDrawn = true;
         JSONObject transformation = components.getJSONObject("Transformation");
         stick.add(new Transformation((float) transformation.getDouble("Translate-X"),
                 (float) transformation.getDouble("Translate-Y"), (float) transformation.getDouble("Angle")));
@@ -127,17 +129,7 @@ public class Utilities {
 
         Entity emitter = new Entity();
         emitter.add(new Transformation(0, 0, -90));
-        emitter.add(new Emitter(game.getRenderer(), 100, game.getRenderer().mFuzzyTextureId, 3, 100, new float[]{180f / 255, 80f / 255, 10f / 255, 1}, new float[]{0, 0, 0, 0}));
-        Emitter e = emitter.get(Emitter.class);
-        e.var_startColor[3] = 0.3f;
-        e.size = 16;
-        e.var_size = 5;
-        e.var_angle = 70;
-        e.speed = 10;
-        e.var_speed = 5;
-        e.accel_x = 20;
-        e.additiveBlend = true;
-        e.emissionRate = 0;
+        emitter.add(createFireEmitter(game.getRenderer(), 16, 70));
         scene.addEntity(emitter);
 
         Burner burner = new Burner(emitter);
@@ -151,6 +143,7 @@ public class Utilities {
     public static void createFire(Scene scene, World world, Entity fire, JSONObject components) throws JSONException {
         Game game = scene.getGame();
         fire.add(new Sprite(/*game.getRenderer().addTexture(new float[]{1, 1, 0, 1}, 10, 10)*/game.textureManager.get("fire"), -1.6f));
+        fire.get(Sprite.class).postDrawn = true;
         JSONObject transformation = components.getJSONObject("Transformation");
         fire.add(new Transformation((float) transformation.getDouble("Translate-X"),
                 (float) transformation.getDouble("Translate-Y"), (float) transformation.getDouble("Angle")));
@@ -167,16 +160,7 @@ public class Utilities {
 
         Entity emitter = new Entity();
         emitter.add(new Transformation(0, 0, -90));
-        emitter.add(new Emitter(game.getRenderer(), 300, game.getRenderer().mFuzzyTextureId, 3, 100, new float[]{180f / 255, 80f / 255, 10f / 255, 1}, new float[]{0, 0, 0, 0}));
-        Emitter e = emitter.get(Emitter.class);
-        e.var_startColor[3] = 0.3f;
-        e.size = 28;
-        e.var_size = 5;
-        e.var_angle = 70;
-        e.speed = 10;
-        e.var_speed = 5;
-        e.accel_x = 20;
-        e.additiveBlend = true;
+        emitter.add(createFireEmitter(game.getRenderer(), 28, 70));
         scene.addEntity(emitter);
 
         Burner burner = new Burner(emitter);
@@ -192,5 +176,35 @@ public class Utilities {
         //fire.add(sound);
         // TODO: Add sound source for fire
         // sound.addSource(scene.getGame().getActivity(), R.raw.firesound, Sound.FIRE|Sound.AMBIANCE);
+    }
+
+    public static Emitter createFireEmitter(GLRenderer renderer, float size, float var_angle) {
+        Emitter emitter = new Emitter(renderer, 300, renderer.mFuzzyTextureId, 3, 100, new float[]{180f / 255, 80f / 255, 10f / 255, 1}, new float[]{0, 0, 0, 0});
+        emitter.var_startColor[3] = 0.3f;
+        emitter.size = size;
+        emitter.var_size = 5;
+        emitter.var_angle = var_angle;
+        emitter.speed = 10;
+        emitter.var_speed = 5;
+        emitter.accel_x = 20;
+        emitter.additiveBlend = true;
+        return emitter;
+    }
+
+    public static void createSnow(Scene scene, Entity entity, float width) {
+        entity.add(new Transformation(width/2, 0, 0));
+        GLRenderer renderer = scene.getGame().getRenderer();
+        Emitter e = new Emitter(renderer, 500, renderer.mFuzzyTextureId);
+
+        e.startColor = new float[]{1,1,1,1};
+        e.endColor = new float[] {1,1,1,1};
+        e.size = 10;
+        e.var_size = 8;
+        e.accel_x = 0; e.accel_y = 5; e.var_accel_y = 3;
+        e.var_x = width;
+        e.emissionRate = width/7300*25;
+        e.life = 20;
+
+        entity.add(e);
     }
 }

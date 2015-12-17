@@ -35,7 +35,8 @@ public class System {
     public void onEntityAdded(Entity entity) {}
     public void init() {}
     public void update(float dt) {}
-    public void draw(float interpolation) {}
+    public void draw() {}
+    public void postDraw() {}
 
     public void onPause() {
 

@@ -1,5 +1,7 @@
 package com.toggle.katana2d;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class ParticleSystem extends System {
@@ -125,27 +127,40 @@ public class ParticleSystem extends System {
         }
     }
 
+    private void draw(Entity entity) {
+        Emitter e = entity.get(Emitter.class);
+        Transformation t = entity.get(Transformation.class);
+        if (e.additiveBlend) {
+            e.pointSprites.getRenderer().setAdditiveBlending();
+        }
+        e.pointSprites.getRenderer().disableDepth();
+
+        e.pointSprites.draw(e.pointSpritesData, t.x, t.y, t.angle+e.offsetAngle, e.numParticles);
+
+        if (e.additiveBlend) {
+            e.pointSprites.getRenderer().setAlphaBlending();
+        }
+        e.pointSprites.getRenderer().enableDepth();
+    }
+
+
+    private List<Entity> mPostDrawing = new ArrayList<>();
+
     @Override
-    public void draw(float interpolation) {
+    public void draw() {
+        mPostDrawing.clear();
         for (Entity entity : mEntities) {
             Emitter e = entity.get(Emitter.class);
-            Transformation t = entity.get(Transformation.class);
-            if (e.additiveBlend) {
-                e.pointSprites.getRenderer().setAdditiveBlending();
-            }
-            e.pointSprites.getRenderer().disableDepth();
-
-            float minus = 1-interpolation;
-            float x = t.x * interpolation + t.lastX * minus;
-            float y = t.y * interpolation + t.lastY * minus;
-            float angle = t.angle * interpolation + t.lastAngle * minus + e.offsetAngle;
-
-            e.pointSprites.draw(e.pointSpritesData, x, y, angle, e.numParticles);
-
-            if (e.additiveBlend) {
-                e.pointSprites.getRenderer().setAlphaBlending();
-            }
-            e.pointSprites.getRenderer().enableDepth();
+            if (e.postDrawn)
+                mPostDrawing.add(entity);
+            else
+                draw(entity);
         }
+    }
+
+    @Override
+    public void postDraw() {
+        for (Entity e: mPostDrawing)
+            draw(e);
     }
 }

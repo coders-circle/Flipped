@@ -31,6 +31,9 @@ public class World extends Scene {
 
     private float mWidth, mHeight;
 
+    public float getWidth() { return mWidth; }
+    public float getHeight() { return mHeight; }
+
     public World(Level parentLevel, LevelLoader levelLoader, String worldName, float width, float height) {
         mLevelLoader = levelLoader;
         mWorldName = worldName;
@@ -60,7 +63,7 @@ public class World extends Scene {
         mSystems.add(mFlipSystem);
         mSystems.add(new WindSystem());
         mSystems.add(new RopeSystem(physicsWorld, mGame.getRenderer()));
-        mSystems.add(new ExplosionSystem(physicsWorld, mGame));
+        mSystems.add(new ExplosionSystem(physicsWorld));
         mSystems.add(new SoundSystem());
         mSystems.add(new PickCarrySystem());
         mSystems.add(new BurnSystem());
@@ -102,6 +105,12 @@ public class World extends Scene {
 
         mPlayer.get(PhysicsBody.class).body.setTransform(new Vector2(x, y), 0);
         mGame.getRenderer().centerCamera(x, y, mWidth, mHeight);
+    }
+
+    @Override
+    public void onActiveStateChanged(boolean active) {
+        if (active)
+            mGame.getRenderer().enablePostProcessing = true;
     }
 
     @Override

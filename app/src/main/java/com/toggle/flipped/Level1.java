@@ -41,8 +41,14 @@ public class Level1 extends Level {
 
     @Override
     public void onWorldInitialized(World world) {
-        Texture tex;
 
+        // add snow
+        Entity snow = new Entity();
+        Utilities.createSnow(world, snow, world.getWidth());
+        world.addEntity(snow);
+
+
+        Texture tex;
         if (world == mWorlds.get(0)) {
             Entity bk1 = new Entity();
             tex = mGame.getRenderer().addTexture(R.drawable.level1_back, 640 * 1.2f, 400 * 1.2f);

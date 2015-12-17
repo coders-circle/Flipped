@@ -90,6 +90,8 @@ public class BotCreator {
             entity.add(new Bot());
             entity.add(new Sound());
 
+            entity.get(Sprite.class).postDrawn = true;
+
             Sound s = entity.get(Sound.class);
             //s.addSource(mGame.getActivity(), R.raw.sound_jump_start, Sound.JUMP_START);
 

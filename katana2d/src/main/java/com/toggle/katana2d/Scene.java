@@ -36,11 +36,6 @@ public class Scene {
     }
 
     public void update(float deltaTime) {
-
-        for (Entity entity : mEntities) {
-            if (entity.has(Transformation.class))
-                entity.get(Transformation.class).saveState();
-        }
         // update all systems
         for (System system : mSystems) {
             system.update(deltaTime);
@@ -52,13 +47,26 @@ public class Scene {
     protected void onUpdate(float deltaTime) {
     }
 
-    public void draw(float interpolation) {
+    public void draw() {
         // call draw method of all systems
         for (System system : mSystems) {
-            system.draw(interpolation);
+            system.draw();
         }
 
         onDraw();
+    }
+
+    public void postDraw() {
+        // call post draw method of all systems
+        for (System system : mSystems) {
+            system.postDraw();
+        }
+
+        onPostDraw();
+    }
+
+    public void onPostDraw() {
+
     }
 
     protected void onDraw() {

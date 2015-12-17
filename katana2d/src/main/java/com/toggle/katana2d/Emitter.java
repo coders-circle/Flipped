@@ -62,4 +62,6 @@ public class Emitter implements Component {
     public boolean emitNext = true;         // Set this to false to stop emitting and true to start emitting
 
     public float emissionTime = 0;          // total time since last emission
+
+    public boolean postDrawn = true;
 }

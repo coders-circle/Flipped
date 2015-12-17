@@ -18,9 +18,6 @@ public class SoundSystem extends com.toggle.katana2d.System {
                 if((soundSource.type() & sound.state) != 0){
                     if(!soundSource.isFinished() && !soundSource.isStarted()){
                         soundSource.start();
-                        if((sound.state&Sound.TOMBSTONE_RISE) != 0){
-                            Log.v("sound", "tomb");
-                        }
                     }
 
                     if(soundSource.isFinished()){
@@ -28,11 +25,11 @@ public class SoundSystem extends com.toggle.katana2d.System {
                         soundSource.reset();
                     }
 
-                    if(soundSource.isPlaying()){
+                    /*if(soundSource.isPlaying()){
                         // TODO: update position of the sound source using following code
                         // soundSource.updatePosition(x, y);
                         // where (x, y) is relative coordinate of their screen position
-                    }
+                    }*/
                 }
             }
         }

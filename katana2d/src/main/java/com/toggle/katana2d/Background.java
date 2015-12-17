@@ -5,7 +5,6 @@ public class Background implements Component {
     public final float distance;
     public float x = 0;
     public float y = 0;
-    public float lastX = 0, lastY = 0;
 
     public Background(Texture texture, float zOrder) {
         mTexture = texture;

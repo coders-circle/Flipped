@@ -37,6 +37,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     // Touch input data;
     public TouchInputData touchInputData;
 
+    public boolean enablePostProcessing = false;
     // FBO
     public int mFbo, mRboTexture, mRboDepth;
 
@@ -297,36 +298,41 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         Matrix.translateM(mViewMatrix, 0, -width / 2, -height / 2, 0);
         Matrix.translateM(mViewMatrix, 0, -mCamera.x, -mCamera.y, 0);
 
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFbo);
+        if (enablePostProcessing)
+            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFbo);
+
         GLES20.glClearColor(mBackR, mBackG, mBackB, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         mGame.newFrame();
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
-        // Set the viewport
-        GLES20.glViewport((int) cx, (int) cy, (int) (width * scale), (int) (height * scale));
-        GLES20.glClearColor(0, 0, 0, 1.0f);
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-        GLES20.glEnable(GLES20.GL_SCISSOR_TEST);
+        if (enablePostProcessing) {
+            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
-        // View transformations
-        Matrix.setIdentityM(mViewMatrix, 0);
+            // Set the viewport
+            GLES20.glViewport((int) cx, (int) cy, (int) (width * scale), (int) (height * scale));
+            GLES20.glClearColor(0, 0, 0, 1.0f);
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+            GLES20.glEnable(GLES20.GL_SCISSOR_TEST);
 
-        // draw framebuffer
-        GLES20.glClearColor(0, 0, 0, 1.0f);
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-        GLES20.glUseProgram(mPostProcessProgram);
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mSpriteBO[0]);
-        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, mSpriteBO[1]);
-        GLES20.glVertexAttribPointer(mPostProcessPositionHandle, 2, GLES20.GL_FLOAT, false, 2 * 4, 0);
-        setPostProcessTransform();
-        GLES20.glUniform4fv(mPostProcessColorHandle, 1, new float[]{1, 1, 1, 1}, 0);
-        GLES20.glUniform1f(mPostProcessTimeHandle, mGame.getTimer().getTotalTime());
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mRboTexture);
-        GLES20.glDrawElements(GLES20.GL_TRIANGLES, 6, GLES20.GL_UNSIGNED_SHORT, 0);
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
-        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
+            // draw framebuffer
+            GLES20.glClearColor(0, 0, 0, 1.0f);
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+            GLES20.glUseProgram(mPostProcessProgram);
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mSpriteBO[0]);
+            GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, mSpriteBO[1]);
+            GLES20.glVertexAttribPointer(mPostProcessPositionHandle, 2, GLES20.GL_FLOAT, false, 2 * 4, 0);
+            setPostProcessTransform();
+            GLES20.glUniform4fv(mPostProcessColorHandle, 1, new float[]{1, 1, 1, 1}, 0);
+            GLES20.glUniform1f(mPostProcessTimeHandle, mGame.getTimer().getTotalTime());
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mRboTexture);
+            GLES20.glDrawElements(GLES20.GL_TRIANGLES, 6, GLES20.GL_UNSIGNED_SHORT, 0);
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+            GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
+        }
+
+        // draw everything to draw after post-processing
+        mGame.postDraw();
     }
 
     public final int width = 580, height = 320;
@@ -418,9 +424,8 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.scaleM(mModelMatrix, 0, width, height, 1);
 
-        // mMVPMatrix = mProjectionMatrix * mViewMatrix * mModelMatrix
-        Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
-        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
+        // mMVPMatrix = mProjectionMatrix * mViewMatrix(Identity) * mModelMatrix
+        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mModelMatrix, 0);
 
         // finally set the value of mvpMatrix uniform to the mMVPMatrix
         GLES20.glUniformMatrix4fv(mPostProcessMVPMatrixHandle, 1, false, mMVPMatrix, 0);

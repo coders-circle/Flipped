@@ -89,10 +89,16 @@ public class Game implements TimerCallback {
 
     // draw method for rendering stuffs
     public void newFrame() {
-        float drawInterpolation = mTimer.update(this);
+        mTimer.update(this);
         // draw a frame
         if (mActiveScene != null)
-            mActiveScene.draw(drawInterpolation);
+            mActiveScene.draw();
+    }
+
+    public void postDraw() {
+        // draw a frame
+        if (mActiveScene != null)
+            mActiveScene.postDraw();
     }
 
     // pause and resume events

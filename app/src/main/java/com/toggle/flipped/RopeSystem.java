@@ -2,7 +2,6 @@ package com.toggle.flipped;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -135,7 +134,7 @@ public class RopeSystem extends com.toggle.katana2d.System {
     // TODO: Use temporal antialiasing
 
     @Override
-    public void draw(float interpolation) {
+    public void draw() {
         for (Entity entity: mEntities) {
             Rope rope = entity.get(Rope.class);
             if (rope.segmentSprite == null)

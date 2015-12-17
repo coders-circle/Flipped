@@ -73,7 +73,7 @@ public class MenuScreen extends Scene {
     @Override
     public void onDraw(){
         Camera c = mGame.getRenderer().getCamera();
-        c.x = c.y = 0;
+        c.x = c.y = 0; c.angle = 0;
         systemMenu.draw();
     }
 
@@ -96,5 +96,11 @@ public class MenuScreen extends Scene {
         }
         input.tap.x = -1;
         input.tap.y = -1;
+    }
+
+    @Override
+    public void onActiveStateChanged(boolean active) {
+        if (active)
+            mGame.getRenderer().enablePostProcessing = false;
     }
 }

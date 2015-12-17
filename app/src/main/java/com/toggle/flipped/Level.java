@@ -291,114 +291,107 @@ public class Level implements CustomLoader, World.WorldEventListener {
     @Override
     public boolean addComponent(com.badlogic.gdx.physics.box2d.World world, Entity entity, String compName, JSONObject component, JSONObject components) {
         try {
-            if (compName.equals("Explosive")) {
-                ExplosionSystem.Explosive e = new ExplosionSystem.Explosive();
-                //e.sprite = new Sprite(mGame.getRenderer().addTexture(R.drawable.explosion, 128, 128),-5, 9, 9);
-                e.sprite = new Sprite(mGame.getRenderer().addTexture(R.drawable.ep, 300, 300),-5, 8, 8);
-                e.sprite.spriteSheetData.loop = false;
-                e.lifeSpan = 4*5/12; //81f/12;    // 81 frames running at 12 FPS
-                entity.add(e);
+            switch (compName) {
+                case "Explosive":
+                    ExplosionSystem.Explosive e = new ExplosionSystem.Explosive();
+                    e.lifeSpan = 2.5f;
+                    entity.add(e);
+                    entity.add(Utilities.createFireEmitter(mGame.getRenderer(), 36, 90));
+                    entity.get(Emitter.class).emitNext = false;
 
-                Emitter emitter = new Emitter(mGame.getRenderer(), 300, mGame.getRenderer().mFuzzyTextureId, 3, 100, new float[]{180f / 255, 80f / 255, 10f / 255, 1}, new float[]{0, 0, 0, 0});
-                emitter.var_startColor[3] = 0.3f;
-                emitter.size = 36;
-                emitter.var_size = 5;
-                emitter.var_angle = 90;
-                emitter.speed = 10;
-                emitter.var_speed = 5;
-                emitter.accel_x = 20;
-                emitter.additiveBlend = true;
-                emitter.emitNext = false;
-                entity.add(emitter);
+                    break;
+                case "Mover": {
+                    Mover m = new Mover();
+                    m.type = Mover.Type.LINEAR;
+                    m.finalX = (float) component.getDouble("Final-X");
+                    m.finalY = (float) component.getDouble("Final-Y");
+                    JSONObject transformation = components.getJSONObject("Transformation");
+                    m.initialX = (float) transformation.getDouble("Translate-X");
+                    m.initialY = (float) transformation.getDouble("Translate-Y");
+                    m.initialAngle = (float) transformation.getDouble("Angle");
+                    entity.add(m);
+                    m.player = levelLoader.mCurrentEntities.get("player");
+                    break;
+                }
+                case "Rotor": {
+                    Mover m = new Mover();
+                    m.type = Mover.Type.ANGULAR;
+                    m.finalAngle = (float) component.getDouble("Final-Angle");
+                    JSONObject transformation = components.getJSONObject("Transformation");
+                    m.initialX = (float) transformation.getDouble("Translate-X");
+                    m.initialY = (float) transformation.getDouble("Translate-Y");
+                    m.initialAngle = (float) transformation.getDouble("Angle");
+                    entity.add(m);
+                    m.player = levelLoader.mCurrentEntities.get("player");
+                    break;
+                }
+                case "Lever": {
+                    final Trigger trigger = new Trigger();
+                    final Entity player = levelLoader.mCurrentEntities.get("player");
+                    trigger.tag = component.getString("Tag");
+                    trigger.type = Trigger.Type.LEVER;
+                    entity.add(trigger);
 
-            }
-            else if (compName.equals("Mover")) {
-                Mover m = new Mover();
-                m.type = Mover.Type.LINEAR;
-                m.finalX = (float)component.getDouble("Final-X");
-                m.finalY = (float)component.getDouble("Final-Y");
-                JSONObject transformation = components.getJSONObject("Transformation");
-                m.initialX = (float)transformation.getDouble("Translate-X");
-                m.initialY = (float)transformation.getDouble("Translate-Y");
-                m.initialAngle = (float)transformation.getDouble("Angle");
-                entity.add(m);
-                m.player = levelLoader.mCurrentEntities.get("player");
-            }
-            else if (compName.equals("Rotor")) {
-                Mover m = new Mover();
-                m.type = Mover.Type.ANGULAR;
-                m.finalAngle = (float)component.getDouble("Final-Angle");
-                JSONObject transformation = components.getJSONObject("Transformation");
-                m.initialX = (float)transformation.getDouble("Translate-X");
-                m.initialY = (float)transformation.getDouble("Translate-Y");
-                m.initialAngle = (float)transformation.getDouble("Angle");
-                entity.add(m);
-                m.player = levelLoader.mCurrentEntities.get("player");
-            }
-            else if (compName.equals("Lever")) {
-                final Trigger trigger = new Trigger();
-                final Entity player = levelLoader.mCurrentEntities.get("player");
-                trigger.tag = component.getString("Tag");
-                trigger.type = Trigger.Type.LEVER;
-                entity.add(trigger);
+                    // create base of lever
+                    JSONObject transformation = components.getJSONObject("Transformation");
+                    Entity base = new Entity();
+                    base.add(new Sprite(mGame.textureManager.get("lever_base"), -0.4f));
+                    base.add(new Transformation((float) transformation.getDouble("Translate-X"), (float) transformation.getDouble("Translate-Y"), 0));
+                    // base.add(new PhysicsBody(world, BodyDef.BodyType.StaticBody, base, new PhysicsBody.Properties(0, 0.2f, 0.2f)));
+                    levelLoader.mCurrentScene.addEntity(base);
 
-                // create base of lever
-                JSONObject transformation = components.getJSONObject("Transformation");
-                Entity base = new Entity();
-                base.add(new Sprite(mGame.textureManager.get("lever_base"), -0.4f));
-                base.add(new Transformation((float)transformation.getDouble("Translate-X"), (float)transformation.getDouble("Translate-Y"), 0));
-                // base.add(new PhysicsBody(world, BodyDef.BodyType.StaticBody, base, new PhysicsBody.Properties(0, 0.2f, 0.2f)));
-                levelLoader.mCurrentScene.addEntity(base);
+                    String mentity = trigger.tag.substring(0, trigger.tag.indexOf("_lever"));
+                    trigger.object = levelLoader.mCurrentEntities.get(mentity);
+                    entity.get(Trigger.class).listeners.add(new Trigger.Listener() {
+                        @Override
+                        public void onTriggered(boolean status) {
+                            Entity triggeredEntity = (Entity) trigger.object;
 
-                String mentity = trigger.tag.substring(0, trigger.tag.indexOf("_lever"));
-                trigger.object = levelLoader.mCurrentEntities.get(mentity);
-                entity.get(Trigger.class).listeners.add(new Trigger.Listener() {
-                    @Override
-                    public void onTriggered(boolean status) {
-                        Entity triggeredEntity = (Entity) trigger.object;
+                            if (triggeredEntity.has(Sound.class)) {
+                                Sound s = triggeredEntity.get(Sound.class);
+                                s.addState(Sound.TOMBSTONE_RISE);
+                            }
 
-                        if (triggeredEntity.has(Sound.class)) {
-                            Sound s = triggeredEntity.get(Sound.class);
-                            s.addState(Sound.TOMBSTONE_RISE);
+                            if (triggeredEntity.has(Mover.class)) {
+                                Mover m = triggeredEntity.get(Mover.class);
+                                m.start(triggeredEntity.get(Transformation.class), false);
+
+                            } else if (triggeredEntity.has(PhysicsBody.class)) {
+                                PhysicsBody pb = triggeredEntity.get(PhysicsBody.class);
+                                pb.body.setGravityScale(-pb.body.getGravityScale());
+                                Bot bot = player.get(Bot.class);
+                                bot.cameraPos = triggeredEntity.get(Transformation.class).getPos();
+                                bot.cameraFocusLimit = true;
+                                bot.cameraFocusTime = 2;
+                            }
                         }
+                    });
+                    break;
+                }
+                case "Button": {
+                    final Trigger trigger = new Trigger();
+                    trigger.tag = component.getString("Tag");
+                    trigger.type = Trigger.Type.BUTTON;
+                    entity.add(trigger);
 
-                        if (triggeredEntity.has(Mover.class)) {
-                            Mover m = triggeredEntity.get(Mover.class);
-                            m.start(triggeredEntity.get(Transformation.class), false);
-
-                        } else if (triggeredEntity.has(PhysicsBody.class)) {
-                            PhysicsBody pb = triggeredEntity.get(PhysicsBody.class);
-                            pb.body.setGravityScale(-pb.body.getGravityScale());
-                            Bot bot = player.get(Bot.class);
-                            bot.cameraPos = triggeredEntity.get(Transformation.class).getPos();
-                            bot.cameraFocusLimit = true;
-                            bot.cameraFocusTime = 2;
+                    String mentity = trigger.tag.substring(0, trigger.tag.indexOf("_button"));
+                    trigger.object = levelLoader.mCurrentEntities.get(mentity);
+                    entity.get(Trigger.class).listeners.add(new Trigger.Listener() {
+                        @Override
+                        public void onTriggered(boolean status) {
+                            Entity moverEntity = (Entity) trigger.object;
+                            Mover m = moverEntity.get(Mover.class);
+                            m.start(moverEntity.get(Transformation.class), true);
                         }
-                    }
-                });
-            }
-            else if (compName.equals("Button")) {
-                final Trigger trigger = new Trigger();
-                trigger.tag = component.getString("Tag");
-                trigger.type = Trigger.Type.BUTTON;
-                entity.add(trigger);
-
-                String mentity = trigger.tag.substring(0, trigger.tag.indexOf("_button"));
-                trigger.object = levelLoader.mCurrentEntities.get(mentity);
-                entity.get(Trigger.class).listeners.add(new Trigger.Listener() {
-                    @Override
-                    public void onTriggered(boolean status) {
-                        Entity moverEntity = (Entity) trigger.object;
-                        Mover m = moverEntity.get(Mover.class);
-                        m.start(moverEntity.get(Transformation.class), true);
-                    }
-                });
-            }
-            else if (compName.equals("Sound")) {
-                Sound s = new Sound();
-                s.addSource(mGame.getActivity(), com.toggle.katana2d.Utilities.getResourceId(
-                        mGame.getActivity(), "raw", component.getString("file")), Sound.TOMBSTONE_RISE);
-                entity.add(s);
+                    });
+                    break;
+                }
+                case "Sound":
+                    Sound s = new Sound();
+                    s.addSource(mGame.getActivity(), com.toggle.katana2d.Utilities.getResourceId(
+                            mGame.getActivity(), "raw", component.getString("file")), Sound.TOMBSTONE_RISE);
+                    entity.add(s);
+                    break;
             }
         }
         catch (Exception e){
