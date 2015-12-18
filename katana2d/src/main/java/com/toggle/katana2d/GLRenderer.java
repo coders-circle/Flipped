@@ -133,7 +133,9 @@ public class GLRenderer implements GLSurfaceView.Renderer {
         GLES20.glEnable(GLES20.GL_SCISSOR_TEST);
 
         // Set the background frame color
-        GLES20.glClearColor(100.0f / 255, 149.0f / 255, 237.0f / 255, 1.0f);
+        //GLES20.glClearColor(100.0f / 255, 149.0f / 255, 237.0f / 255, 1.0f);
+        //mBackR = 100f/255; mBackG = 149f/255; mBackB = 237f/255;
+        mBackR = mBackG = mBackB = 0f;
         GLES20.glClearDepthf(1.0f);
 
         prepareSpriteProgram();

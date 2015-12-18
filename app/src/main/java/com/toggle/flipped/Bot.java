@@ -14,6 +14,8 @@ public class Bot implements Component {
     boolean dead = false;
     enum Direction { LEFT, RIGHT }
 
+    boolean disableInput = false;
+
     // Note that the following two states are different
     // since one can be moving and jumping at the same time.
     enum MotionState { IDLE, MOVE }

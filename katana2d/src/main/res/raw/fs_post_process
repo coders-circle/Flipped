@@ -13,7 +13,7 @@ void main() {
 
     // Simple blur
     vec4 sample[9];
-    float kernel = 0.004;
+    float kernel = 0.001;
     sample[0] = texture2D(uTexture, texcoord.st + vec2(kernel, -kernel));
     sample[1] = texture2D(uTexture, texcoord.st + vec2(-kernel, -kernel));
     sample[2] = texture2D(uTexture, texcoord.st + vec2(0.0, -kernel));
@@ -24,9 +24,9 @@ void main() {
     sample[7] = texture2D(uTexture, texcoord.st + vec2(0.0, kernel));
     sample[8] = texture2D(uTexture, texcoord.st + vec2(kernel, 0.0));
 
-    gl_FragColor = (sample[0] + (2.0 * sample[1]) + sample[2] +
-                (2.0 * sample[3]) + sample[4] + 2.0 * sample[5] +
-                 sample[6] + 2.0 * sample[7] + sample[8] ) / 13.0;
+    gl_FragColor = (sample[0] + (sample[1]) + sample[2] +
+                (sample[3]) + sample[4] + sample[5] +
+                 sample[6] + sample[7] + sample[8] ) / 9.0;
 
     //gl_FragColor = texture2D(uTexture, texcoord) * uColor;
 }

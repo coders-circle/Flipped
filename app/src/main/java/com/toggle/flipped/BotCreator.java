@@ -90,7 +90,9 @@ public class BotCreator {
             entity.add(new Bot());
             entity.add(new Sound());
 
-            entity.get(Sprite.class).postDrawn = true;
+            Sprite sprite = entity.get(Sprite.class);
+            //sprite.postDrawn = false;
+            sprite.mixColor = new float[] {0.8f, 0.8f, 0.8f, 1.0f};
 
             Sound s = entity.get(Sound.class);
             //s.addSource(mGame.getActivity(), R.raw.sound_jump_start, Sound.JUMP_START);

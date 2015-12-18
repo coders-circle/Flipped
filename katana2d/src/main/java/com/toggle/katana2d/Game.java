@@ -111,5 +111,9 @@ public class Game implements TimerCallback {
         for (Scene scene: mScenes)
             scene.onResume();
     }
+
+    public Scene getActiveScene() {
+        return mActiveScene;
+    }
 }
 

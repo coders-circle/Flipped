@@ -1,5 +1,5 @@
 {
-  "walk_sprite" : { "file":"runnin", "width": 24, "height": 48 },
+  "walk_sprite" : { "file":"runnin", "width": 26, "height": 48 },
   "walk_sheet": { "rows": 2, "cols" : 5 },
 
   "jump_sheet": { "rows": 2, "cols" : 5, "index": 2 },
@@ -16,7 +16,7 @@
   "carry_sprite" : { "file": "carrying", "width":24, "height":48 },
   "carry_sheet" : { "rows":1, "cols":8},
 
-  "idle_sprite" : {"file":"idle", "width":24, "height":48},
+  "idle_sprite" : {"file":"idle", "width":26, "height":48},
   "idle_sheet" : {"rows":2, "cols":8},
 
   "lever_sprite" : {"file":"lever_push", "width":32, "height":48},

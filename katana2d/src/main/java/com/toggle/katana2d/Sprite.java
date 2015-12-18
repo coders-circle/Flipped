@@ -16,16 +16,16 @@ public class Sprite implements Component{
     public Sprite(Texture texture, float z) {
         this.texture = texture;
         this.distance = (1 - (BackgroundSystem.MAX_Z - z) / BackgroundSystem.MAX_Z);
-        if (z < 0)
-            postDrawn = true;
+        /*if (z < 0)
+            postDrawn = true;*/
     }
 
     public Sprite(Texture texture, float z, SpriteSheetData spriteSheetData) {
         this.texture = texture;
         this.distance = (1 - (BackgroundSystem.MAX_Z - z) / BackgroundSystem.MAX_Z);
         this.spriteSheetData = spriteSheetData;
-        if (z < 0)
-            postDrawn = true;
+        /*if (z < 0)
+            postDrawn = true;*/
     }
 
     public Sprite(Texture texture, float z, int numCols, int numRows) {
@@ -42,8 +42,8 @@ public class Sprite implements Component{
 
         spriteSheetData.imgWidth = 1f/numCols;
         spriteSheetData.imgHeight = 1f/numRows;
-        if (z < 0)
-            postDrawn = true;
+        /*if (z < 0)
+            postDrawn = true;*/
     }
 
     public Sprite(Texture texture, float z, int numCols, int numRows, int numImages, int index, float animationSpeed) {

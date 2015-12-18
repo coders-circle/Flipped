@@ -8,6 +8,7 @@ import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.GLRenderer;
 import com.toggle.katana2d.Game;
 import com.toggle.katana2d.Scene;
+import com.toggle.katana2d.SimpleTexture;
 import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Transformation;
 import com.toggle.katana2d.physics.PhysicsBody;
@@ -194,10 +195,10 @@ public class Utilities {
     public static void createSnow(Scene scene, Entity entity, float width) {
         entity.add(new Transformation(width/2, 0, 0));
         GLRenderer renderer = scene.getGame().getRenderer();
-        Emitter e = new Emitter(renderer, 500, renderer.mFuzzyTextureId);
+        Emitter e = new Emitter(renderer, 500, ((SimpleTexture)scene.getGame().textureManager.get("snow")).textureId);
 
-        e.startColor = new float[]{1,1,1,1};
-        e.endColor = new float[] {1,1,1,1};
+        e.startColor = new float[]{0.7f, 0.7f, 0.9f,1};
+        e.endColor = new float[] {0.7f, 0.7f, 0.9f,1};
         e.size = 10;
         e.var_size = 8;
         e.accel_x = 0; e.accel_y = 5; e.var_accel_y = 3;

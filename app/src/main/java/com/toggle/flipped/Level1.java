@@ -21,12 +21,24 @@ public class Level1 extends Level {
 
     @Override
     public void load() {
-        mGame.getActivity().handler.sendEmptyMessage(1);
-        addWorld("world1", 0, 7300, 640);
-        addWorld("world2", 180, 3500, 640);    // flipped world
+        //mGame.getActivity().handler.sendEmptyMessage(1);
 
-        changeWorld(0, null);
-        mGame.getActivity().handler.sendEmptyMessage(2);
+        SplashScreen sc = mListener.getSplashScreen();
+        sc.data.text = "Loading Level";
+        sc.data.background = null;
+        sc.data.showTime = -1;
+        sc.listener = new SplashScreen.Listener() {
+            @Override
+            public void onShown() {
+                addWorld("world1", 0, 7300, 640);
+                addWorld("world2", 180, 3500, 640);    // flipped world
+
+                changeWorld(0, null);
+            }
+        };
+        mGame.setActiveScene(sc.sceneId);
+
+        //mGame.getActivity().handler.sendEmptyMessage(2);
     }
 
     @Override
@@ -42,14 +54,13 @@ public class Level1 extends Level {
     @Override
     public void onWorldInitialized(World world) {
 
-        // add snow
-        Entity snow = new Entity();
-        Utilities.createSnow(world, snow, world.getWidth());
-        world.addEntity(snow);
-
-
         Texture tex;
         if (world == mWorlds.get(0)) {
+            // add snow
+            Entity snow = new Entity();
+            Utilities.createSnow(world, snow, world.getWidth());
+            world.addEntity(snow);
+
             Entity bk1 = new Entity();
             tex = mGame.getRenderer().addTexture(R.drawable.level1_back, 640 * 1.2f, 400 * 1.2f);
             bk1.add(new Background(tex, 98));
@@ -99,12 +110,12 @@ public class Level1 extends Level {
             world.addEntity(bk4);
             mTextures.add(tex);
 
-            /*Entity bk5 = new Entity();
-            tex = mGame.getRenderer().addTexture(R.drawable.strokes, 940, 640, 8, 1);
+            Entity bk5 = new Entity();
+            tex = mGame.getRenderer().addTexture(R.drawable.level1_snow, 1825, 640, 4, 1);
             bk5.add(new Sprite(tex, -3));
             bk5.add(new Transformation(tex.width/2, tex.height/2, 0));
             world.addEntity(bk5);
-            mTextures.add(tex);*/
+            mTextures.add(tex);
         }
         else if (world == mWorlds.get(1)) {
             Entity bk1 = new Entity();

@@ -56,72 +56,73 @@ public class PlayerInputSystem extends com.toggle.katana2d.System {
         for (Entity e : mEntities) {
             //Player p = e.get(Player.class);
             Bot b = e.get(Bot.class);
-            if (b.cameraPos == null) {
-                boolean hanging = b.actionState == Bot.ActionState.HANG || b.actionState == Bot.ActionState.HANG_UP;
-                boolean idleState = b.actionState == Bot.ActionState.PICK || b.actionState == Bot.ActionState.FADE_IN || b.actionState == Bot.ActionState.FADE_OUT || b.actionState == Bot.ActionState.FADE_COMPLETE;
+            if (!b.disableInput) {
+                if (b.cameraPos == null) {
+                    boolean hanging = b.actionState == Bot.ActionState.HANG || b.actionState == Bot.ActionState.HANG_UP;
+                    boolean idleState = b.actionState == Bot.ActionState.PICK || b.actionState == Bot.ActionState.FADE_IN || b.actionState == Bot.ActionState.FADE_OUT || b.actionState == Bot.ActionState.FADE_COMPLETE;
 
-                int dxLimit = 3;
-                int dyLimit = 3;
-                for (int i = 0; i < touchData.pointers.size(); i++) {
-                    TouchInputData.Pointer touch;
-                    try {
-                        touch = touchData.pointers.valueAt(i);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                        continue;
-                    }
-                    if (motionControlLimit.hitTest(touch.x, touch.y) && !idleState) {
-                        b.touchX = Math.max(b.touchX, Math.abs(touch.vx / 30.0f));
-                        if (touch.dx > dxLimit
-                                && !(hanging && b.direction == Bot.Direction.RIGHT)) {
-                            b.direction = Bot.Direction.RIGHT;
-                            b.motionState = Bot.MotionState.MOVE;
-                        } else if (touch.dx < -dxLimit
-                                && !(hanging && b.direction == Bot.Direction.LEFT)) {
-                            b.direction = Bot.Direction.LEFT;
-                            b.motionState = Bot.MotionState.MOVE;
+                    int dxLimit = 3;
+                    int dyLimit = 3;
+                    for (int i = 0; i < touchData.pointers.size(); i++) {
+                        TouchInputData.Pointer touch;
+                        try {
+                            touch = touchData.pointers.valueAt(i);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                            continue;
                         }
-                    } else if (actionControlLimit.hitTest(touch.x, touch.y)) {
-                        // if vertical sliding direction is up, and sliding magnitude is big enough
-                        // then jump (or move up if we are hanging)
+                        if (motionControlLimit.hitTest(touch.x, touch.y) && !idleState) {
+                            b.touchX = Math.max(b.touchX, Math.abs(touch.vx / 30.0f));
+                            if (touch.dx > dxLimit
+                                    && !(hanging && b.direction == Bot.Direction.RIGHT)) {
+                                b.direction = Bot.Direction.RIGHT;
+                                b.motionState = Bot.MotionState.MOVE;
+                            } else if (touch.dx < -dxLimit
+                                    && !(hanging && b.direction == Bot.Direction.LEFT)) {
+                                b.direction = Bot.Direction.LEFT;
+                                b.motionState = Bot.MotionState.MOVE;
+                            }
+                        } else if (actionControlLimit.hitTest(touch.x, touch.y)) {
+                            // if vertical sliding direction is up, and sliding magnitude is big enough
+                            // then jump (or move up if we are hanging)
 
-                        boolean flipped = false;//mGame.getRenderer().getCamera().angle == 180;
-                        float dy = touch.vy / 10.0f;
-                        boolean slideUp = false;
-                        if (/*!flipped &&*/ dy < -dyLimit) {
-                            slideUp = true;
-                            dy = -dy;
-                        }/* else if (flipped && dy > dyLimit) {
+                            boolean flipped = false;//mGame.getRenderer().getCamera().angle == 180;
+                            float dy = touch.vy / 10.0f;
+                            boolean slideUp = false;
+                            if (/*!flipped &&*/ dy < -dyLimit) {
+                                slideUp = true;
+                                dy = -dy;
+                            }/* else if (flipped && dy > dyLimit) {
                         slideUp = true;
                     }*/
-                        if (slideUp) {
-                            b.touchY = dy;
-                            if (b.actionState == Bot.ActionState.HANG)
-                                b.actionState = Bot.ActionState.HANG_UP;
-                            else if (b.actionState == Bot.ActionState.NOTHING)
-                                b.actionState = Bot.ActionState.JUMP_START;
-                        }
+                            if (slideUp) {
+                                b.touchY = dy;
+                                if (b.actionState == Bot.ActionState.HANG)
+                                    b.actionState = Bot.ActionState.HANG_UP;
+                                else if (b.actionState == Bot.ActionState.NOTHING)
+                                    b.actionState = Bot.ActionState.JUMP_START;
+                            }
 
-                        // if movement is small, we just tapped for action
-                        else if (!b.actionStart && Math.abs(touch.dx) < 4 && Math.abs(touch.dy) < 4
-                                && b.actionState != Bot.ActionState.JUMP && b.actionState != Bot.ActionState.JUMP_START) {
-                            b.actionStart = true;
-                            b.touchX = touch.x;
-                            b.touchY = touch.y;
+                            // if movement is small, we just tapped for action
+                            else if (!b.actionStart && Math.abs(touch.dx) < 4 && Math.abs(touch.dy) < 4
+                                    && b.actionState != Bot.ActionState.JUMP && b.actionState != Bot.ActionState.JUMP_START) {
+                                b.actionStart = true;
+                                b.touchX = touch.x;
+                                b.touchY = touch.y;
+                            }
+
                         }
 
                     }
 
-                }
-
-                if (touchData.pointers.size() == 0 || idleState) {
+                    if (touchData.pointers.size() == 0 || idleState) {
+                        b.motionState = Bot.MotionState.IDLE;
+                        b.touchX = 0;
+                    }
+                } else {
                     b.motionState = Bot.MotionState.IDLE;
-                    b.touchX = 0;
+                    b.touchX = b.touchY = 0;
                 }
-            }
-            else {
-                b.motionState = Bot.MotionState.IDLE;
-                b.touchX = b.touchY = 0;
             }
 
             // We may do this in a different system, but for now

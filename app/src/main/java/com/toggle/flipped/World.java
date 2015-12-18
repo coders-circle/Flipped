@@ -1,5 +1,7 @@
 package com.toggle.flipped;
 
+import android.util.Log;
+
 import com.badlogic.gdx.math.Vector2;
 import com.toggle.katana2d.BackgroundSystem;
 import com.toggle.katana2d.Camera;
@@ -7,6 +9,7 @@ import com.toggle.katana2d.Entity;
 import com.toggle.katana2d.ParticleSystem;
 import com.toggle.katana2d.RenderSystem;
 import com.toggle.katana2d.Scene;
+import com.toggle.katana2d.Sprite;
 import com.toggle.katana2d.Transformation;
 import com.toggle.katana2d.physics.PhysicsBody;
 import com.toggle.katana2d.physics.PhysicsSystem;
@@ -70,6 +73,9 @@ public class World extends Scene {
         mSystems.add(new TriggerSystem());
         mSystems.add(new MoverSystem());
 
+        if (mParentLevel.getClass() == Level1.class && mWorldName.equals("world1"))
+            mSystems.add(new HelpSystem(mGame.getRenderer()));
+
         // Load the entities from the level editor
         mLevelLoader.loadWorld(mWorldName, this, physicsWorld);
 
@@ -92,6 +98,8 @@ public class World extends Scene {
         Camera camera = mGame.getRenderer().getCamera();
         camera.angle = mAngle;
 
+        //mPlayer.get(Sprite.class).mixColor = new float[] {1,0.3f,0.3f,1};
+
         mFlipSystem.incoming = true;
 
         float x, y;
@@ -109,8 +117,13 @@ public class World extends Scene {
 
     @Override
     public void onActiveStateChanged(boolean active) {
-        if (active)
-            mGame.getRenderer().enablePostProcessing = true;
+        if (active) {
+            mGame.getRenderer().enablePostProcessing = false;
+
+            float x = mPlayer.get(Transformation.class).x;
+            float y = mPlayer.get(Transformation.class).y;
+            mGame.getRenderer().centerCamera(x, y, mWidth, mHeight);
+        }
     }
 
     @Override

@@ -24,15 +24,25 @@ public class Level2 extends Level {
 
     @Override
     public void load() {
-        mGame.getActivity().handler.sendEmptyMessage(1);
+        //mGame.getActivity().handler.sendEmptyMessage(1);
 
-        int world1 = addWorld("world1", 0, 7520, 640);
-        int world2 = addWorld("world2", 180, 3568, 640);    // flipped world
+        SplashScreen sc = mListener.getSplashScreen();
+        sc.data.text = "Loading Level";
+        sc.data.background = null;
+        sc.data.showTime = -1;
+        sc.listener = new SplashScreen.Listener() {
+            @Override
+            public void onShown() {
+                int world1 = addWorld("world1", 0, 7520, 640);
+                int world2 = addWorld("world2", 180, 3568, 640);    // flipped world
 
-        changeWorld(world1, null);
+                changeWorld(world1, null);
+            }
+        };
 
-        //loader_dialog.dismiss();
-        mGame.getActivity().handler.sendEmptyMessage(2);
+        mGame.setActiveScene(sc.sceneId);
+
+        //mGame.getActivity().handler.sendEmptyMessage(2);
     }
 
     @Override
@@ -48,9 +58,9 @@ public class Level2 extends Level {
     @Override
     public void onWorldInitialized(World world) {
         // add snow
-        Entity snow = new Entity();
+        /*Entity snow = new Entity();
         Utilities.createSnow(world, snow, world.getWidth());
-        world.addEntity(snow);
+        world.addEntity(snow);*/
 
         Texture tex;
         // add backgrounds and path

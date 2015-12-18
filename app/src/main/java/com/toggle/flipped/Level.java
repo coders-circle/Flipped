@@ -33,8 +33,9 @@ public class Level implements CustomLoader, World.WorldEventListener {
     public interface Listener {
         void onLevelComplete(Level level);
         void onLevelPaused(Level level);
+        SplashScreen getSplashScreen();
     }
-    private Listener mListener;
+    protected Listener mListener;
 
     public Level(Game game, int levelFileId, Listener listener) {
         mGame = game;
@@ -103,9 +104,10 @@ public class Level implements CustomLoader, World.WorldEventListener {
         if (mActiveWorld != null)
             mActiveWorld.unload();
 
+        mGame.setActiveScene(-1);
+        if (nextWorldId >= 0 && nextWorldId < mWorlds.size())
+            mWorlds.get(nextWorldId).load(entryMirror);
         setActiveWorld(nextWorldId);
-        if (mActiveWorld != null)
-            mActiveWorld.load(entryMirror);
     }
 
     public void changeWorld(String nextWorld, Entity entryMirror) {
@@ -225,19 +227,9 @@ public class Level implements CustomLoader, World.WorldEventListener {
                 mrr.nextWorld = mirrorJson.getString("Next world");
                 mrr.exitMirror = mirrorJson.getString("Exit mirror");
 
-                entity.add(new Sprite(mGame.textureManager.get("mirror"), -1));
+                entity.add(new Sprite(mGame.textureManager.get("mirror"), -4));
                 if (mrr.nextWorld.equals("")) {
                     entity.get(Sprite.class).visible = false;
-                } else {
-                    /*Emitter emitter = new Emitter(mGame.getRenderer(), 20, mGame.getRenderer().mFuzzyTextureId,
-                            12, 1.2f, new float[]{1,1,1,0.7f}, new float[]{1,1,1,0});
-                    emitter.size = 5; emitter.var_size = 4;
-                    emitter.var_y = entity.get(Sprite.class).texture.width-32;
-                    emitter.var_angle = 90f;
-                    emitter.offsetAngle = -90f;
-                    emitter.additiveBlend = false;
-                    emitter.speed = 2;
-                    entity.add(emitter);*/
                 }
 
                 transformation = components.getJSONObject("Transformation");
@@ -246,6 +238,14 @@ public class Level implements CustomLoader, World.WorldEventListener {
                 entity.add(new PhysicsBody(world, BodyDef.BodyType.StaticBody, entity, new PhysicsBody.Properties(true)));
 
                 mirrors.put(entityName, entity);
+                return true;
+            }
+            else if (entityName.startsWith("owl")) {
+                entity.add(new Sprite(mGame.textureManager.get("owl"), 2, 8, 5, 39));
+                transformation = components.getJSONObject("Transformation");
+                entity.add(new Transformation((float) transformation.getDouble("Translate-X"),
+                        (float) transformation.getDouble("Translate-Y"), (float) transformation.getDouble("Angle")));
+
                 return true;
             }
             else if (components.has("Rope") && components.has("Path")) {
