@@ -104,10 +104,10 @@ public class Level implements CustomLoader, World.WorldEventListener {
         if (mActiveWorld != null)
             mActiveWorld.unload();
 
-        mGame.setActiveScene(-1);
-        if (nextWorldId >= 0 && nextWorldId < mWorlds.size())
-            mWorlds.get(nextWorldId).load(entryMirror);
         setActiveWorld(nextWorldId);
+
+        if (mActiveWorld != null)
+            mActiveWorld.load(entryMirror);
     }
 
     public void changeWorld(String nextWorld, Entity entryMirror) {

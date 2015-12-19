@@ -15,13 +15,14 @@ public class HelpSystem extends com.toggle.katana2d.System {
     private float time = 0;
     private boolean done = false;
 
-    private Sprite left, right, up;
+    private Sprite left, right, up, dotted;
 
     @Override
     public void init() {
         left = new Sprite(mRenderer.addTexture(R.drawable.left, 100, 45), -10, 8, 1);
         right = new Sprite(mRenderer.addTexture(R.drawable.right, 100, 45), -10, 8, 1);
         up = new Sprite(mRenderer.addTexture(R.drawable.up, 45, 100), -10, 8, 1);
+        dotted = new Sprite(mRenderer.addTexture(R.drawable.dotted_line, new float[]{1,1,1,0.2f}, 8, 320), -10);
     }
 
     @Override
@@ -93,15 +94,19 @@ public class HelpSystem extends com.toggle.katana2d.System {
         if (done)
             return;
 
+        float cx = mRenderer.getCamera().x, cy = mRenderer.getCamera().y;
+        float w = mRenderer.width, h = mRenderer.height;
+
+        dotted.draw(mRenderer, cx+w/2, cy+h/2, 0);
         switch (current) {
             case Left:
-                left.draw(mRenderer, mRenderer.getCamera().x + mRenderer.width/4,  mRenderer.getCamera().y + mRenderer.height/2, 0);
+                left.draw(mRenderer, cx + w/4f,  cy + h*3f/4f, 0);
                 break;
             case Right:
-                right.draw(mRenderer, mRenderer.getCamera().x + mRenderer.width/4,  mRenderer.getCamera().y + mRenderer.height/2, 0);
+                right.draw(mRenderer, cx + w/4f,  cy + h*3f/4f, 0);
                 break;
             case Up:
-                up.draw(mRenderer, mRenderer.getCamera().x + mRenderer.width*3/4,  mRenderer.getCamera().y + mRenderer.height/2, 0);
+                up.draw(mRenderer, cx + w*3.3f/4f,  cy + h*3f/4f, 0);
                 break;
         }
     }

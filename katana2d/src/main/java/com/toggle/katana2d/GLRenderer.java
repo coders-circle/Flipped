@@ -291,7 +291,10 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 unused) {
 
         GLES20.glDisable(GLES20.GL_SCISSOR_TEST);
-        GLES20.glViewport(0, 0, devWidth, devHeight);
+        if (enablePostProcessing)
+            GLES20.glViewport(0, 0, devWidth, devHeight);
+        else
+            GLES20.glViewport((int) cx, (int) cy, (int) (width * scale), (int) (height * scale));
 
         // View transformations
         Matrix.setIdentityM(mViewMatrix, 0);
@@ -357,12 +360,12 @@ public class GLRenderer implements GLSurfaceView.Renderer {
 
         // Fit one dimension and maintain the ratio with other dimension
         float aspect_ratio = (float) width / (float) height;
-        // if aspect-ratio of device is greater than what is desired, fit the height
+        // if aspect-ratio of device is greater than what is desired, fit the width
         if (ar > aspect_ratio) {
             scale = (float)dev_height/(float)height;
             cx = (dev_width - width*scale)/2.0f;
         }
-        // otherwise fit the width
+        // otherwise fit the height
         else {
             scale = (float)dev_width/(float)width;
             cy = (dev_height - height*scale)/2.0f;

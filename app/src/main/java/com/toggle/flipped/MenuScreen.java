@@ -42,7 +42,7 @@ public class MenuScreen extends Scene {
         systemMenu.setup(font);
 
         Entity boy = new Entity();
-        boy.add(new Sprite(mGame.getRenderer().addTexture(R.drawable.runnin, 30, 60), 0, 5, 2));
+        boy.add(new Sprite(mGame.getRenderer().addTexture(R.drawable.walk, 24*60f/48f, 60), 0, 5, 2));
         boy.add(new Transformation(100, mGame.getRenderer().height - 100, -15));
         addEntity(boy);
 

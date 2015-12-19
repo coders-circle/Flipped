@@ -63,7 +63,6 @@ public class World extends Scene {
         // Flipped's systems, controlling inputs, player, mirror, wind, rope, explosives etc.
         mSystems.add(new BotControlSystem());
         mSystems.add(new PlayerInputSystem(mGame, mWidth, mHeight));
-        mSystems.add(mFlipSystem);
         mSystems.add(new WindSystem());
         mSystems.add(new RopeSystem(physicsWorld, mGame.getRenderer()));
         mSystems.add(new ExplosionSystem(physicsWorld));
@@ -72,6 +71,7 @@ public class World extends Scene {
         mSystems.add(new BurnSystem());
         mSystems.add(new TriggerSystem());
         mSystems.add(new MoverSystem());
+        mSystems.add(mFlipSystem);
 
         if (mParentLevel.getClass() == Level1.class && mWorldName.equals("world1"))
             mSystems.add(new HelpSystem(mGame.getRenderer()));

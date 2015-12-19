@@ -1,13 +1,14 @@
 {
-  "walk_sprite" : { "file":"runnin", "width": 26, "height": 48 },
+  "walk_sprite" : { "file":"walk", "width": 24, "height": 48 },
   "walk_sheet": { "rows": 2, "cols" : 5 },
 
-  "jump_sheet": { "rows": 2, "cols" : 5, "index": 2 },
+  "jump_sprite": { "file":"jump", "width": 26, "height": 48 },
+  "jump_sheet": { "rows": 1, "cols" : 8, "index": 2 },
 
   "push_sprite" : { "file":"pushing", "width": 28, "height": 48 },
   "push_sheet": { "rows": 1, "cols" : 8 },
 
-  "climb_sprite" : { "file":"climbing", "width":60, "height": 48, "origin-x":0.312},
+  "climb_sprite" : { "file":"climbing", "width":64, "height": 52, "origin-x":0.312},
   "climb_sheet" : { "rows":2, "cols":8 },
 
   "pick_sprite" : { "file": "picking", "width":48, "height":48, "origin-x":0.25 },
