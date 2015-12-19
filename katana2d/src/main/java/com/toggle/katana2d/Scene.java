@@ -48,6 +48,7 @@ public class Scene {
     }
 
     public void draw() {
+
         // call draw method of all systems
         for (System system : mSystems) {
             system.draw();

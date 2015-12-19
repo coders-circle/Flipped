@@ -16,6 +16,7 @@ public class MainActivity extends GameActivity implements Level.Listener, MenuSc
     Level level1, level2, mActiveLevel;
     MenuScreen menu;
     SplashScreen splashScreen;
+    StoryScene storyScene;
 
     @Override
     public void onGameStart() {
@@ -26,6 +27,15 @@ public class MainActivity extends GameActivity implements Level.Listener, MenuSc
 
         splashScreen = new SplashScreen();
         game.addScene(splashScreen);
+
+        storyScene = new StoryScene(new StoryScene.Listener() {
+            @Override
+            public void onExit() {
+                level1.load();
+                mActiveLevel = level1;
+            }
+        });
+        game.addScene(storyScene);
 
         menu = new MenuScreen(this);
         game.addScene(menu);
@@ -101,8 +111,7 @@ public class MainActivity extends GameActivity implements Level.Listener, MenuSc
             mPausedLevel.resumeLevel();
             mActiveLevel = mPausedLevel;
         } else {
-            level1.load();
-            mActiveLevel = level1;
+            mEngine.getGame().setActiveScene(storyScene.sceneId);
         }
     }
 
@@ -120,7 +129,8 @@ public class MainActivity extends GameActivity implements Level.Listener, MenuSc
                     mActiveLevel.pauseLevel();
                     return true;
                 }
-                else if (mEngine.getGame().getActiveScene() == splashScreen)
+                else if (mEngine.getGame().getActiveScene() == splashScreen
+                        || mEngine.getGame().getActiveScene() == storyScene)
                     return true;
         }
         return super.onKeyDown(keycode, e);

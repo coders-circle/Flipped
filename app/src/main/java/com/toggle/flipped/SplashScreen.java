@@ -13,6 +13,7 @@ import com.toggle.katana2d.RenderSystem;
 import com.toggle.katana2d.Scene;
 import com.toggle.katana2d.SimpleTexture;
 import com.toggle.katana2d.Texture;
+import com.toggle.katana2d.Timer;
 
 public class SplashScreen extends Scene {
     public Listener listener;
@@ -40,7 +41,11 @@ public class SplashScreen extends Scene {
     private float mShownTime = 0;
 
     @Override
-    public void onUpdate(float dt) {
+    public void onUpdate(float deltaTime) {
+        float currentTime = System.nanoTime();
+        float dt = (currentTime - mLastTime)/ Timer.ONE_SECOND;
+        mLastTime = currentTime;
+
         mShownTime += dt;
         if (data.showTime > 0 && mShownTime >= data.showTime) {
             listener.onShown();
@@ -72,12 +77,16 @@ public class SplashScreen extends Scene {
         shown ++;
     }
 
+    private float mLastTime = 0;
     @Override
     public void onActiveStateChanged(boolean active) {
         if (active) {
             mGame.getRenderer().enablePostProcessing = false;
             shown = 0;
             mShownTime = 0;
+            mLastTime = System.nanoTime();
+            Camera c = mGame.getRenderer().getCamera();
+            c.x = c.y = 0; c.angle = 0;
         }
     }
 }

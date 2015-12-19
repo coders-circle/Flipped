@@ -205,6 +205,7 @@ public class Utilities {
         e.var_x = width;
         e.emissionRate = width/7300*25;
         e.life = 20;
+        e.dimWithSize = true;
 
         entity.add(e);
     }

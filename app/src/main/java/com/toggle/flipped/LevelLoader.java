@@ -138,6 +138,7 @@ public class LevelLoader {
                 sc.scaleX = scaleX;
                 sc.scaleY = scaleY;
                 sc.visible = component.optString("Visible", "true").equals("true");
+                sc.scroll = component.optString("Scroll", "false").equals("true");
                 entity.add(sc);
             }
                 break;

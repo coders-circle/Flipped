@@ -35,6 +35,9 @@ public class ParticleSystem extends System {
             p.accel_x = getRandomVar(e.var_accel_x) + e.accel_x;
             p.accel_y = getRandomVar(e.var_accel_y) + e.accel_y;
 
+            p.life = 0;
+            p.size = e.size + getRandomVar(e.var_size);
+
             p.startColor[0] = getRandomVar(e.var_startColor[0]) + e.startColor[0];
             p.startColor[1] = getRandomVar(e.var_startColor[1]) + e.startColor[1];
             p.startColor[2] = getRandomVar(e.var_startColor[2]) + e.startColor[2];
@@ -45,8 +48,10 @@ public class ParticleSystem extends System {
             p.rangeColor[2] = getRandomVar(e.var_endColor[2]) + e.endColor[2] - p.startColor[2];
             p.rangeColor[3] = getRandomVar(e.var_endColor[3]) + e.endColor[3] - p.startColor[3];
 
-            p.life = 0;
-            p.size = e.size + getRandomVar(e.var_size);
+            if (e.dimWithSize) {
+                float alpha = p.size / (e.size + e.var_size);
+                p.startColor[3] = p.rangeColor[3] = alpha;
+            }
 
 
             // Fill the point sprites data

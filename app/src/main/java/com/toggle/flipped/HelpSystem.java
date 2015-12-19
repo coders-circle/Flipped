@@ -13,7 +13,7 @@ public class HelpSystem extends com.toggle.katana2d.System {
     enum Arrow { None, Left, Right, Up };
     private Arrow current = Arrow.None;
     private float time = 0;
-    private boolean done = false;
+    private static boolean done = false;
 
     private Sprite left, right, up, dotted;
 
@@ -27,6 +27,8 @@ public class HelpSystem extends com.toggle.katana2d.System {
 
     @Override
     public void onEntityAdded(Entity e) {
+        if (done)
+            return;
         Bot b = e.get(Bot.class);
         b.disableInput = true;
     }

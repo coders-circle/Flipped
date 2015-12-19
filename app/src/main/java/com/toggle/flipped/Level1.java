@@ -85,6 +85,13 @@ public class Level1 extends Level {
             world.addEntity(bk3);
             mTextures.add(tex);
 
+
+            Entity bk3aa = new Entity();
+            tex = mGame.getRenderer().addTexture(R.drawable.billboard, 320, 240);
+            bk3aa.add(new Background(tex, 50, 2800, 190));
+            world.addEntity(bk3aa);
+            mTextures.add(tex);
+
             /*Entity fg2 = new Entity();
             tex = mGame.getRenderer().addTexture(R.drawable.tree_fog, 1955, 640, 2, 1);
             fg2.add(new Background(tex, 54));

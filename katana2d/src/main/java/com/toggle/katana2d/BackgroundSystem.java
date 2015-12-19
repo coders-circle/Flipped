@@ -34,8 +34,8 @@ public class BackgroundSystem extends System {
         for (Entity entity: mEntities) {
             Background b = entity.get(Background.class);
 
-            b.x = mRenderer.getCamera().x * b.distance;
-            b.y = mRenderer.getCamera().y * b.distance;
+            b.x = b.offsetX + mRenderer.getCamera().x * b.distance;
+            b.y = b.offsetY + mRenderer.getCamera().y * b.distance;
         }
     }
 

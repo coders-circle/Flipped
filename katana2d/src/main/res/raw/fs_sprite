@@ -8,4 +8,6 @@ varying vec2 vTexCoord;     // texture coordinates for the fragment
 
 void main() {
     gl_FragColor = texture2D(uTexture, vTexCoord*uClip.zw + uClip.xy) * uColor;
+    if (gl_FragColor.a < 0.00001)
+        discard;
 }

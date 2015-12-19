@@ -80,25 +80,27 @@ public class Game implements TimerCallback {
         }
     }
 
+    private Scene mCurrentScene;
     // update method for updating game logic and animations, which are time dependent
     @Override
     public void update(float deltaTime) {
-        if (mActiveScene != null)
-            mActiveScene.update(deltaTime);
+        mCurrentScene = mActiveScene;
+        if (mCurrentScene != null)
+            mCurrentScene.update(deltaTime);
     }
 
     // draw method for rendering stuffs
     public void newFrame() {
         mTimer.update(this);
         // draw a frame
-        if (mActiveScene != null)
-            mActiveScene.draw();
+        if (mCurrentScene != null)
+            mCurrentScene.draw();
     }
 
     public void postDraw() {
         // draw a frame
-        if (mActiveScene != null)
-            mActiveScene.postDraw();
+        if (mCurrentScene != null)
+            mCurrentScene.postDraw();
     }
 
     // pause and resume events

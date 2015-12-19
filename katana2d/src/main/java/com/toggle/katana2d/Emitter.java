@@ -64,4 +64,6 @@ public class Emitter implements Component {
     public float emissionTime = 0;          // total time since last emission
 
     public boolean postDrawn = true;
+
+    public boolean dimWithSize = false;
 }

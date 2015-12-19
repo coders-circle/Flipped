@@ -504,7 +504,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     }
 
     // create texture from a resource image
-    public Texture addTexture(int resourceId, float width, float height) {
+    public SimpleTexture addTexture(int resourceId, float width, float height) {
         SimpleTexture t = new SimpleTexture(loadTexture(resourceId), width, height);
         t.resourceId = resourceId;
         mTextures.add(t);
@@ -512,7 +512,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     }
 
     // create multi-texture from a resource image
-    public Texture addTexture(int resourceId, float width, float height, int numCols, int numRows) {
+    public MultiTexture addTexture(int resourceId, float width, float height, int numCols, int numRows) {
         MultiTexture t = new MultiTexture(loadTexture(resourceId, (int)width, (int)height, numCols, numRows), width, height, numCols, numRows);
         t.resourceId = resourceId;
         mTextures.add(t);
@@ -520,7 +520,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     }
 
     // create texture from bitmap
-    public Texture addTexture(Bitmap bitmap, float width, float height) {
+    public SimpleBitmapTexture addTexture(Bitmap bitmap, float width, float height) {
         SimpleBitmapTexture t = new SimpleBitmapTexture(loadTexture(bitmap), width, height);
         t.bitmap = bitmap;
         mTextures.add(t);
@@ -528,7 +528,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     }
 
     // create texture from color
-    public Texture addTexture(float[] color, float width, float height) {
+    public SimpleTexture addTexture(float[] color, float width, float height) {
         SimpleTexture t = new SimpleTexture(mWhiteTextureId, color, width, height);
         t.resourceId = -1;
         mTextures.add(t);
@@ -536,7 +536,7 @@ public class GLRenderer implements GLSurfaceView.Renderer {
     }
 
     // create texture from color and resource image
-    public Texture addTexture(int resourceId, float[] color, float width, float height) {
+    public SimpleTexture addTexture(int resourceId, float[] color, float width, float height) {
         SimpleTexture t = new SimpleTexture(loadTexture(resourceId), color, width, height);
         t.resourceId = resourceId;
         mTextures.add(t);

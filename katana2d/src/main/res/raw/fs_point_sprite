@@ -5,4 +5,7 @@ varying vec4 fColor;     // texture coordinates for the fragment
 
 void main() {
     gl_FragColor = texture2D(uTexture, gl_PointCoord) * fColor;
+
+    if (gl_FragColor.a < 0.00001)
+        discard;
 }

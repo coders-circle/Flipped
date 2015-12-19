@@ -11,8 +11,11 @@ public class Mover implements Component {
     public Entity player;
     public boolean moving = false;
     public boolean reverse = true;
+    public boolean cameraFocus = true;
+    public boolean canReverse = false;
 
     public void start(Transformation current, boolean reverse) {
+        canReverse = reverse;
         this.reverse = reverse && !this.reverse;
 
         float fx = finalX, fy = finalY, fangle = finalAngle;
