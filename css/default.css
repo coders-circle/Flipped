@@ -1,20 +1,101 @@
 body{
     padding:0;
     margin:0;
+    transition: 0.2s;
+}
+
+.container{
+    text-align: center;
+}
+
+h2{
+    margin-bottom: 20px;
 }
 
 .block{
     margin:0;
-    padding:40px;
+    padding:30px;
 }
-#block-top{
+#top-block{
     font-family: "Indie Flower";
-    background-color: #2c3e50;
+    background-color: #323232;
+    background-image: url('../imgs/title-background.png');
+    background-size: cover;
+    background-blend-mode: overlay;
     color: #fff;
-    min-height: 400px;
+    min-height: 300px;
+}
+#top-block .row{
+    text-align: center;
+
+}
+#top-block h1{
+    font-size: 6em;
+}
+#top-block p{
+    font-size: 2em;
+}
+#top-block img{
+    width: 200px;
+}
+#top-block a:hover{
+    color:#fff;
+}
+#top-block a{
+    color:#ddd;
+    font-size: 3em;
+}
+#top-block .container-button{
+    margin-top: 40px;
+    margin-bottom: 82px;
+}
+#top-block .container-button a{
+    min-width: 400px;
+    margin: 0 auto;
+    background-color: #484848;
+    color: #eee;
+    font-family: "Open Sans Condensed", "Ubuntu Condensed";
+    font-size: 1.3333em;
+    text-transform: uppercase;
+    border: none;
+    outline: none;
+    padding: 26px 36px;
+    transition: 0.2s;
+    text-decoration: none;
+}
+#top-block .container-button a i{
+    margin-right: 10px;
 }
 
-#embeded-intro-video{
-    margin-top: -240px;
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
+#top-block .container-button a:hover{
+    background-color: #ddd;
+    color: #484848;
+}
+
+#content-block{
+    font-family: "Indie Flower";
+    font-size: 1.23em;
+    background-color: #fff;
+}
+.carousel-inner > .item > img,
+.carousel-inner > .item > a > img {
+    width: 90%;
+    margin: auto;
+}
+
+#content-block .container{
+    position: relative;
+}
+#scr img{
+
+}
+
+#footer-block{
+    background-color: #323232;
+    color: #fff;
+    font-size: 1.23em;
+    font-family: "Indie Flower";
+}
+#footer-block p{
+    margin: 0px;
 }
