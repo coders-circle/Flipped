@@ -24,6 +24,7 @@ h2{
     background-blend-mode: overlay;
     color: #fff;
     min-height: 300px;
+    height: 100%;
 }
 #top-block .row{
     text-align: center;
